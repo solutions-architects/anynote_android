@@ -21,4 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "Lockscreen_notes"
 include(":app")
- 
+include(":data")
+include(":domain")
