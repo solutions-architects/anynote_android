@@ -19,7 +19,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Lockscreen_notes"
+rootProject.name = "lockscreen_notes"
 include(":app")
-include(":data")
 include(":domain")
+include(":data")

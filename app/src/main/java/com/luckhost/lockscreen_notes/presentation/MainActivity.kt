@@ -1,4 +1,4 @@
-package com.luckhost.lockscreen_notes
+package com.luckhost.lockscreen_notes.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
