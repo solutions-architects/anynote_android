@@ -1,33 +1,33 @@
 package com.luckhost.data.repository
 
-import com.luckhost.data.storage.Note
-import com.luckhost.data.storage.NotesStorage
+import com.luckhost.data.storage.models.Note
+import com.luckhost.data.storage.materials.NotesStorage
 import com.luckhost.domain.models.NoteModel
 import com.luckhost.domain.repository.NotesRepositoryInterface
-import java.util.Date
 
 open class NotesRepositoryImpl(
     private val notesStorage: NotesStorage,
 ): NotesRepositoryInterface {
-    override fun saveNote(saveParam: NoteModel) {
+    override fun saveNote(saveObject: NoteModel) {
         val note = Note(
-            header = saveParam.header,
-            content= saveParam.content,
-            deadLine = saveParam.deadLine,
-            coordinateX = saveParam.coordinateX,
-            coordinateY = saveParam.coordinateY
+            header = saveObject.header,
+            content= saveObject.content,
+            deadLine = saveObject.deadLine,
+            coordinateX = saveObject.coordinateX,
+            coordinateY = saveObject.coordinateY,
+            noteHash = saveObject.hashCode()
         )
-
-
+        notesStorage.saveNote(note)
     }
 
-    override fun getNote(): NoteModel {
+    override fun getNote(noteHash: Int): NoteModel {
+        val result = notesStorage.getNote(noteHash)
         return NoteModel(
-            header = "",
-            content= "saveParam.content",
-            deadLine = Date(),
-            coordinateX = 0,
-            coordinateY = 0
+            header = result.header,
+            content= result.content,
+            deadLine = result.deadLine,
+            coordinateX = result.coordinateX,
+            coordinateY = result.coordinateY,
         )
     }
 }

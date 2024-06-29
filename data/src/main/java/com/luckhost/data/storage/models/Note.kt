@@ -1,4 +1,4 @@
-package com.luckhost.data.storage
+package com.luckhost.data.storage.models
 
 import java.util.Date
 
@@ -8,5 +8,7 @@ class Note(
     val deadLine: Date,
     val coordinateX: Int,
     val coordinateY: Int,
+    val noteHash: Int,
 ) {
+
 }
