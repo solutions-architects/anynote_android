@@ -20,14 +20,24 @@ open class NotesRepositoryImpl(
         notesStorage.saveNote(note)
     }
 
-    override fun getNote(noteHash: Int): NoteModel {
-        val result = notesStorage.getNote(noteHash)
-        return NoteModel(
-            header = result.header,
-            content= result.content,
-            deadLine = result.deadLine,
-            coordinateX = result.coordinateX,
-            coordinateY = result.coordinateY,
-        )
+    override fun getNotes(noteHashes: List<Int>): List<NoteModel> {
+        val getData = notesStorage.getNotes(noteHashes)
+        val result: MutableList<NoteModel> = mutableListOf()
+        getData.forEach{
+            result.add(
+                NoteModel(
+                    header = it.header,
+                    content= it.content,
+                    deadLine = it.deadLine,
+                    coordinateX = it.coordinateX,
+                    coordinateY = it.coordinateY,
+                )
+            )
+        }
+        return result
+    }
+
+    override fun deleteNote(noteHash: Int) {
+        notesStorage.deleteNote(noteHash)
     }
 }

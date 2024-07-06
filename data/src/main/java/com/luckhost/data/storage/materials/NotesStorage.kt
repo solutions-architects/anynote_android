@@ -5,5 +5,7 @@ import com.luckhost.data.storage.models.Note
 interface NotesStorage {
     fun saveNote(saveObject: Note)
 
-    fun getNote(noteHash: Int): Note
+    fun getNotes(noteHashes: List<Int>): List<Note>
+
+    fun deleteNote(noteHash: Int)
 }

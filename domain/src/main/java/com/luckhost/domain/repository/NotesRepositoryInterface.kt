@@ -5,5 +5,7 @@ import com.luckhost.domain.models.NoteModel
 interface NotesRepositoryInterface {
     fun saveNote(saveObject: NoteModel)
 
-    fun getNote(noteHash: Int): NoteModel
+    fun getNotes(noteHashes: List<Int>): List<NoteModel>
+
+    fun deleteNote(noteHash: Int)
 }

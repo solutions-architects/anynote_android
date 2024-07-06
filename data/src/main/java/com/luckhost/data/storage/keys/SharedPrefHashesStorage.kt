@@ -27,4 +27,9 @@ class SharedPrefHashesStorage(context: Context): HashStorage {
         val type = object : TypeToken<List<Int>>() {}.type
         return gson.fromJson(jsonString, type)
     }
+
+    override fun deleteHash(hashToDelete: Int) {
+        val oldList = getHashes()
+        saveHashes(oldList.minus(hashToDelete))
+    }
 }

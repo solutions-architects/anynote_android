@@ -1,9 +1,7 @@
 package com.luckhost.domain.repository
 
-import com.luckhost.domain.models.NoteModel
-
-interface NotesHashesRepoInterface {
+interface NoteHashesRepoInterface {
     fun saveHashes(noteHashes: List<Int>)
-
     fun getHashes(): List<Int>
+    fun deleteHash(hashToDelete: Int)
 }

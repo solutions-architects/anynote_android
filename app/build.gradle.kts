@@ -52,11 +52,11 @@ android {
 dependencies {
     // Other modules
     implementation(project(":domain"))
+    implementation(project(":data"))
 
     // Koin dependencies
     implementation("io.insert-koin:koin-android:3.1.4")
     implementation("io.insert-koin:koin-android-compat:3.1.4")
-    implementation("io.insert-koin:koin-android-ext:3.1.4")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

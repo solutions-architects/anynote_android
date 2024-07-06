@@ -17,10 +17,18 @@ class SharedPrefNotesStorage(context: Context): NotesStorage {
         sharedPreferences.edit().putString(saveObject.noteHash.toString(), noteJson).apply()
     }
 
-    override fun getNote(noteHash: Int): Note {
+    override fun getNotes(noteHashes: List<Int>): List<Note> {
         val gson = Gson()
-        val noteJson = sharedPreferences.getString(noteHash.toString(),
-            null)
-        return gson.fromJson(noteJson, Note::class.java)
+        val result: MutableList<Note> = mutableListOf()
+        noteHashes.forEach{
+            val noteJson = sharedPreferences.getString(it.toString(),
+                null)
+            result.add(gson.fromJson(noteJson, Note::class.java))
+        }
+        return result
+    }
+
+    override fun deleteNote(noteHash: Int) {
+        sharedPreferences.edit().remove(noteHash.toString()).apply()
     }
 }

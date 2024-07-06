@@ -9,5 +9,5 @@ class NoteModel(
     val coordinateX: Int,
     val coordinateY: Int,
 ) {
-
+    val hashCode: Int = hashCode()
 }
