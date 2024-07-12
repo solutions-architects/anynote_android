@@ -32,7 +32,7 @@ class MainViewModel(
         deadLine: Date,
         coordinateX: Int,
         coordinateY: Int,
-    ) {
+    ): NoteModel {
         val modelToSave = NoteModel(
             header = header,
             content= content,
@@ -44,6 +44,8 @@ class MainViewModel(
 
         hashesList.add(modelToSave.hashCode())
         saveHashesUseCase.execute(hashesList.toList())
+
+        return modelToSave
     }
 
     fun getNotes(): List<NoteModel> {
