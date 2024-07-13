@@ -8,6 +8,6 @@ class NoteModel(
     val deadLine: Date,
     val coordinateX: Int,
     val coordinateY: Int,
+    val hashCode: Int?,
 ) {
-    val hashCode: Int = hashCode()
 }

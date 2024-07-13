@@ -5,7 +5,7 @@ import com.luckhost.domain.repository.NoteHashesRepoInterface
 class DeleteHashUseCase(
     private val hashesRepository: NoteHashesRepoInterface,
 ) {
-    fun execute() {
-
+    fun execute(hashCode: Int) {
+        hashesRepository.deleteHash(hashCode)
     }
 }

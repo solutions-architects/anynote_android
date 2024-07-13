@@ -2,6 +2,7 @@ package com.luckhost.data.storage.materials
 
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
+import android.util.Log
 import com.google.gson.Gson
 import com.luckhost.data.storage.models.Note
 
@@ -23,7 +24,9 @@ class SharedPrefNotesStorage(context: Context): NotesStorage {
         noteHashes.forEach{
             val noteJson = sharedPreferences.getString(it.toString(),
                 null)
-            result.add(gson.fromJson(noteJson, Note::class.java))
+            if(noteJson != null) {
+                result.add(gson.fromJson(noteJson, Note::class.java))
+            }
         }
         return result
     }

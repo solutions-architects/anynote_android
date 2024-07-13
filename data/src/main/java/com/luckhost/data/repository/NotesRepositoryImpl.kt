@@ -27,11 +27,13 @@ open class NotesRepositoryImpl(
             result.add(
                 NoteModel(
                     header = it.header,
-                    content= it.content,
+                    content = it.content,
                     deadLine = it.deadLine,
                     coordinateX = it.coordinateX,
                     coordinateY = it.coordinateY,
+                    hashCode = it.noteHash,
                 )
+
             )
         }
         return result

@@ -1,4 +1,4 @@
-package com.luckhost.lockscreen_notes.presentation
+package com.luckhost.lockscreen_notes.presentation.main
 
 import androidx.lifecycle.ViewModel
 import com.luckhost.domain.models.NoteModel
@@ -35,17 +35,32 @@ class MainViewModel(
     ): NoteModel {
         val modelToSave = NoteModel(
             header = header,
-            content= content,
+            content = content,
             deadLine = deadLine,
             coordinateX = coordinateX,
-            coordinateY = coordinateY
+            coordinateY = coordinateY,
+            hashCode = null
         )
         saveNoteUseCase.execute(modelToSave)
 
         hashesList.add(modelToSave.hashCode())
         saveHashesUseCase.execute(hashesList.toList())
 
-        return modelToSave
+        return NoteModel(
+            header = header,
+            content = content,
+            deadLine = deadLine,
+            coordinateX = coordinateX,
+            coordinateY = coordinateY,
+            hashCode = modelToSave.hashCode()
+        )
+    }
+
+    fun deleteNote(
+        hashCode: Int
+    ) {
+        deleteNoteUseCase.execute(hashCode)
+        deleteHashUseCase.execute(hashCode)
     }
 
     fun getNotes(): List<NoteModel> {
