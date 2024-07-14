@@ -8,4 +8,6 @@ interface NotesRepositoryInterface {
     fun getNotes(noteHashes: List<Int>): List<NoteModel>
 
     fun deleteNote(noteHash: Int)
+
+    fun changeNote(noteHash: Int, saveObject: NoteModel)
 }

@@ -34,4 +34,10 @@ class SharedPrefNotesStorage(context: Context): NotesStorage {
     override fun deleteNote(noteHash: Int) {
         sharedPreferences.edit().remove(noteHash.toString()).apply()
     }
+
+    override fun changeNote(noteHash: Int, saveObject: Note) {
+        val gson = Gson()
+        val noteJson = gson.toJson(saveObject)
+        sharedPreferences.edit().putString(noteHash.toString(), noteJson).apply()
+    }
 }

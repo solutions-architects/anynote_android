@@ -1,7 +1,9 @@
 package com.luckhost.lockscreen_notes.presentation.ui
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -31,14 +34,17 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.example.yourapp.ui.components.ConfirmDialog
 import com.luckhost.lockscreen_notes.R
+import com.luckhost.lockscreen_notes.presentation.createNote.OpenNoteActivity
 
 @Composable
 fun NoteBox(
     title: String,
     content: String,
+    noteHash: Int?,
     bitmap: ImageBitmap?,
     onClick: () -> Unit,
 ) {
+    val context = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -48,7 +54,12 @@ fun NoteBox(
                 shape = RoundedCornerShape(20.dp)
             )
             .background(color = colorResource(R.color.notebox_bg))
-            .wrapContentHeight(),
+            .wrapContentHeight()
+            .clickable {
+                val intent = Intent(context, OpenNoteActivity::class.java)
+                intent.putExtra("noteHash", noteHash)
+                context.startActivity(intent)
+               },
         contentAlignment = Alignment.Center,
         
     ) {

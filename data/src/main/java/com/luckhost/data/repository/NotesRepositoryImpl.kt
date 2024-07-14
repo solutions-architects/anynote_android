@@ -42,4 +42,16 @@ open class NotesRepositoryImpl(
     override fun deleteNote(noteHash: Int) {
         notesStorage.deleteNote(noteHash)
     }
+
+    override fun changeNote(noteHash: Int, saveObject: NoteModel) {
+        val note = Note(
+            header = saveObject.header,
+            content= saveObject.content,
+            deadLine = saveObject.deadLine,
+            coordinateX = saveObject.coordinateX,
+            coordinateY = saveObject.coordinateY,
+            noteHash = noteHash
+        )
+        notesStorage.changeNote(noteHash, note)
+    }
 }

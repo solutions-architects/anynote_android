@@ -19,9 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.unit.dp
 import com.luckhost.domain.models.NoteModel
 import com.luckhost.lockscreen_notes.R
@@ -32,6 +30,7 @@ import java.util.Date
 
 class MainActivity : ComponentActivity() {
     private val vm by viewModel<MainViewModel>()
+    private val notesList = mutableStateListOf<NoteModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -41,18 +40,13 @@ class MainActivity : ComponentActivity() {
                     color = colorResource(id = R.color.main_bg)
                 ) {
                     Column {
-
-                        val listOfNotes = remember {
-                            mutableStateListOf<NoteModel>()
-                        }
-                        listOfNotes.addAll(vm.getNotes())
-
+                        val notesListState = remember { notesList }
                         NotesList(
-                            notes = listOfNotes,
+                            notes = notesListState,
                             onItemClick = {
                                 model: NoteModel ->  model.hashCode?.let {
                                     vm.deleteNote(it)
-                                    listOfNotes.remove(model)}
+                                    notesListState.remove(model)}
                                 Log.d("onClick", "execute/ ${model.hashCode}")
                             }
                         )
@@ -62,7 +56,7 @@ class MainActivity : ComponentActivity() {
                                 .size(60.dp)
                                 .padding(20.dp),
                             onClick = {
-                                listOfNotes.add(vm.createNote(
+                                notesListState.add(vm.createNote(
                                     header = "aboba",
                                     content = "or no aboba",
                                     coordinateX = 0,
@@ -76,27 +70,35 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
 
-@Composable
-fun NotesList(notes: SnapshotStateList<NoteModel>,
-              onItemClick: (NoteModel) -> Unit ) {
-    LazyColumn(modifier = Modifier.wrapContentSize(),
-        horizontalAlignment = Alignment.CenterHorizontally) {
-        items(notes){
-                item -> NoteBox(
-            title = item.header,
-            content = item.content,
-            bitmap = null,
-            onClick = { onItemClick(item) })
+    override fun onResume() {
+        super.onResume()
+        notesList.clear()
+        val notes = vm.getNotes()
+        notesList.addAll(notes)
+        notes.forEach{
+            Log.d("onMainResume", it.header)
+        }
+
+    }
+    @Composable
+    fun NotesList(notes: SnapshotStateList<NoteModel>,
+                  onItemClick: (NoteModel) -> Unit ) {
+        LazyColumn(modifier = Modifier.wrapContentSize(),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            items(notes){
+                    item ->
+                NoteBox(
+                    title = item.header,
+                    content = item.content,
+                    noteHash = item.hashCode,
+                    bitmap = null,
+                    onClick = { onItemClick(item) }
+                )
+            }
         }
     }
 }
 
-@Composable
-fun NoteObj() {
-    NoteBox(title = "Test",
-        content = "lorem ipsum",
-        bitmap = ImageBitmap.imageResource(R.drawable.aboba)) {
-    }
-}
+
+

@@ -1,5 +1,6 @@
 package com.luckhost.lockscreen_notes.presentation.main
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.luckhost.domain.models.NoteModel
 import com.luckhost.domain.useCases.keys.DeleteHashUseCase
@@ -22,6 +23,7 @@ class MainViewModel(
     private var notesList: MutableList<NoteModel> = mutableListOf()
 
     init {
+        Log.d("MainActivityVM", "init")
         hashesList = getHashesUseCase.execute().toMutableList()
         notesList = getNotesUseCase.execute(hashesList).toMutableList()
     }
@@ -64,6 +66,7 @@ class MainViewModel(
     }
 
     fun getNotes(): List<NoteModel> {
+        notesList = getNotesUseCase.execute(noteHashes = hashesList).toMutableList()
         return notesList
     }
 }

@@ -8,4 +8,6 @@ interface NotesStorage {
     fun getNotes(noteHashes: List<Int>): List<Note>
 
     fun deleteNote(noteHash: Int)
+
+    fun changeNote(noteHash: Int, saveObject: Note)
 }
