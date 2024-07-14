@@ -16,8 +16,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,7 +63,7 @@ fun NoteBox(
                 val intent = Intent(context, OpenNoteActivity::class.java)
                 intent.putExtra("noteHash", noteHash)
                 context.startActivity(intent)
-               },
+            },
         contentAlignment = Alignment.Center,
         
     ) {
@@ -70,16 +74,19 @@ fun NoteBox(
             val (titleRef, contentRef, imageRef, dividerRef, buttonRef) = createRefs()
 
             var showDialog by remember { mutableStateOf(false) }
-            
-            Button(
-                onClick = { showDialog = true },
+
+            IconButton(onClick = { showDialog = true },
                 modifier = Modifier
                     .constrainAs(buttonRef) {
                         end.linkTo(parent.end)
                         top.linkTo(parent.top)
                     }
-                    .size(10.dp)
-            ) {
+                    .size(30.dp)) {
+                Icon(
+                    imageVector = Icons.Outlined.Close,
+                    contentDescription = null,
+                    tint = colorResource(id = R.color.notebox_title_text)
+                )
             }
 
             if (showDialog) {

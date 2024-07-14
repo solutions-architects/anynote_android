@@ -51,15 +51,15 @@ class OpenNoteActivity : ComponentActivity() {
                     color = colorResource(id = R.color.main_bg)
                 ) {
                     Column {
-                        var textState by remember { mutableStateOf(note.header) }
+                        var titleTextState by remember { mutableStateOf(note.header) }
                         val maxLength = 20
                         TextField(
                             modifier = Modifier
                                 .wrapContentSize()
                                 .fillMaxWidth(),
-                            value = textState,
+                            value = titleTextState,
                             onValueChange = {
-                                if (it.length <= maxLength) textState = it
+                                if (it.length <= maxLength) titleTextState = it
                             },
                             textStyle = TextStyle(
                                 color = colorResource(id = R.color.notebox_title_text),
@@ -72,8 +72,8 @@ class OpenNoteActivity : ComponentActivity() {
                                 unfocusedContainerColor = colorResource(id = R.color.main_bg),
                             ),
                             trailingIcon = {
-                                if (textState.isNotEmpty()) {
-                                    IconButton(onClick = { textState = "" }) {
+                                if (titleTextState.isNotEmpty()) {
+                                    IconButton(onClick = { titleTextState = "" }) {
                                         Icon(
                                             imageVector = Icons.Outlined.Close,
                                             contentDescription = null
@@ -82,11 +82,17 @@ class OpenNoteActivity : ComponentActivity() {
                                 }
                             }
                         )
+
+
+                        var contentTextState by remember { mutableStateOf(note.content) }
+
                         TextField(modifier = Modifier
                             .wrapContentSize()
                             .fillMaxWidth(),
-                            value = note.content,
-                            onValueChange = {},
+                            value = contentTextState,
+                            onValueChange = {
+                                contentTextState = it
+                            },
                             textStyle = TextStyle(
                                 color = colorResource(id = R.color.grey_neutral),
                                 fontSize = 16.sp
@@ -98,7 +104,8 @@ class OpenNoteActivity : ComponentActivity() {
                         )
                         Button(modifier = Modifier.wrapContentSize(),
                             onClick = {
-                                note.header = textState
+                                note.header = titleTextState
+                                note.content = contentTextState
                                 note.hashCode?.let { vm.changeNote(it, note) }
                             }) {
                             Text(modifier = Modifier.wrapContentSize(),
