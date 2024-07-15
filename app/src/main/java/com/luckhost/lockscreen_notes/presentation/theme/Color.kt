@@ -1,4 +1,4 @@
-package com.luckhost.lockscreen_notes.presentation.createNote.ui.theme
+package com.luckhost.lockscreen_notes.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 

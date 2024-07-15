@@ -1,5 +1,6 @@
 package com.luckhost.lockscreen_notes.presentation.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -19,10 +20,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import com.luckhost.domain.models.NoteModel
 import com.luckhost.lockscreen_notes.R
+import com.luckhost.lockscreen_notes.presentation.createNote.OpenNoteActivity
 import com.luckhost.lockscreen_notes.presentation.ui.NoteBox
 import com.luckhost.lockscreen_notes.ui.theme.Lockscreen_notesTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -43,11 +46,10 @@ class MainActivity : ComponentActivity() {
                         val notesListState = remember { notesList }
                         NotesList(
                             notes = notesListState,
-                            onItemClick = {
+                            onDeleteButClick = {
                                 model: NoteModel ->  model.hashCode?.let {
                                     vm.deleteNote(it)
                                     notesListState.remove(model)}
-                                Log.d("onClick", "execute/ ${model.hashCode}")
                             }
                         )
 
@@ -83,7 +85,8 @@ class MainActivity : ComponentActivity() {
     }
     @Composable
     fun NotesList(notes: SnapshotStateList<NoteModel>,
-                  onItemClick: (NoteModel) -> Unit ) {
+                  onDeleteButClick: (NoteModel) -> Unit ) {
+        val context = LocalContext.current
         LazyColumn(modifier = Modifier.wrapContentSize(),
             horizontalAlignment = Alignment.CenterHorizontally) {
             items(notes){
@@ -91,9 +94,12 @@ class MainActivity : ComponentActivity() {
                 NoteBox(
                     title = item.header,
                     content = item.content,
-                    noteHash = item.hashCode,
                     bitmap = null,
-                    onClick = { onItemClick(item) }
+                    onItemClick = {
+                        val intent = Intent(context, OpenNoteActivity::class.java)
+                        intent.putExtra("noteHash", item.hashCode)
+                        context.startActivity(intent) },
+                    onDeleteIconClick = { onDeleteButClick(item) }
                 )
             }
         }

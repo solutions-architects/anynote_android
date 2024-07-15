@@ -1,6 +1,5 @@
 package com.luckhost.lockscreen_notes.presentation.ui
 
-import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,8 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.getValue
@@ -27,28 +25,25 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.example.yourapp.ui.components.ConfirmDialog
 import com.luckhost.lockscreen_notes.R
-import com.luckhost.lockscreen_notes.presentation.createNote.OpenNoteActivity
+import dev.jeziellago.compose.markdowntext.MarkdownText
 
 @Composable
 fun NoteBox(
     title: String,
     content: String,
-    noteHash: Int?,
     bitmap: ImageBitmap?,
-    onClick: () -> Unit,
+    onItemClick: () -> Unit,
+    onDeleteIconClick: () -> Unit,
 ) {
-    val context = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -60,9 +55,7 @@ fun NoteBox(
             .background(color = colorResource(R.color.notebox_bg))
             .wrapContentHeight()
             .clickable {
-                val intent = Intent(context, OpenNoteActivity::class.java)
-                intent.putExtra("noteHash", noteHash)
-                context.startActivity(intent)
+                onItemClick()
             },
         contentAlignment = Alignment.Center,
         
@@ -93,7 +86,7 @@ fun NoteBox(
                 ConfirmDialog(
                     text = "Вы хотите удалить заметку?",
                     onConfirm = {
-                        onClick()
+                        onDeleteIconClick()
                         showDialog = false
                     },
                     onDismiss = { showDialog = false }
@@ -118,29 +111,32 @@ fun NoteBox(
                 ),
             )
 
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier.constrainAs(dividerRef) {
                     top.linkTo(titleRef.bottom, margin = 4.dp)
                 },
-                color = colorResource(id = R.color.grey_neutral),
-                thickness = 1.dp
+                thickness = 1.dp,
+                color = colorResource(id = R.color.grey_neutral)
             )
 
-            Text(
+            MarkdownText(
                 modifier = Modifier.constrainAs(contentRef) {
                     top.linkTo(dividerRef.bottom, margin = 4.dp)
                     bottom.linkTo(parent.bottom, margin = 4.dp)
                     start.linkTo(parent.start, margin = 4.dp)
-                    end.linkTo(imageRef.start, margin = 8.dp)
+                    bitmap?.let {
+                        end.linkTo(imageRef.start, margin = 8.dp)
+                    } ?: end.linkTo(parent.end)
+
                     width = Dimension.fillToConstraints
                 },
-                text = content,
+                markdown = content.trimIndent(),
                 maxLines = 5,
-                textAlign = TextAlign.Left,
                 style = TextStyle(
                     color = colorResource(id = R.color.grey_neutral),
                     fontSize = 16.sp
                 ),
+                onClick = { onItemClick() }
             )
 
             if (bitmap != null) {

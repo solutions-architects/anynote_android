@@ -2,36 +2,23 @@ package com.luckhost.lockscreen_notes.presentation.createNote
 
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.Switch
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import com.luckhost.domain.models.NoteModel
 import com.luckhost.lockscreen_notes.R
+import com.luckhost.lockscreen_notes.presentation.createNote.additional.functions.EditNoteFragment
+import com.luckhost.lockscreen_notes.presentation.createNote.additional.functions.NoteViewFragment
 import com.luckhost.lockscreen_notes.ui.theme.Lockscreen_notesTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -51,66 +38,21 @@ class OpenNoteActivity : ComponentActivity() {
                     color = colorResource(id = R.color.main_bg)
                 ) {
                     Column {
-                        var titleTextState by remember { mutableStateOf(note.header) }
-                        val maxLength = 20
-                        TextField(
-                            modifier = Modifier
-                                .wrapContentSize()
-                                .fillMaxWidth(),
-                            value = titleTextState,
-                            onValueChange = {
-                                if (it.length <= maxLength) titleTextState = it
-                            },
-                            textStyle = TextStyle(
-                                color = colorResource(id = R.color.notebox_title_text),
-                                fontSize = 26.sp,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = FontFamily.SansSerif
-                            ),
-                            colors = TextFieldDefaults.colors(
-                                focusedContainerColor = colorResource(id = R.color.main_bg),
-                                unfocusedContainerColor = colorResource(id = R.color.main_bg),
-                            ),
-                            trailingIcon = {
-                                if (titleTextState.isNotEmpty()) {
-                                    IconButton(onClick = { titleTextState = "" }) {
-                                        Icon(
-                                            imageVector = Icons.Outlined.Close,
-                                            contentDescription = null
-                                        )
-                                    }
-                                }
-                            }
+                        var isEditMode by remember { mutableStateOf(false) }
+
+                        Switch(
+                            checked = isEditMode,
+                            onCheckedChange = { isEditMode = it }
                         )
-
-
-                        var contentTextState by remember { mutableStateOf(note.content) }
-
-                        TextField(modifier = Modifier
-                            .wrapContentSize()
-                            .fillMaxWidth(),
-                            value = contentTextState,
-                            onValueChange = {
-                                contentTextState = it
-                            },
-                            textStyle = TextStyle(
-                                color = colorResource(id = R.color.grey_neutral),
-                                fontSize = 16.sp
-                            ),
-                            colors = TextFieldDefaults.colors(
-                                focusedContainerColor = colorResource(id = R.color.main_bg),
-                                unfocusedContainerColor = colorResource(id = R.color.main_bg),
-                            ),
-                        )
-                        Button(modifier = Modifier.wrapContentSize(),
-                            onClick = {
-                                note.header = titleTextState
-                                note.content = contentTextState
-                                note.hashCode?.let { vm.changeNote(it, note) }
-                            }) {
-                            Text(modifier = Modifier.wrapContentSize(),
-                                text = "Save")
+                        
+                        if(isEditMode) {
+                            EditNoteFragment(note = note,
+                                onSaveClick = {hash: Int, note: NoteModel ->
+                                    vm.changeNote(hash, note)})
+                        } else {
+                            NoteViewFragment(note = note)
                         }
+
                     }
                 }
             }
@@ -120,4 +62,6 @@ class OpenNoteActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
     }
+
+
 }

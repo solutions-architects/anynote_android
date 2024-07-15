@@ -1,4 +1,4 @@
-package com.luckhost.lockscreen_notes.presentation.createNote.ui.theme
+package com.luckhost.lockscreen_notes.presentation.theme
 
 import android.app.Activity
 import android.os.Build
