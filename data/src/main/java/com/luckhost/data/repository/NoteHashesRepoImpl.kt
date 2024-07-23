@@ -17,4 +17,8 @@ class NoteHashesRepoImpl(
     override fun deleteHash(hashToDelete: Int) {
         hashStorage.deleteHash(hashToDelete)
     }
+
+    override fun addHash(hash: Int) {
+        hashStorage.addHash(hash)
+    }
 }

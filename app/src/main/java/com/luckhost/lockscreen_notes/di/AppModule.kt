@@ -10,19 +10,17 @@ val appModule = module {
     viewModel<MainViewModel>{
         MainViewModel(
             getNotesUseCase = get(),
-            saveNoteUseCase = get(),
             deleteNoteUseCase = get(),
             getHashesUseCase = get(),
-            saveHashesUseCase = get(),
             deleteHashUseCase = get(),
         )
     }
     viewModel<OpenNoteViewModel>{
         OpenNoteViewModel(
             saveNoteUseCase = get(),
-            saveHashesUseCase = get(),
             getNotesUseCase = get(),
             changeNoteUseCase = get(),
+            addHashUseCase = get()
         )
     }
     viewModel<LoginViewModel>{

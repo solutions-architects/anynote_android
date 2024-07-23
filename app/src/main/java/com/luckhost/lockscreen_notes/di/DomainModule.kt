@@ -1,5 +1,6 @@
 package com.luckhost.lockscreen_notes.di
 
+import com.luckhost.domain.useCases.keys.AddHashUseCase
 import com.luckhost.domain.useCases.keys.DeleteHashUseCase
 import com.luckhost.domain.useCases.keys.GetHashesUseCase
 import com.luckhost.domain.useCases.keys.SaveHashesUseCase
@@ -43,6 +44,11 @@ val domainModule = module {
     }
     factory<DeleteHashUseCase> {
         DeleteHashUseCase(
+            hashesRepository = get(),
+        )
+    }
+    factory<AddHashUseCase> {
+        AddHashUseCase(
             hashesRepository = get(),
         )
     }

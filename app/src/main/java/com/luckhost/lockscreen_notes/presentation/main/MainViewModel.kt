@@ -13,50 +13,11 @@ import java.util.Date
 
 class MainViewModel(
     private val getNotesUseCase: GetNotesUseCase,
-    private val saveNoteUseCase: SaveNoteUseCase,
     private val deleteNoteUseCase: DeleteNoteUseCase,
     private val getHashesUseCase: GetHashesUseCase,
-    private val saveHashesUseCase: SaveHashesUseCase,
     private val deleteHashUseCase: DeleteHashUseCase,
 ): ViewModel() {
-    private var hashesList: MutableList<Int> = mutableListOf()
     private var notesList: MutableList<NoteModel> = mutableListOf()
-
-    init {
-        Log.d("MainActivityVM", "init")
-        hashesList = getHashesUseCase.execute().toMutableList()
-        notesList = getNotesUseCase.execute(hashesList).toMutableList()
-    }
-
-    fun createNote(
-        header: String,
-        content: String,
-        deadLine: Date,
-        coordinateX: Int,
-        coordinateY: Int,
-    ): NoteModel {
-        val modelToSave = NoteModel(
-            header = header,
-            content = content,
-            deadLine = deadLine,
-            coordinateX = coordinateX,
-            coordinateY = coordinateY,
-            hashCode = null
-        )
-        saveNoteUseCase.execute(modelToSave)
-
-        hashesList.add(modelToSave.hashCode())
-        saveHashesUseCase.execute(hashesList.toList())
-
-        return NoteModel(
-            header = header,
-            content = content,
-            deadLine = deadLine,
-            coordinateX = coordinateX,
-            coordinateY = coordinateY,
-            hashCode = modelToSave.hashCode()
-        )
-    }
 
     fun deleteNote(
         hashCode: Int
@@ -66,7 +27,9 @@ class MainViewModel(
     }
 
     fun getNotes(): List<NoteModel> {
-        notesList = getNotesUseCase.execute(noteHashes = hashesList).toMutableList()
+        notesList = getNotesUseCase.execute(
+            getHashesUseCase.execute().toMutableList()
+        ).toMutableList()
         return notesList
     }
 }

@@ -2,6 +2,7 @@ package com.luckhost.lockscreen_notes.presentation.createNote
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -21,6 +22,7 @@ import com.luckhost.lockscreen_notes.presentation.createNote.additional.function
 import com.luckhost.lockscreen_notes.presentation.createNote.additional.functions.NoteViewFragment
 import com.luckhost.lockscreen_notes.ui.theme.Lockscreen_notesTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.Date
 
 class OpenNoteActivity : ComponentActivity() {
     private val vm by viewModel<OpenNoteViewModel>()
@@ -29,7 +31,22 @@ class OpenNoteActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        note = vm.getNote(intent.getIntExtra("noteHash", 0))
+        val extras = intent.extras
+
+
+        extras?.let {
+            val noteHash = intent.getIntExtra("noteHash", 0)
+            note = vm.getNote(noteHash)
+        }?: run {
+            note = vm.createNote(
+                header = "Empty note",
+                content = "tap to edit",
+                coordinateX = 0,
+                coordinateY = 0,
+                deadLine = Date()
+            )
+        }
+
 
         setContent {
             Lockscreen_notesTheme {

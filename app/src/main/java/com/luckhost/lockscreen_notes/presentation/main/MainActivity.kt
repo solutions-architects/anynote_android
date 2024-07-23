@@ -1,5 +1,6 @@
 package com.luckhost.lockscreen_notes.presentation.main
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -97,13 +98,7 @@ class MainActivity : ComponentActivity() {
             containerColor = colorResource(id = R.color.main_bg),
             floatingActionButton = {
                 FloatingActionButton(onClick = {
-                    notesListState.add(vm.createNote(
-                        header = "Empty note",
-                        content = "tap to edit",
-                        coordinateX = 0,
-                        coordinateY = 0,
-                        deadLine = Date()
-                    ))
+                    startOpenNoteActivity(context)
                 }) {
                     Icon(Icons.Default.Add, contentDescription = "Add")
                 }
@@ -114,7 +109,6 @@ class MainActivity : ComponentActivity() {
                 .fillMaxSize()
                 .padding(innerPadding)) {
                 Column(modifier = Modifier.padding(top = 15.dp)) {
-
                     HorizontalDivider()
                     NotesList(
                         notes = notesListState,
@@ -143,14 +137,23 @@ class MainActivity : ComponentActivity() {
                     content = item.content,
                     bitmap = null,
                     onItemClick = {
-                        val intent = Intent(context, OpenNoteActivity::class.java)
-                        intent.putExtra("noteHash", item.hashCode)
-                        context.startActivity(intent)
+                        startOpenNoteActivity(context = context, item)
                     },
                     onDeleteIconClick = { onDeleteButClick(item) }
                 )
             }
         }
+    }
+
+    private fun startOpenNoteActivity(context: Context, note: NoteModel) {
+        val intent = Intent(context, OpenNoteActivity::class.java)
+        intent.putExtra("noteHash", note.hashCode)
+        context.startActivity(intent)
+    }
+
+    private fun startOpenNoteActivity(context: Context) {
+        val intent = Intent(context, OpenNoteActivity::class.java)
+        context.startActivity(intent)
     }
 
     override fun onResume() {

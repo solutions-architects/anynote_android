@@ -32,4 +32,8 @@ class SharedPrefHashesStorage(context: Context): HashStorage {
         val oldList = getHashes()
         saveHashes(oldList.minus(hashToDelete))
     }
+
+    override fun addHash(hash: Int) {
+        saveHashes(getHashes().plus(hash))
+    }
 }
