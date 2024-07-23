@@ -41,7 +41,7 @@ fun EditNoteFragment(note: NoteModel,
                 if (it.length <= maxLength) titleTextState = it
             },
             textStyle = TextStyle(
-                color = colorResource(id = R.color.notebox_title_text),
+                color = colorResource(id = R.color.main_title_text),
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily.SansSerif

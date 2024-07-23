@@ -1,6 +1,7 @@
 package com.luckhost.lockscreen_notes.di
 import com.luckhost.lockscreen_notes.presentation.createNote.OpenNoteViewModel
 import com.luckhost.lockscreen_notes.presentation.main.MainViewModel
+import com.luckhost.lockscreen_notes.presentation.userLogin.LoginViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -23,5 +24,8 @@ val appModule = module {
             getNotesUseCase = get(),
             changeNoteUseCase = get(),
         )
+    }
+    viewModel<LoginViewModel>{
+        LoginViewModel()
     }
 }

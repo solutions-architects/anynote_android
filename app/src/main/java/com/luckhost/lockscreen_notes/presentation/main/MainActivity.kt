@@ -2,18 +2,29 @@ package com.luckhost.lockscreen_notes.presentation.main
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
-import androidx.compose.material3.Surface
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
@@ -26,7 +37,8 @@ import androidx.compose.ui.unit.dp
 import com.luckhost.domain.models.NoteModel
 import com.luckhost.lockscreen_notes.R
 import com.luckhost.lockscreen_notes.presentation.createNote.OpenNoteActivity
-import com.luckhost.lockscreen_notes.presentation.ui.NoteBox
+import com.luckhost.lockscreen_notes.presentation.main.additional.functions.NoteBox
+import com.luckhost.lockscreen_notes.presentation.userLogin.LoginActivity
 import com.luckhost.lockscreen_notes.ui.theme.Lockscreen_notesTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Date
@@ -38,51 +50,86 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             Lockscreen_notesTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = colorResource(id = R.color.main_bg)
-                ) {
-                    Column {
-                        val notesListState = remember { notesList }
-                        NotesList(
-                            notes = notesListState,
-                            onDeleteButClick = {
-                                model: NoteModel ->  model.hashCode?.let {
-                                    vm.deleteNote(it)
-                                    notesListState.remove(model)}
-                            }
-                        )
-
-                        Button(
-                            modifier = Modifier
-                                .size(60.dp)
-                                .padding(20.dp),
-                            onClick = {
-                                notesListState.add(vm.createNote(
-                                    header = "aboba",
-                                    content = "or no aboba",
-                                    coordinateX = 0,
-                                    coordinateY = 0,
-                                    deadLine = Date()
-                                ))
-                            }
-                        ) {}
-                    }
-                }
+                ScreenLayout()
             }
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        notesList.clear()
-        val notes = vm.getNotes()
-        notesList.addAll(notes)
-        notes.forEach{
-            Log.d("onMainResume", it.header)
-        }
+    @Composable
+    fun ScreenLayout() {
+        val notesListState = remember { notesList }
+        val context = LocalContext.current
 
+        Scaffold(
+            topBar = {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    IconButton(
+                        modifier = Modifier
+                            .padding(start = 8.dp,
+                                top = 8.dp),
+                        onClick = { /*TODO*/ }) {
+                        Icon(Icons.Default.Menu,
+                            modifier = Modifier.size(90.dp),
+                            contentDescription = "Profile",
+                            tint = colorResource(id = R.color.grey_neutral)
+                        )
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    IconButton(
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .padding(end = 8.dp,
+                                top = 8.dp),
+                        onClick = {
+                            val intent = Intent(context, LoginActivity::class.java)
+                            context.startActivity(intent)
+                        }) {
+                        Icon(Icons.Default.AccountCircle,
+                            modifier = Modifier.size(90.dp),
+                            contentDescription = "Profile",
+                            tint = colorResource(id = R.color.grey_neutral)
+                        )
+                    }
+                }
+            },
+            containerColor = colorResource(id = R.color.main_bg),
+            floatingActionButton = {
+                FloatingActionButton(onClick = {
+                    notesListState.add(vm.createNote(
+                        header = "Empty note",
+                        content = "tap to edit",
+                        coordinateX = 0,
+                        coordinateY = 0,
+                        deadLine = Date()
+                    ))
+                }) {
+                    Icon(Icons.Default.Add, contentDescription = "Add")
+                }
+            }
+        ) {
+            innerPadding  ->
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)) {
+                Column(modifier = Modifier.padding(top = 15.dp)) {
+
+                    HorizontalDivider()
+                    NotesList(
+                        notes = notesListState,
+                        onDeleteButClick = {
+                                model: NoteModel ->  model.hashCode?.let {
+                            vm.deleteNote(it)
+                            notesListState.remove(model)}
+                        }
+                    )
+                }
+
+            }
+        }
     }
+
     @Composable
     fun NotesList(notes: SnapshotStateList<NoteModel>,
                   onDeleteButClick: (NoteModel) -> Unit ) {
@@ -98,11 +145,19 @@ class MainActivity : ComponentActivity() {
                     onItemClick = {
                         val intent = Intent(context, OpenNoteActivity::class.java)
                         intent.putExtra("noteHash", item.hashCode)
-                        context.startActivity(intent) },
+                        context.startActivity(intent)
+                    },
                     onDeleteIconClick = { onDeleteButClick(item) }
                 )
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        notesList.clear()
+        val notes = vm.getNotes()
+        notesList.addAll(notes)
     }
 }
 

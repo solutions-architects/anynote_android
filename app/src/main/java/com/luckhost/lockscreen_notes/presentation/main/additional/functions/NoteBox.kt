@@ -1,4 +1,4 @@
-package com.luckhost.lockscreen_notes.presentation.ui
+package com.luckhost.lockscreen_notes.presentation.main.additional.functions
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -78,7 +78,7 @@ fun NoteBox(
                 Icon(
                     imageVector = Icons.Outlined.Close,
                     contentDescription = null,
-                    tint = colorResource(id = R.color.notebox_title_text)
+                    tint = colorResource(id = R.color.main_title_text)
                 )
             }
 
@@ -104,7 +104,7 @@ fun NoteBox(
                     .fillMaxWidth(),
                 maxLines = 1,
                 style = TextStyle(
-                    color = colorResource(id = R.color.notebox_title_text),
+                    color = colorResource(id = R.color.main_title_text),
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = FontFamily.SansSerif
