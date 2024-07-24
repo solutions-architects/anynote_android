@@ -1,6 +1,8 @@
 package com.luckhost.lockscreen_notes.presentation.main
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import com.luckhost.domain.models.NoteModel
 import com.luckhost.domain.useCases.keys.DeleteHashUseCase
@@ -17,19 +19,22 @@ class MainViewModel(
     private val getHashesUseCase: GetHashesUseCase,
     private val deleteHashUseCase: DeleteHashUseCase,
 ): ViewModel() {
-    private var notesList: MutableList<NoteModel> = mutableListOf()
+    var notesList = mutableStateListOf<NoteModel>()
 
     fun deleteNote(
-        hashCode: Int
+        model: NoteModel
     ) {
-        deleteNoteUseCase.execute(hashCode)
-        deleteHashUseCase.execute(hashCode)
+        notesList.remove(model)
+        model.hashCode?.let {
+            deleteNoteUseCase.execute(it)
+            deleteHashUseCase.execute(it)
+        }
     }
 
-    fun getNotes(): List<NoteModel> {
-        notesList = getNotesUseCase.execute(
+    fun refreshNotesList() {
+        notesList.clear()
+        notesList.addAll(getNotesUseCase.execute(
             getHashesUseCase.execute().toMutableList()
-        ).toMutableList()
-        return notesList
+        ).toMutableStateList())
     }
 }

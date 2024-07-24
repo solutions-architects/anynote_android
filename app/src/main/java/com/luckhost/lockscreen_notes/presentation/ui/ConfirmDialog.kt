@@ -4,7 +4,9 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.luckhost.lockscreen_notes.R
 
 @Composable
 fun ConfirmDialog(
@@ -14,16 +16,16 @@ fun ConfirmDialog(
 ) {
     AlertDialog(
         onDismissRequest = { onDismiss() },
-        title = { Text(text = "Подтверждение") },
+        title = { Text(text = stringResource(id = R.string.confirm_dialog_question)) },
         text = { Text(text) },
         confirmButton = {
             Button(onClick = { onConfirm() }) {
-                Text("Да")
+                Text(stringResource(id = R.string.confirm_dialog_answer_yes))
             }
         },
         dismissButton = {
             Button(onClick = { onDismiss() }) {
-                Text("Нет")
+                Text(stringResource(id = R.string.confirm_dialog_answer_no))
             }
         }
     )
@@ -33,7 +35,7 @@ fun ConfirmDialog(
 @Composable
 fun PreviewConfirmDialog() {
     ConfirmDialog(
-        text = "Вы уверены?",
+        stringResource(id = R.string.confirm_dialog_question),
         onConfirm = {},
         onDismiss = {}
     )

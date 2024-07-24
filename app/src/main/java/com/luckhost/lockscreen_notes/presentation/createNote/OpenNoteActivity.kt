@@ -8,6 +8,9 @@ import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.runtime.getValue
@@ -32,8 +35,7 @@ class OpenNoteActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val extras = intent.extras
-
-
+        
         extras?.let {
             val noteHash = intent.getIntExtra("noteHash", 0)
             note = vm.getNote(noteHash)
@@ -47,14 +49,19 @@ class OpenNoteActivity : ComponentActivity() {
             )
         }
 
-
         setContent {
             Lockscreen_notesTheme {
-                Surface(
+                Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    color = colorResource(id = R.color.main_bg)
+                    containerColor = colorResource(id = R.color.main_bg),
+                    floatingActionButton = {
+                        FloatingActionButton(onClick = { /*TODO*/ }) {
+
+                        }
+                    }
                 ) {
-                    Column {
+                    innerPadding  ->
+                    Column(modifier = Modifier.padding(innerPadding)) {
                         var isEditMode by remember { mutableStateOf(false) }
 
                         Switch(
@@ -75,10 +82,4 @@ class OpenNoteActivity : ComponentActivity() {
             }
         }
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
-
 }

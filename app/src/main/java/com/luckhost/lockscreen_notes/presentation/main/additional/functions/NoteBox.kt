@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -84,7 +85,7 @@ fun NoteBox(
 
             if (showDialog) {
                 ConfirmDialog(
-                    text = "Вы хотите удалить заметку?",
+                    text = stringResource(id = R.string.question_of_note_deleting),
                     onConfirm = {
                         onDeleteIconClick()
                         showDialog = false

@@ -74,7 +74,7 @@ fun EditNoteFragment(note: NoteModel,
             },
             textStyle = TextStyle(
                 color = colorResource(id = R.color.grey_neutral),
-                fontSize = 16.sp
+                fontSize = 24.sp
             ),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = colorResource(id = R.color.main_bg),

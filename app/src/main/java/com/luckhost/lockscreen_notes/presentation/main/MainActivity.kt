@@ -46,7 +46,6 @@ import java.util.Date
 
 class MainActivity : ComponentActivity() {
     private val vm by viewModel<MainViewModel>()
-    private val notesList = mutableStateListOf<NoteModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -58,10 +57,11 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun ScreenLayout() {
-        val notesListState = remember { notesList }
+        val notesListState = remember { vm.notesList }
         val context = LocalContext.current
 
         Scaffold(
+            containerColor = colorResource(id = R.color.main_bg),
             topBar = {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -95,7 +95,6 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             },
-            containerColor = colorResource(id = R.color.main_bg),
             floatingActionButton = {
                 FloatingActionButton(onClick = {
                     startOpenNoteActivity(context)
@@ -113,13 +112,10 @@ class MainActivity : ComponentActivity() {
                     NotesList(
                         notes = notesListState,
                         onDeleteButClick = {
-                                model: NoteModel ->  model.hashCode?.let {
-                            vm.deleteNote(it)
-                            notesListState.remove(model)}
+                                model: NoteModel -> vm.deleteNote(model)
                         }
                     )
                 }
-
             }
         }
     }
@@ -158,9 +154,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        notesList.clear()
-        val notes = vm.getNotes()
-        notesList.addAll(notes)
+        vm.refreshNotesList()
     }
 }
 
