@@ -18,6 +18,8 @@
     <string name="confirm_dialog_answer_no">No</string>
 
     <string name="question_of_note_deleting">Do you want to delete a note?</string>
+    <string name="empty_note_title">Empty note</string>
+    <string name="empty_note_content">This note wishes you a good day!</string>
 
     <string name="title_activity_create_note">CreateNoteActivity</string>
     <string name="title_activity_login">LoginActivity</string>

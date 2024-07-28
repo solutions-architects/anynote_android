@@ -1,4 +1,4 @@
-package com.luckhost.lockscreen_notes.presentation.createNote.additional.functions
+package com.luckhost.lockscreen_notes.presentation.openNote.additional.functions
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,17 +16,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.luckhost.domain.models.NoteModel
 import com.luckhost.lockscreen_notes.R
+import com.luckhost.lockscreen_notes.presentation.openNote.OpenNoteViewModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
 @Composable
-fun NoteViewFragment(note: NoteModel) {
+fun NoteViewFragment(vm: OpenNoteViewModel) {
     Column {
         Text(
             modifier = Modifier
                 .wrapContentSize()
                 .padding(10.dp)
                 .fillMaxWidth(),
-            text = note.header,
+            text = vm.titleText,
             style = TextStyle(
                 color = colorResource(id = R.color.main_title_text),
                 fontSize = 26.sp,
@@ -35,12 +36,20 @@ fun NoteViewFragment(note: NoteModel) {
             ),
         )
         HorizontalDivider()
-        MarkdownText(modifier = Modifier.padding(8.dp),
-            markdown = note.content.trimIndent(),
-            style = TextStyle(
-                color = colorResource(id = R.color.grey_neutral),
-                fontSize = 24.sp
-            ),
-        )
+
+        vm.note.content.forEach{
+            when(it["name"]) {
+                "md" -> MarkdownText(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .fillMaxWidth(),
+                    markdown = it["text"].toString(),
+                    style = TextStyle(
+                        color = colorResource(id = R.color.grey_neutral),
+                        fontSize = 24.sp
+                    ),
+                )
+            }
+        }
     }
 }

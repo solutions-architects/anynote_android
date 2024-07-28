@@ -10,11 +10,7 @@ open class NotesRepositoryImpl(
 ): NotesRepositoryInterface {
     override fun saveNote(saveObject: NoteModel) {
         val note = Note(
-            header = saveObject.header,
             content= saveObject.content,
-            deadLine = saveObject.deadLine,
-            coordinateX = saveObject.coordinateX,
-            coordinateY = saveObject.coordinateY,
             noteHash = saveObject.hashCode()
         )
         notesStorage.saveNote(note)
@@ -26,11 +22,7 @@ open class NotesRepositoryImpl(
         getData.forEach{
             result.add(
                 NoteModel(
-                    header = it.header,
-                    content = it.content,
-                    deadLine = it.deadLine,
-                    coordinateX = it.coordinateX,
-                    coordinateY = it.coordinateY,
+                    content = it.content.toMutableList(),
                     hashCode = it.noteHash,
                 )
 
@@ -45,11 +37,7 @@ open class NotesRepositoryImpl(
 
     override fun changeNote(noteHash: Int, saveObject: NoteModel) {
         val note = Note(
-            header = saveObject.header,
             content= saveObject.content,
-            deadLine = saveObject.deadLine,
-            coordinateX = saveObject.coordinateX,
-            coordinateY = saveObject.coordinateY,
             noteHash = noteHash
         )
         notesStorage.changeNote(noteHash, note)

@@ -1,5 +1,7 @@
 package com.luckhost.lockscreen_notes.presentation.main
 
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.toMutableStateList
@@ -11,6 +13,7 @@ import com.luckhost.domain.useCases.keys.SaveHashesUseCase
 import com.luckhost.domain.useCases.objects.DeleteNoteUseCase
 import com.luckhost.domain.useCases.objects.GetNotesUseCase
 import com.luckhost.domain.useCases.objects.SaveNoteUseCase
+import com.luckhost.lockscreen_notes.presentation.openNote.OpenNoteActivity
 import java.util.Date
 
 class MainViewModel(
@@ -36,5 +39,16 @@ class MainViewModel(
         notesList.addAll(getNotesUseCase.execute(
             getHashesUseCase.execute().toMutableList()
         ).toMutableStateList())
+    }
+
+    fun startOpenNoteActivity(context: Context) {
+        val intent = Intent(context, OpenNoteActivity::class.java)
+        context.startActivity(intent)
+    }
+
+    fun startOpenNoteActivity(context: Context, note: NoteModel) {
+        val intent = Intent(context, OpenNoteActivity::class.java)
+        intent.putExtra("noteHash", note.hashCode)
+        context.startActivity(intent)
     }
 }

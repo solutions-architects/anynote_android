@@ -1,13 +1,10 @@
 package com.luckhost.data.storage.models
 
 import java.util.Date
+import java.util.Dictionary
 
 class Note(
-    val header: String,
-    val content: String,
-    val deadLine: Date,
-    val coordinateX: Int,
-    val coordinateY: Int,
+    var content: List<MutableMap<String, String>>,
     val noteHash: Int,
 ) {
 

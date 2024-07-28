@@ -1,6 +1,5 @@
 package com.luckhost.lockscreen_notes.presentation.main.additional.functions
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -24,7 +23,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -39,9 +37,7 @@ import dev.jeziellago.compose.markdowntext.MarkdownText
 
 @Composable
 fun NoteBox(
-    title: String,
-    content: String,
-    bitmap: ImageBitmap?,
+    content: List<Map<String, String>>,
     onItemClick: () -> Unit,
     onDeleteIconClick: () -> Unit,
 ) {
@@ -94,66 +90,79 @@ fun NoteBox(
                 )
             }
 
-            Text(
-                text = title,
-                modifier = Modifier
-                    .constrainAs(titleRef) {
-                        top.linkTo(parent.top)
-                        start.linkTo(parent.start, margin = 4.dp)
-                        end.linkTo(parent.end)
-                    }
-                    .fillMaxWidth(),
-                maxLines = 1,
-                style = TextStyle(
-                    color = colorResource(id = R.color.main_title_text),
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.SansSerif
-                ),
-            )
 
-            HorizontalDivider(
-                modifier = Modifier.constrainAs(dividerRef) {
-                    top.linkTo(titleRef.bottom, margin = 4.dp)
-                },
-                thickness = 1.dp,
-                color = colorResource(id = R.color.grey_neutral)
-            )
-
-            MarkdownText(
-                modifier = Modifier.constrainAs(contentRef) {
-                    top.linkTo(dividerRef.bottom, margin = 4.dp)
-                    bottom.linkTo(parent.bottom, margin = 4.dp)
-                    start.linkTo(parent.start, margin = 4.dp)
-                    bitmap?.let {
-                        end.linkTo(imageRef.start, margin = 8.dp)
-                    } ?: end.linkTo(parent.end)
-
-                    width = Dimension.fillToConstraints
-                },
-                markdown = content.trimIndent(),
-                maxLines = 5,
-                style = TextStyle(
-                    color = colorResource(id = R.color.grey_neutral),
-                    fontSize = 16.sp
-                ),
-                onClick = { onItemClick() }
-            )
-
-            if (bitmap != null) {
-                Image(
-                    modifier = Modifier
-                        .constrainAs(imageRef) {
-                            top.linkTo(dividerRef.bottom, margin = 8.dp)
-                            bottom.linkTo(parent.bottom, margin = 6.dp)
-                            end.linkTo(parent.end)
+            /*TODO*/ // слишком громостко и долго
+            for (entry in content) {
+                when(entry["name"]) {
+                    "info" -> {
+                        entry["header"]?.let {
+                            TitlePart(modifier = Modifier
+                                .constrainAs(titleRef) {
+                                    top.linkTo(parent.top)
+                                    start.linkTo(parent.start, margin = 4.dp)
+                                    end.linkTo(parent.end)
+                                }
+                                .fillMaxWidth(), title = it)
+                            HorizontalDivider(
+                                modifier = Modifier.constrainAs(dividerRef) {
+                                    top.linkTo(titleRef.bottom, margin = 4.dp)
+                                },
+                                thickness = 1.dp,
+                                color = colorResource(id = R.color.grey_neutral)
+                            )
                         }
-                        .size(70.dp),
-                    bitmap = bitmap,
-                    contentDescription = title,
-                    alignment = Alignment.TopEnd,
-                )
+                    }
+                    "md" -> {
+                        entry["text"]?.let {
+                            MarkdownPart(
+                                modifier = Modifier.constrainAs(contentRef) {
+                                    top.linkTo(dividerRef.bottom, margin = 4.dp)
+                                    bottom.linkTo(parent.bottom, margin = 4.dp)
+                                    start.linkTo(parent.start, margin = 4.dp)
+                                    width = Dimension.fillToConstraints },
+                                string = it,
+                                onItemClick = onItemClick,
+                            )
+                        }
+                    }
+                    "map" -> { }
+                }
             }
+
         }
     }
+}
+
+@Composable
+private fun MarkdownPart(
+    modifier: Modifier,
+    string: String,
+    onItemClick: () -> Unit
+) {
+    MarkdownText(
+        modifier = modifier,
+        markdown = string.trimIndent(),
+        maxLines = 5,
+        style = TextStyle(
+            color = colorResource(id = R.color.grey_neutral),
+            fontSize = 16.sp
+        ),
+        onClick = { onItemClick() }
+    )
+}
+@Composable
+private fun TitlePart(
+    modifier: Modifier,
+    title: String,) {
+    Text(
+        text = title,
+        modifier = modifier,
+        maxLines = 1,
+        style = TextStyle(
+            color = colorResource(id = R.color.main_title_text),
+            fontSize = 26.sp,
+            fontWeight = FontWeight.Bold,
+            fontFamily = FontFamily.SansSerif
+        ),
+    )
 }

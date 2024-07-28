@@ -1,4 +1,4 @@
-package com.luckhost.lockscreen_notes.presentation.createNote.additional.functions
+package com.luckhost.lockscreen_notes.presentation.openNote.additional.functions
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,12 +25,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.luckhost.domain.models.NoteModel
 import com.luckhost.lockscreen_notes.R
+import com.luckhost.lockscreen_notes.presentation.openNote.OpenNoteActivity
+import com.luckhost.lockscreen_notes.presentation.openNote.OpenNoteViewModel
 
 @Composable
-fun EditNoteFragment(note: NoteModel,
-                     onSaveClick: (Int, NoteModel) -> Unit) {
+fun EditNoteFragment(vm: OpenNoteViewModel) {
     Column {
-        var titleTextState by remember { mutableStateOf(note.header) }
+        var titleTextState by remember { mutableStateOf(vm.titleText) }
+
         val maxLength = 20
         TextField(
             modifier = Modifier
@@ -38,7 +40,10 @@ fun EditNoteFragment(note: NoteModel,
                 .fillMaxWidth(),
             value = titleTextState,
             onValueChange = {
-                if (it.length <= maxLength) titleTextState = it
+                if (it.length <= maxLength){
+                    titleTextState = it
+                    vm.updateTitleText(titleTextState)
+                }
             },
             textStyle = TextStyle(
                 color = colorResource(id = R.color.main_title_text),
@@ -62,34 +67,51 @@ fun EditNoteFragment(note: NoteModel,
             }
         )
 
-        var contentTextState by remember { mutableStateOf(note.content) }
-
-        TextField(
-            modifier = Modifier
-                .wrapContentSize()
-                .fillMaxWidth(),
-            value = contentTextState,
-            onValueChange = {
-                contentTextState = it
-            },
-            textStyle = TextStyle(
-                color = colorResource(id = R.color.grey_neutral),
-                fontSize = 24.sp
-            ),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = colorResource(id = R.color.main_bg),
-                unfocusedContainerColor = colorResource(id = R.color.main_bg),
-            ),
-        )
+        vm.note.content.forEachIndexed { index, map ->
+            when(map["name"]) {
+                "md" -> TextPart(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .fillMaxWidth(),
+                    initialVale = map["text"].toString(),
+                    onTextChange = { newText ->
+                        vm.updateMdText(index, newText)
+                    }
+                )
+            }
+        }
 
         Button(modifier = Modifier.wrapContentSize(),
             onClick = {
-                note.header = titleTextState
-                note.content = contentTextState
-                note.hashCode?.let { onSaveClick(it, note) }
+                vm.saveChanges()
             }) {
             Text(modifier = Modifier.wrapContentSize(),
                 text = "Save")
         }
     }
+}
+
+@Composable
+private fun TextPart(
+    modifier: Modifier,
+    initialVale: String,
+    onTextChange: (String) -> Unit
+    ) {
+    var contentTextState by remember { mutableStateOf(initialVale) }
+    TextField(
+        modifier = modifier,
+        value = contentTextState,
+        onValueChange = {
+            contentTextState = it
+            onTextChange(it)
+        },
+        textStyle = TextStyle(
+            color = colorResource(id = R.color.grey_neutral),
+            fontSize = 24.sp
+        ),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = colorResource(id = R.color.main_bg),
+            unfocusedContainerColor = colorResource(id = R.color.main_bg),
+        ),
+    )
 }

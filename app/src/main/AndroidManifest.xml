@@ -19,7 +19,7 @@
             android:label="@string/title_activity_login"
             android:theme="@style/Theme.Lockscreen_notes" />
         <activity
-            android:name=".presentation.createNote.OpenNoteActivity"
+            android:name=".presentation.openNote.OpenNoteActivity"
             android:exported="false"
             android:label="@string/title_activity_create_note"
             android:theme="@style/Theme.Lockscreen_notes" />

@@ -20,14 +20,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -37,12 +35,11 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import com.luckhost.domain.models.NoteModel
 import com.luckhost.lockscreen_notes.R
-import com.luckhost.lockscreen_notes.presentation.createNote.OpenNoteActivity
+import com.luckhost.lockscreen_notes.presentation.openNote.OpenNoteActivity
 import com.luckhost.lockscreen_notes.presentation.main.additional.functions.NoteBox
 import com.luckhost.lockscreen_notes.presentation.userLogin.LoginActivity
 import com.luckhost.lockscreen_notes.ui.theme.Lockscreen_notesTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.Date
 
 class MainActivity : ComponentActivity() {
     private val vm by viewModel<MainViewModel>()
@@ -97,7 +94,7 @@ class MainActivity : ComponentActivity() {
             },
             floatingActionButton = {
                 FloatingActionButton(onClick = {
-                    startOpenNoteActivity(context)
+                    vm.startOpenNoteActivity(context)
                 }) {
                     Icon(Icons.Default.Add, contentDescription = "Add")
                 }
@@ -129,27 +126,14 @@ class MainActivity : ComponentActivity() {
             items(notes){
                     item ->
                 NoteBox(
-                    title = item.header,
                     content = item.content,
-                    bitmap = null,
                     onItemClick = {
-                        startOpenNoteActivity(context = context, item)
+                        vm.startOpenNoteActivity(context = context, item)
                     },
                     onDeleteIconClick = { onDeleteButClick(item) }
                 )
             }
         }
-    }
-
-    private fun startOpenNoteActivity(context: Context, note: NoteModel) {
-        val intent = Intent(context, OpenNoteActivity::class.java)
-        intent.putExtra("noteHash", note.hashCode)
-        context.startActivity(intent)
-    }
-
-    private fun startOpenNoteActivity(context: Context) {
-        val intent = Intent(context, OpenNoteActivity::class.java)
-        context.startActivity(intent)
     }
 
     override fun onResume() {
