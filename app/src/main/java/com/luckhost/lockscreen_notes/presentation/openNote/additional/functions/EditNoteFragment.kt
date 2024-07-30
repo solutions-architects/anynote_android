@@ -5,10 +5,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -23,9 +21,7 @@ import androidx.compose.ui.text.font.FontFamily
 
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.luckhost.domain.models.NoteModel
 import com.luckhost.lockscreen_notes.R
-import com.luckhost.lockscreen_notes.presentation.openNote.OpenNoteActivity
 import com.luckhost.lockscreen_notes.presentation.openNote.OpenNoteViewModel
 
 @Composable
@@ -80,14 +76,6 @@ fun EditNoteFragment(vm: OpenNoteViewModel) {
                 )
             }
         }
-
-        Button(modifier = Modifier.wrapContentSize(),
-            onClick = {
-                vm.saveChanges()
-            }) {
-            Text(modifier = Modifier.wrapContentSize(),
-                text = "Save")
-        }
     }
 }
 
@@ -112,6 +100,8 @@ private fun TextPart(
         colors = TextFieldDefaults.colors(
             focusedContainerColor = colorResource(id = R.color.main_bg),
             unfocusedContainerColor = colorResource(id = R.color.main_bg),
+
+
         ),
     )
 }

@@ -59,10 +59,12 @@ dependencies {
     implementation("io.insert-koin:koin-android-compat:3.1.4")
 
     //markdown
-
-
-
     implementation("com.github.jeziellago:compose-markdown:0.5.1")
+
+    //animation
+    implementation("androidx.compose.animation:animation:1.0.0")
+    implementation("androidx.compose.animation:animation-core:1.0.0")
+
 
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 

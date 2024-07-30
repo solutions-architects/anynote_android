@@ -14,7 +14,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.luckhost.domain.models.NoteModel
 import com.luckhost.lockscreen_notes.R
 import com.luckhost.lockscreen_notes.presentation.openNote.OpenNoteViewModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
@@ -25,7 +24,7 @@ fun NoteViewFragment(vm: OpenNoteViewModel) {
         Text(
             modifier = Modifier
                 .wrapContentSize()
-                .padding(10.dp)
+                .padding(16.dp)
                 .fillMaxWidth(),
             text = vm.titleText,
             style = TextStyle(
@@ -42,6 +41,7 @@ fun NoteViewFragment(vm: OpenNoteViewModel) {
                 "md" -> MarkdownText(
                     modifier = Modifier
                         .wrapContentSize()
+                        .padding(16.dp)
                         .fillMaxWidth(),
                     markdown = it["text"].toString(),
                     style = TextStyle(

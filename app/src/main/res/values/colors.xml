@@ -2,7 +2,7 @@
 <resources>
     <color name="grey_neutral">#A1A1A1</color>
     <color name="heavy_metal">#2C2C2C</color>
-    <color name="button_stroke">#5A5A5A</color>
+    <color name="stroke_color">#5A5A5A</color>
     <color name="light_grey">#1D1D1D</color>
     <color name="black_and_brown">#212121</color>
     <color name="main_bg">#121212</color>

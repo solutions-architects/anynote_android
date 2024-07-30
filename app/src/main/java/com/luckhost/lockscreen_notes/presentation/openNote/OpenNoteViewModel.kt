@@ -1,7 +1,6 @@
 package com.luckhost.lockscreen_notes.presentation.openNote
 
 import android.util.Log
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import com.luckhost.domain.models.NoteModel
 import com.luckhost.domain.useCases.keys.AddHashUseCase
@@ -27,11 +26,12 @@ class OpenNoteViewModel(
     }
 
     fun createEmptyNote() {
-        titleText = resourceProvider.getString(R.string.empty_note_content)
+        titleText = resourceProvider.getString(R.string.empty_note_title)
+        val contentText = resourceProvider.getString(R.string.empty_note_content)
         val infoBlock = mutableMapOf<String, String>("name" to "info",
-            "header" to resourceProvider.getString(R.string.empty_note_title))
+            "header" to titleText)
         val essenceBlock = mutableMapOf<String, String>("name" to "md",
-            "text" to titleText)
+            "text" to contentText)
 
         note = NoteModel(
             content = mutableListOf<MutableMap<String, String>>(infoBlock, essenceBlock),
