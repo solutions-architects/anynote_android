@@ -113,8 +113,7 @@ fun ScreenLayout() {
                     end.linkTo(parent.end)
                 }
                 .wrapContentSize(),
-                horizontalArrangement = Arrangement.Center
-
+                horizontalArrangement = Arrangement.Center,
             ) {
                 TextButton(
                     modifier = Modifier

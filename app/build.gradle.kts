@@ -55,18 +55,18 @@ dependencies {
     implementation(project(":data"))
 
     // Koin dependencies
-    implementation("io.insert-koin:koin-android:3.1.4")
-    implementation("io.insert-koin:koin-android-compat:3.1.4")
+    implementation(libs.koin.android)
+    implementation(libs.koin.android.compat)
 
     //markdown
-    implementation("com.github.jeziellago:compose-markdown:0.5.1")
+    implementation(libs.compose.markdown)
 
     //animation
-    implementation("androidx.compose.animation:animation:1.0.0")
-    implementation("androidx.compose.animation:animation-core:1.0.0")
+    implementation(libs.androidx.animation)
+    implementation(libs.androidx.animation.core)
 
 
-    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+    implementation(libs.androidx.constraintlayout.compose)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

@@ -37,7 +37,10 @@ dependencies {
     // Other modules
     implementation(project(":domain"))
 
-    implementation("com.google.code.gson:gson:2.8.8")
+    implementation (libs.retrofit)
+    implementation (libs.converter.gson)
+
+    implementation(libs.gson)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
