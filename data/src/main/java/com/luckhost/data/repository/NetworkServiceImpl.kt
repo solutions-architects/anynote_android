@@ -1,11 +1,14 @@
 package com.luckhost.data.repository
 
+import com.luckhost.data.network.NetworkModule
 import com.luckhost.domain.models.network.AuthToken
 import com.luckhost.domain.models.network.LoginInformation
 import com.luckhost.domain.models.network.UserAccountParams
 import com.luckhost.domain.repository.NetworkServiceInterface
 
-class NetworkServiceImpl(): NetworkServiceInterface {
+class NetworkServiceImpl(
+    private val networkModule: NetworkModule,
+): NetworkServiceInterface {
     override fun getAuthToken(loginInformation: LoginInformation): AuthToken {
         TODO("Not yet implemented")
     }

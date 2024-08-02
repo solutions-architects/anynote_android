@@ -1,4 +1,4 @@
-package com.luckhost.data.storage.models.network
+package com.luckhost.data.network.dto
 
 // Refresh and access tokens for further work with the API.
 data class LoginAnswerBody(

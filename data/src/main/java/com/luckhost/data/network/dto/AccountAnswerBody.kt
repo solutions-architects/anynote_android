@@ -1,4 +1,4 @@
-package com.luckhost.data.storage.models.network
+package com.luckhost.data.network.dto
 
 data class AccountAnswerBody(
     val id: Int?,
