@@ -1,6 +1,6 @@
-package com.luckhost.data.storage.materials
+package com.luckhost.data.localStorage.materials
 
-import com.luckhost.data.storage.models.Note
+import com.luckhost.data.localStorage.models.Note
 
 interface NotesStorage {
     fun saveNote(saveObject: Note)

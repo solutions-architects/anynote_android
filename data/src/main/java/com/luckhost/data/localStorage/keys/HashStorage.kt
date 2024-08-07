@@ -1,4 +1,4 @@
-package com.luckhost.data.storage.keys
+package com.luckhost.data.localStorage.keys
 
 interface HashStorage {
     fun getHashes(): List<Int>

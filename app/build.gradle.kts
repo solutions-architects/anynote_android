@@ -65,6 +65,9 @@ dependencies {
     implementation(libs.androidx.animation)
     implementation(libs.androidx.animation.core)
 
+    implementation (libs.jetbrains.kotlin.stdlib)
+    implementation (libs.kotlinx.coroutines.core)
+
 
     implementation(libs.androidx.constraintlayout.compose)
 

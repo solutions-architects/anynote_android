@@ -1,4 +1,4 @@
-package com.luckhost.data.storage.keys
+package com.luckhost.data.localStorage.keys
 
 import android.content.Context
 import com.google.gson.Gson

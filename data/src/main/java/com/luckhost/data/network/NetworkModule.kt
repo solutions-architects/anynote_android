@@ -1,21 +1,33 @@
 package com.luckhost.data.network
 
+import com.luckhost.data.network.dto.AccessToken
 import com.luckhost.data.network.dto.AccessTokens
 import com.luckhost.data.network.dto.AccountAnswerBody
 import com.luckhost.data.network.dto.AccountParams
 import com.luckhost.data.network.dto.LoginAnswerBody
 import com.luckhost.data.network.dto.LoginRequest
-import com.luckhost.data.storage.models.Note
+import com.luckhost.data.network.dto.VerifyTokenAnswer
+import com.luckhost.data.network.models.NetworkError
+import com.luckhost.data.network.models.Either
+import com.luckhost.data.localStorage.models.Note
 
 interface NetworkModule {
-    fun getAuthToken(loginInformation: LoginRequest): LoginAnswerBody
-    fun register(loginInformation: LoginRequest)
-    fun refreshAccessToken(refreshToken: AccessTokens): AccessTokens
-    fun verifyToken(refreshToken: AccessTokens): Boolean
+    suspend fun getAuthToken(loginInformation: LoginRequest):
+            Either<NetworkError, LoginAnswerBody>
+    suspend fun register(loginInformation: LoginRequest):
+            Either<NetworkError, AccountAnswerBody>
 
-    fun getUserAccountParams(accessToken: AccessTokens): AccountAnswerBody
-    fun changeUserAccountParams(accessToken: AccessTokens, userParams: AccountParams)
+    suspend fun refreshAccessToken(refreshToken: AccessTokens):
+            Either<NetworkError, AccessToken>
+    suspend fun verifyToken(refreshToken: AccessTokens):
+            Either<NetworkError, VerifyTokenAnswer>
+    suspend fun getUserAccountParams(accessToken: AccessTokens):
+            Either<NetworkError, AccountAnswerBody>
+    suspend fun changeUserAccountParams(accessToken: AccessTokens, userParams: AccountParams)
 
-    fun getAllNotes(accessToken: AccessTokens): Note
-    fun getNoteById(accessToken: AccessTokens)
+    suspend fun getAllNotes(accessToken: AccessTokens):
+            Either<NetworkError, List<Note>>
+    suspend fun createNewNote(accessToken: AccessTokens, note: Note):
+            Either<NetworkError, Note>
+    suspend fun changeNoteById(accessToken: AccessTokens, note: Note)
 }

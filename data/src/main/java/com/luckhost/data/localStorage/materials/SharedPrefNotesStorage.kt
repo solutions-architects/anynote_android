@@ -1,10 +1,9 @@
-package com.luckhost.data.storage.materials
+package com.luckhost.data.localStorage.materials
 
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
-import android.util.Log
 import com.google.gson.Gson
-import com.luckhost.data.storage.models.Note
+import com.luckhost.data.localStorage.models.Note
 
 class SharedPrefNotesStorage(context: Context): NotesStorage {
     companion object {

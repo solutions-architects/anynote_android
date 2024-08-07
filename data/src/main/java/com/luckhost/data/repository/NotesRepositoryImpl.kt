@@ -1,7 +1,7 @@
 package com.luckhost.data.repository
 
-import com.luckhost.data.storage.models.Note
-import com.luckhost.data.storage.materials.NotesStorage
+import com.luckhost.data.localStorage.models.Note
+import com.luckhost.data.localStorage.materials.NotesStorage
 import com.luckhost.domain.models.NoteModel
 import com.luckhost.domain.repository.NotesRepositoryInterface
 

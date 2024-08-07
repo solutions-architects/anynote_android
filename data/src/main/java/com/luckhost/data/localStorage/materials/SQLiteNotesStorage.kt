@@ -1,4 +1,4 @@
-package com.luckhost.data.storage.materials
+package com.luckhost.data.localStorage.materials
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase

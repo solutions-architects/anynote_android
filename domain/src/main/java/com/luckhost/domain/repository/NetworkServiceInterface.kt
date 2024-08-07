@@ -1,18 +1,32 @@
 package com.luckhost.domain.repository
 
+import com.luckhost.domain.models.Either
+import com.luckhost.domain.models.NoteModel
 import com.luckhost.domain.models.network.AuthToken
 import com.luckhost.domain.models.network.LoginInformation
+import com.luckhost.domain.models.network.NetworkErrorDescription
+import com.luckhost.domain.models.network.SuccessDescription
 import com.luckhost.domain.models.network.UserAccountParams
+import com.luckhost.domain.models.network.VerifyTokenAnswer
 
 interface NetworkServiceInterface {
-    fun getAuthToken(loginInformation: LoginInformation): AuthToken
-    fun register(loginInformation: LoginInformation)
-    fun refreshAccessToken(refreshToken: AuthToken): AuthToken
-    fun verifyToken(refreshToken: AuthToken): Boolean
+    suspend fun getAuthToken(loginInformation: LoginInformation):
+            Either<NetworkErrorDescription, AuthToken>
+    suspend fun register(loginInformation: LoginInformation):
+            Either<NetworkErrorDescription, SuccessDescription>
+    suspend fun refreshAccessToken(refreshToken: AuthToken):
+            Either<NetworkErrorDescription, AuthToken>
+    suspend fun verifyToken(refreshToken: AuthToken):
+            Either<NetworkErrorDescription, VerifyTokenAnswer>
 
-    fun getUserAccountParams(accessToken: AuthToken): UserAccountParams
-    fun changeUserAccountParams(accessToken: AuthToken, userParams: UserAccountParams)
-
-    fun getAllNotes(accessToken: AuthToken)
-    fun getNoteById(accessToken: AuthToken)
+    suspend fun getUserAccountParams(accessToken: AuthToken):
+            Either<NetworkErrorDescription, UserAccountParams>
+    suspend fun changeUserAccountParams(accessToken: AuthToken, userParams: UserAccountParams):
+            Either<NetworkErrorDescription, SuccessDescription>
+    suspend fun getAllNotes(accessToken: AuthToken):
+            Either<NetworkErrorDescription, SuccessDescription>
+    suspend fun createNote(accessToken: AuthToken, note: NoteModel):
+            Either<NetworkErrorDescription, NoteModel>
+    suspend fun changeNoteById(accessToken: AuthToken, note: NoteModel):
+            Either<NetworkErrorDescription, SuccessDescription>
 }

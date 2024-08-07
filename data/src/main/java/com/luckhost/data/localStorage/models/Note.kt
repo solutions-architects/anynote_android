@@ -1,7 +1,4 @@
-package com.luckhost.data.storage.models
-
-import java.util.Date
-import java.util.Dictionary
+package com.luckhost.data.localStorage.models
 
 class Note(
     var id: Int?,
