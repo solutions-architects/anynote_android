@@ -10,6 +10,7 @@ import com.luckhost.data.network.dto.VerifyTokenAnswer
 import com.luckhost.data.network.models.NetworkError
 import com.luckhost.data.network.models.Either
 import com.luckhost.data.localStorage.models.Note
+import com.luckhost.data.network.dto.VerifyTokenRequest
 
 interface NetworkModule {
     suspend fun getAuthToken(loginInformation: LoginRequest):
@@ -19,7 +20,7 @@ interface NetworkModule {
 
     suspend fun refreshAccessToken(refreshToken: AccessTokens):
             Either<NetworkError, AccessToken>
-    suspend fun verifyToken(refreshToken: AccessTokens):
+    suspend fun verifyToken(token: VerifyTokenRequest):
             Either<NetworkError, VerifyTokenAnswer>
     suspend fun getUserAccountParams(accessToken: AccessTokens):
             Either<NetworkError, AccountAnswerBody>

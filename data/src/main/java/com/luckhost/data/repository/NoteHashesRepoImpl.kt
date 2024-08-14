@@ -1,6 +1,6 @@
 package com.luckhost.data.repository
 
-import com.luckhost.data.localStorage.keys.HashStorage
+import com.luckhost.data.localStorage.keys.hashes.HashStorage
 import com.luckhost.domain.repository.NoteHashesRepoInterface
 
 class NoteHashesRepoImpl(

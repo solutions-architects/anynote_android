@@ -1,6 +1,9 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.plugin.serialization)
+
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -64,6 +67,10 @@ dependencies {
     //animation
     implementation(libs.androidx.animation)
     implementation(libs.androidx.animation.core)
+
+    //navigation
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
 
     implementation (libs.jetbrains.kotlin.stdlib)
     implementation (libs.kotlinx.coroutines.core)

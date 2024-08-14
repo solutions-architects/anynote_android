@@ -8,6 +8,7 @@ import com.luckhost.domain.models.network.NetworkErrorDescription
 import com.luckhost.domain.models.network.SuccessDescription
 import com.luckhost.domain.models.network.UserAccountParams
 import com.luckhost.domain.models.network.VerifyTokenAnswer
+import com.luckhost.domain.models.network.VerifyTokenRequest
 
 interface NetworkServiceInterface {
     suspend fun getAuthToken(loginInformation: LoginInformation):
@@ -16,7 +17,7 @@ interface NetworkServiceInterface {
             Either<NetworkErrorDescription, SuccessDescription>
     suspend fun refreshAccessToken(refreshToken: AuthToken):
             Either<NetworkErrorDescription, AuthToken>
-    suspend fun verifyToken(refreshToken: AuthToken):
+    suspend fun verifyToken(token: VerifyTokenRequest):
             Either<NetworkErrorDescription, VerifyTokenAnswer>
 
     suspend fun getUserAccountParams(accessToken: AuthToken):

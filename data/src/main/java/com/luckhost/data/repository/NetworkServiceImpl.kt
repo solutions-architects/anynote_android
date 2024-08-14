@@ -14,6 +14,7 @@ import com.luckhost.domain.models.network.NetworkErrorDescription
 import com.luckhost.domain.models.network.SuccessDescription
 import com.luckhost.domain.models.network.UserAccountParams
 import com.luckhost.domain.models.network.VerifyTokenAnswer
+import com.luckhost.domain.models.network.VerifyTokenRequest
 import com.luckhost.domain.repository.NetworkServiceInterface
 
 class NetworkServiceImpl(
@@ -23,8 +24,8 @@ class NetworkServiceImpl(
             DomainEither<NetworkErrorDescription, AuthToken> {
         val response = networkModule.getAuthToken(
             loginInformation = LoginRequest(
-            password = loginInformation.password,
-            username = loginInformation.username,
+                password = loginInformation.password,
+                username = loginInformation.username,
         ))
 
         return response.toDomainAuthTokenEither()
@@ -60,11 +61,9 @@ class NetworkServiceImpl(
         ))
     }
 
-    override suspend fun verifyToken(refreshToken: AuthToken):
+    override suspend fun verifyToken(token: VerifyTokenRequest):
             DomainEither<NetworkErrorDescription, VerifyTokenAnswer> {
-        return DomainEither.Left(NetworkErrorDescription.Api(
-            error = mutableMapOf("message" to "\"Not yet implemented\""),
-        ))
+        TODO("Not yet implemented")
     }
 
     override suspend fun getUserAccountParams(accessToken: AuthToken):

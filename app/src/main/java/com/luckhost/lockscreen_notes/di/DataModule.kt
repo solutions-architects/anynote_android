@@ -2,8 +2,8 @@ package com.luckhost.lockscreen_notes.di
 
 import com.luckhost.data.repository.NoteHashesRepoImpl
 import com.luckhost.data.repository.NotesRepositoryImpl
-import com.luckhost.data.localStorage.keys.HashStorage
-import com.luckhost.data.localStorage.keys.SharedPrefHashesStorage
+import com.luckhost.data.localStorage.keys.hashes.HashStorage
+import com.luckhost.data.localStorage.keys.hashes.SharedPrefHashesStorage
 import com.luckhost.data.localStorage.materials.NotesStorage
 import com.luckhost.data.localStorage.materials.SharedPrefNotesStorage
 import com.luckhost.data.network.NetworkModule

@@ -5,10 +5,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
@@ -20,13 +16,13 @@ import com.luckhost.lockscreen_notes.R
 fun LoginInputField(
     modifier: Modifier,
     labelText: String,
+    value: String,
+    onValueChange: (String) -> Unit,
 ) {
-    var nicknameFieldState by remember { mutableStateOf("") }
-
     OutlinedTextField(
         modifier = modifier,
-        value = nicknameFieldState,
-        onValueChange = { nicknameFieldState = it },
+        value = value,
+        onValueChange = onValueChange,
         label = {
             Text(
                 text = labelText,

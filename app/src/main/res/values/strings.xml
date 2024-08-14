@@ -8,10 +8,12 @@
         non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
 
     <string name="login_activity_main_text">Log in</string>
+    <string name="login_activity_sign_up_text">Sign up</string>
     <string name="login_activity_nickname_text_field">Nickname</string>
     <string name="login_activity_password_text_field">Password</string>
+    <string name="login_activity_repeat_password_text_field">Repeat password</string>
     <string name="login_activity_sign_in_button">Sing up</string>
-    <string name="login_activity_next_button">Next</string>
+    <string name="login_activity_next_button">Apply</string>
 
     <string name="confirm_dialog_question">Are you sure?</string>
     <string name="confirm_dialog_answer_yes">Yes</string>

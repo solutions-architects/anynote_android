@@ -14,39 +14,36 @@ import com.luckhost.data.network.dto.VerifyTokenRequest
 import com.luckhost.data.network.models.Either
 import com.luckhost.data.network.models.NetworkError
 import com.luckhost.data.localStorage.models.Note
+import kotlinx.coroutines.flow.last
 
 class RetrofitModule: NetworkModule  {
     private val netApi = NetApi.retrofitApi
 
     override suspend fun getAuthToken(
         loginInformation: LoginRequest): Either<NetworkError, LoginAnswerBody> {
-        val response = netApi.login(loginInformation)
-
-        return getBodyOrNetworkError(
-            response = response,
-            errorStringToGet = "detail"
-        )
+        return execute(
+            responseCall = { netApi.login(loginInformation) },
+            errorStringToGet = "detail",
+        ).last()
     }
 
     override suspend fun register(
         loginInformation: LoginRequest): Either<NetworkError, AccountAnswerBody> {
-        val response = netApi.register(loginInformation)
 
-        return getBodyOrNetworkError(
-            response = response,
-            errorStringToGet = "detail"
-        )
+        return execute(
+            responseCall = { netApi.register(loginInformation) },
+            errorStringToGet = "detail",
+        ).last()
     }
 
     override suspend fun refreshAccessToken(
         refreshToken: AccessTokens): Either<NetworkError, AccessToken> {
         refreshToken.refreshToken?.let {
-            val response = netApi.refreshAccessToken(RefreshToken(it))
 
-            return getBodyOrNetworkError(
-                response = response,
+            return execute(
+                responseCall = { netApi.refreshAccessToken(RefreshToken(it)) },
                 errorStringToGet = "detail",
-            )
+            ).last()
         }
         return Either.Left(
             NetworkError.Api(
@@ -56,29 +53,27 @@ class RetrofitModule: NetworkModule  {
     }
 
     override suspend fun verifyToken(
-        refreshToken: AccessTokens): Either<NetworkError, VerifyTokenAnswer> {
-        val response = netApi.verifyToken(
-            VerifyTokenRequest(
-                refreshToken.refreshToken.toString()
-            )
-        )
+        token: VerifyTokenRequest): Either<NetworkError, VerifyTokenAnswer> {
 
-        return getBodyOrNetworkError(
-            response = response,
-            errorStringToGet = "detail"
-        )
+        return execute(
+            responseCall = { netApi.verifyToken(
+                VerifyTokenRequest(
+                    token = token.token
+                )
+            ) },
+            errorStringToGet = "detail",
+        ).last()
     }
 
     override suspend fun getUserAccountParams(
         accessToken: AccessTokens): Either<NetworkError, AccountAnswerBody> {
-        val response = netApi.getAccountParams(
-            token = "Bearer ${accessToken.accessToken}"
-        )
 
-        return getBodyOrNetworkError(
-            response = response,
-            errorStringToGet = "detail"
-        )
+        return execute(
+            responseCall = { netApi.getAccountParams(
+                token = "Bearer ${accessToken.accessToken}"
+            ) },
+            errorStringToGet = "detail",
+        ).last()
     }
 
     override suspend fun changeUserAccountParams(accessToken: AccessTokens,
@@ -91,30 +86,29 @@ class RetrofitModule: NetworkModule  {
 
     override suspend fun getAllNotes(accessToken: AccessTokens):
             Either<NetworkError, List<Note>> {
-        val response = netApi.getAllNotes(
-            token = "Bearer ${accessToken.accessToken}",
-        )
 
-        return getBodyOrNetworkError(
-            response = response,
-            errorStringToGet = "detail"
-        )
+        return execute(
+            responseCall = { netApi.getAllNotes(
+                token = "Bearer ${accessToken.accessToken}",
+            )
+            },
+            errorStringToGet = "detail",
+        ).last()
     }
 
     override suspend fun createNewNote(accessToken: AccessTokens, note: Note):
             Either<NetworkError, Note> {
-        val response = netApi.createNewNote(
-            token = "Bearer ${accessToken.accessToken}",
-            note = CreateNoteRequest(
-                content = note.content,
-                noteHash = note.noteHash,
-            )
-        )
 
-        return getBodyOrNetworkError(
-            response = response,
-            errorStringToGet = "detail"
-        )
+        return execute(
+            responseCall = { netApi.createNewNote(
+                token = "Bearer ${accessToken.accessToken}",
+                note = CreateNoteRequest(
+                    content = note.content,
+                    noteHash = note.noteHash,
+                )
+            ) },
+            errorStringToGet = "detail",
+        ).last()
     }
 
     override suspend fun changeNoteById(accessToken: AccessTokens, note: Note) {

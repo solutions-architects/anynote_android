@@ -1,4 +1,4 @@
-package com.luckhost.data.localStorage.keys
+package com.luckhost.data.localStorage.keys.hashes
 
 import android.content.Context
 import com.google.gson.Gson
@@ -7,7 +7,7 @@ import com.google.gson.reflect.TypeToken
 
 class SharedPrefHashesStorage(context: Context): HashStorage {
     companion object {
-        private const val SHARED_PREFS_NAME = "hash_note_prefs"
+        const val SHARED_PREFS_NAME = "hash_note_prefs"
     }
 
     private val sharedPreferences = context.getSharedPreferences(
