@@ -21,7 +21,7 @@ class RetrofitModule: NetworkModule  {
 
     override suspend fun getAuthToken(
         loginInformation: LoginRequest): Either<NetworkError, LoginAnswerBody> {
-        return execute(
+        return makeRequest(
             responseCall = { netApi.login(loginInformation) },
             errorStringToGet = "detail",
         ).last()
@@ -30,7 +30,7 @@ class RetrofitModule: NetworkModule  {
     override suspend fun register(
         loginInformation: LoginRequest): Either<NetworkError, AccountAnswerBody> {
 
-        return execute(
+        return makeRequest(
             responseCall = { netApi.register(loginInformation) },
             errorStringToGet = "detail",
         ).last()
@@ -40,7 +40,7 @@ class RetrofitModule: NetworkModule  {
         refreshToken: AccessTokens): Either<NetworkError, AccessToken> {
         refreshToken.refreshToken?.let {
 
-            return execute(
+            return makeRequest(
                 responseCall = { netApi.refreshAccessToken(RefreshToken(it)) },
                 errorStringToGet = "detail",
             ).last()
@@ -53,9 +53,10 @@ class RetrofitModule: NetworkModule  {
     }
 
     override suspend fun verifyToken(
-        token: VerifyTokenRequest): Either<NetworkError, VerifyTokenAnswer> {
+        token: com.luckhost.domain.models.network.VerifyTokenRequest
+    ): Either<NetworkError, VerifyTokenAnswer> {
 
-        return execute(
+        return makeRequest(
             responseCall = { netApi.verifyToken(
                 VerifyTokenRequest(
                     token = token.token
@@ -68,7 +69,7 @@ class RetrofitModule: NetworkModule  {
     override suspend fun getUserAccountParams(
         accessToken: AccessTokens): Either<NetworkError, AccountAnswerBody> {
 
-        return execute(
+        return makeRequest(
             responseCall = { netApi.getAccountParams(
                 token = "Bearer ${accessToken.accessToken}"
             ) },
@@ -87,7 +88,7 @@ class RetrofitModule: NetworkModule  {
     override suspend fun getAllNotes(accessToken: AccessTokens):
             Either<NetworkError, List<Note>> {
 
-        return execute(
+        return makeRequest(
             responseCall = { netApi.getAllNotes(
                 token = "Bearer ${accessToken.accessToken}",
             )
@@ -99,7 +100,7 @@ class RetrofitModule: NetworkModule  {
     override suspend fun createNewNote(accessToken: AccessTokens, note: Note):
             Either<NetworkError, Note> {
 
-        return execute(
+        return makeRequest(
             responseCall = { netApi.createNewNote(
                 token = "Bearer ${accessToken.accessToken}",
                 note = CreateNoteRequest(

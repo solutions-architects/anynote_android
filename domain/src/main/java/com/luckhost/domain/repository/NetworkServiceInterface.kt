@@ -25,7 +25,7 @@ interface NetworkServiceInterface {
     suspend fun changeUserAccountParams(accessToken: AuthToken, userParams: UserAccountParams):
             Either<NetworkErrorDescription, SuccessDescription>
     suspend fun getAllNotes(accessToken: AuthToken):
-            Either<NetworkErrorDescription, SuccessDescription>
+            Either<NetworkErrorDescription, List<NoteModel>>
     suspend fun createNote(accessToken: AuthToken, note: NoteModel):
             Either<NetworkErrorDescription, NoteModel>
     suspend fun changeNoteById(accessToken: AuthToken, note: NoteModel):

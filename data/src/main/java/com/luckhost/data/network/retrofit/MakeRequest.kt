@@ -1,6 +1,7 @@
 package com.luckhost.data.network.retrofit
 
 import com.luckhost.data.network.models.Either
+import com.luckhost.data.network.models.IsBodyWasEmpty
 import com.luckhost.data.network.models.NetworkError
 import kotlinx.coroutines.flow.flow
 import org.json.JSONObject
@@ -11,12 +12,13 @@ import retrofit2.HttpException
 import java.io.IOException
 import java.net.SocketTimeoutException
 
-fun <T> execute(
+fun <T> makeRequest(
     responseCall: suspend () -> Response<T>,
     errorStringToGet: String,
 ): Flow<Either<NetworkError, T>> = flow {
     try {
         val response = responseCall()
+
         if (response.isSuccessful && response.body() != null) {
             emit(Either.Right(response.body()!!))
         } else {
