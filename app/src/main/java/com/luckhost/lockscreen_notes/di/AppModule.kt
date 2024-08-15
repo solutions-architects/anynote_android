@@ -30,6 +30,7 @@ val appModule = module {
     viewModel<LoginViewModel>{
         LoginViewModel(
             getAuthTokenUseCase = get(),
+            signUpUseCase = get()
         )
     }
 }

@@ -2,6 +2,7 @@ package com.luckhost.data.repository
 
 import com.luckhost.data.network.NetworkModule
 import com.luckhost.data.network.dto.AccessTokens
+import com.luckhost.data.network.dto.AccountParams
 import com.luckhost.data.network.dto.LoginRequest
 import com.luckhost.data.network.models.Either
 import com.luckhost.data.network.models.NetworkError
@@ -107,9 +108,21 @@ class NetworkServiceImpl(
     override suspend fun changeUserAccountParams(accessToken: AuthToken,
                                                  userParams: UserAccountParams):
             DomainEither<NetworkErrorDescription, SuccessDescription> {
-        return DomainEither.Left(NetworkErrorDescription.Api(
-            error = mutableMapOf("message" to "\"Not yet implemented\""),
-        ))
+        val response = networkModule.changeUserAccountParams(
+                accessToken = AccessTokens(
+                    accessToken = accessToken.accessToken,
+                    refreshToken = accessToken.refreshToken
+                ),
+                userParams = AccountParams(
+                    username = userParams.username,
+                    firstName = userParams.firstName,
+                    lastName = userParams.lastName,
+                    email = userParams.email,
+                    isStuff = userParams.isStuff
+                )
+            )
+
+        return response.toDomainOnlyErrorEither()
     }
 
     override suspend fun getAllNotes(accessToken: AuthToken):

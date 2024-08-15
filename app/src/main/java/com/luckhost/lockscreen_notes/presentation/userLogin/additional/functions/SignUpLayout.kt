@@ -89,7 +89,7 @@ fun SignUpLayout(
                     },
                 labelText = stringResource(id = R.string.login_activity_password_text_field),
                 value = passwordTextState,
-                onValueChange = { text -> vm.updatePasswordRepeatText(text) }
+                onValueChange = { text -> vm.updatePasswordText(text) }
             )
 
             LoginInputField(
@@ -103,7 +103,7 @@ fun SignUpLayout(
                 labelText =
                 stringResource(id = R.string.login_activity_repeat_password_text_field),
                 value = passwordRepeatTextState,
-                onValueChange = { text -> vm.updatePasswordText(text) }
+                onValueChange = { text -> vm.updatePasswordRepeatText(text) }
             )
 
             Row(modifier = Modifier
@@ -141,7 +141,7 @@ fun SignUpLayout(
                         disabledContentColor = colorResource(id = R.color.light_grey),
                     ),
                     onClick = {
-                        vm.getToken()
+                        vm.signUp()
                     }) {
                     Text(text = stringResource(id = R.string.login_activity_next_button),
                         style = TextStyle(fontSize = 26.sp),

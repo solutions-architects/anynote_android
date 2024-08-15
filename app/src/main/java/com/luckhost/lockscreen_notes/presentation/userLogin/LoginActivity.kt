@@ -1,6 +1,7 @@
 package com.luckhost.lockscreen_notes.presentation.userLogin
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
@@ -19,10 +20,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -69,6 +72,17 @@ class LoginActivity : ComponentActivity() {
                         SignUpLayout(
                             vm = vm
                         )
+                    }
+                }
+
+                val toastNotification by vm.toastNotification.collectAsState()
+
+                val context = LocalContext.current
+                if (toastNotification.isNotEmpty()) {
+                    LaunchedEffect(vm.toastNotification) {
+                        Toast.makeText(context, toastNotification,
+                            Toast.LENGTH_SHORT).show()
+                        vm.clearToastNotification()
                     }
                 }
             }

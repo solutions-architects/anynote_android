@@ -1,5 +1,6 @@
 package com.luckhost.data.network.retrofit
 
+import com.luckhost.data.network.dto.SuccessMessage
 import com.luckhost.data.network.models.Either
 import com.luckhost.data.network.models.NetworkError
 import kotlinx.coroutines.flow.flow
@@ -11,15 +12,18 @@ import retrofit2.HttpException
 import java.io.IOException
 import java.net.SocketTimeoutException
 
-fun <T> makeRequest(
+/**
+ * this function is needed in order to send requests that return empty bodies
+ */
+fun <T> makeNullableRequest(
     responseCall: suspend () -> Response<T>,
     errorStringToGet: String
-): Flow<Either<NetworkError, T>> = flow {
+): Flow<Either<NetworkError, SuccessMessage>> = flow {
     try {
         val response = responseCall()
 
-        if (response.isSuccessful && response.body() != null) {
-            emit(Either.Right(response.body()!!))
+        if (response.isSuccessful) {
+            emit(Either.Right(SuccessMessage()))
         } else {
             response.errorBody()?.let {
                 val errorMessage =
@@ -47,7 +51,6 @@ fun <T> makeRequest(
 }.catch { e ->
     emit(Either.Left(NetworkError.Unexpected(
         "An error occurred: ${e.localizedMessage}")
-    )
+        )
     )
 }
-

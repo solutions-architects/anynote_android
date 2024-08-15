@@ -1,9 +1,9 @@
 package com.luckhost.domain.models.network
 
 data class UserAccountParams(
-    val username: String?,
-    val firstName: String?,
-    val lastName: String?,
-    val email: String?,
-    val isStuff: Boolean?,
+    var username: String = "not specified",
+    var firstName: String = "not specified",
+    var lastName: String = "not specified",
+    var email: String = "not specified",
+    var isStuff: Boolean = false,
 )

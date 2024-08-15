@@ -31,11 +31,13 @@ fun AccessToken.toDomainAuthToken(refreshToken: String): AuthToken {
 }
 
 fun AccountAnswerBody.toDomainUserAccountParams(): UserAccountParams {
-    return UserAccountParams(
-        username = this.username,
-        firstName = this.first_name,
-        lastName = this.last_name,
-        email = this.email,
-        isStuff = this.is_staff
-    )
+    val result = UserAccountParams()
+
+    this.username?.let { result.username = it }
+    this.first_name?.let { result.firstName = it }
+    this.last_name?.let { result.lastName = it }
+    this.email?.let { result.email = it }
+    this.is_staff?.let { result.isStuff = it }
+
+    return result
 }

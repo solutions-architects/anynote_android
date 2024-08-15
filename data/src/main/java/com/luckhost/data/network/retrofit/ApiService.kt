@@ -7,9 +7,9 @@ import com.luckhost.data.network.dto.CreateNoteRequest
 import com.luckhost.data.network.dto.LoginAnswerBody
 import com.luckhost.data.network.dto.LoginRequest
 import com.luckhost.data.network.dto.RefreshToken
-import com.luckhost.data.network.dto.VerifyTokenAnswer
 import com.luckhost.data.network.dto.VerifyTokenRequest
 import com.luckhost.data.localStorage.models.Note
+import okhttp3.Request
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -29,7 +29,7 @@ interface ApiService {
     suspend fun refreshAccessToken(@Body request: RefreshToken): Response<AccessToken>
 
     @POST("auth/verify")
-    suspend fun verifyToken(@Body request: VerifyTokenRequest): Response<VerifyTokenAnswer>
+    suspend fun verifyToken(@Body request: VerifyTokenRequest): Response<Request>
 
     @GET("account")
     suspend fun getAccountParams(
@@ -37,7 +37,7 @@ interface ApiService {
 
     @PATCH("account")
     suspend fun changeAccountParams(@Header("Authorization") token: String,
-                                    @Body request: AccountParams)
+                                    @Body request: AccountParams): Response<Request>
 
     @GET("account/notes")
     suspend fun getAllNotes(@Header("Authorization") token: String): Response<List<Note>>
@@ -49,5 +49,5 @@ interface ApiService {
     // still in development on the server
     @PATCH("account/notes/{id}")
     suspend fun changeNoteById(@Header("Authorization") token: String,
-                            @Path("id") id: Int, @Body request: Note)
+                            @Path("id") id: Int, @Body request: Note): Response<Request>
 }

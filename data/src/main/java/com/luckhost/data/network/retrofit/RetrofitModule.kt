@@ -9,11 +9,11 @@ import com.luckhost.data.network.dto.CreateNoteRequest
 import com.luckhost.data.network.dto.LoginAnswerBody
 import com.luckhost.data.network.dto.LoginRequest
 import com.luckhost.data.network.dto.RefreshToken
-import com.luckhost.data.network.dto.VerifyTokenAnswer
 import com.luckhost.data.network.dto.VerifyTokenRequest
 import com.luckhost.data.network.models.Either
 import com.luckhost.data.network.models.NetworkError
 import com.luckhost.data.localStorage.models.Note
+import com.luckhost.data.network.dto.SuccessMessage
 import kotlinx.coroutines.flow.last
 
 class RetrofitModule: NetworkModule  {
@@ -54,9 +54,9 @@ class RetrofitModule: NetworkModule  {
 
     override suspend fun verifyToken(
         token: com.luckhost.domain.models.network.VerifyTokenRequest
-    ): Either<NetworkError, VerifyTokenAnswer> {
+    ): Either<NetworkError, SuccessMessage> {
 
-        return makeRequest(
+        return makeNullableRequest(
             responseCall = { netApi.verifyToken(
                 VerifyTokenRequest(
                     token = token.token
@@ -77,12 +77,16 @@ class RetrofitModule: NetworkModule  {
         ).last()
     }
 
-    override suspend fun changeUserAccountParams(accessToken: AccessTokens,
-                                                 userParams: AccountParams) {
-        netApi.changeAccountParams(
-            token = "Bearer ${accessToken.accessToken}",
-            request = userParams,
-        )
+    override suspend fun changeUserAccountParams(
+        accessToken: AccessTokens, userParams: AccountParams):
+            Either<NetworkError, SuccessMessage> {
+        return makeNullableRequest(
+            responseCall = { netApi.changeAccountParams(
+                token = "Bearer ${accessToken.accessToken}",
+                request = userParams,
+            ) },
+            errorStringToGet = "detail",
+        ).last()
     }
 
     override suspend fun getAllNotes(accessToken: AccessTokens):
@@ -112,13 +116,19 @@ class RetrofitModule: NetworkModule  {
         ).last()
     }
 
-    override suspend fun changeNoteById(accessToken: AccessTokens, note: Note) {
+    override suspend fun changeNoteById(
+        accessToken: AccessTokens, note: Note): Either<NetworkError, SuccessMessage> {
         note.id?.let {
-            netApi.changeNoteById(
-                token = "Bearer ${accessToken.accessToken}",
-                id = it,
-                request = note,
-            )
+            return makeNullableRequest(
+                responseCall = { netApi.changeNoteById(
+                    token = "Bearer ${accessToken.accessToken}",
+                    id = it,
+                    request = note,
+                ) },
+                errorStringToGet = "detail",
+            ).last()
         }
+
+        return Either.Left(NetworkError.Unexpected(error = "Note id is null :("))
     }
 }
