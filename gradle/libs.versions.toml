@@ -5,6 +5,7 @@ composeMarkdown = "0.5.1"
 constraintlayoutCompose = "1.0.1"
 converterGson = "2.9.0"
 gson = "2.10.1"
+jetbrainsKotlinxCoroutinesCore = "1.5.2"
 koinAndroid = "3.1.4"
 koinAndroidCompat = "3.1.4"
 kotlin = "2.0.0"
@@ -13,10 +14,12 @@ junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
 kotlinxCoroutinesCore = "1.7.1"
+kotlinxCoroutinesCoreVersion = "1.3.2"
 lifecycleRuntimeKtx = "2.8.0"
 activityCompose = "1.9.0"
 composeBom = "2023.08.00"
 appcompat = "1.6.1"
+lifecycleRuntimeKtxVersion = "2.4.0-beta01"
 material = "1.12.0"
 jetbrainsKotlinJvm = "1.9.0"
 constraintlayout = "2.1.4"
@@ -26,6 +29,9 @@ serializationVersion = "2.0.0"
 serializationKotlin = "1.7.1"
 
 [libraries]
+androidx-lifecycle-runtime-ktx-v240beta01 = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtxVersion" }
+kotlinx-coroutines-core-v132 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCoreVersion" }
+kotlinx-coroutines-core-v152 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "jetbrainsKotlinxCoroutinesCore" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serializationKotlin"}
 
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }

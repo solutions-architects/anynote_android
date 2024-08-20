@@ -34,7 +34,6 @@ class LoginViewModel(
         _toastNotification.value = ""
     }
 
-
     fun updateLoginText(newText: String) {
         _loginTextState.value = newText
     }
@@ -49,24 +48,28 @@ class LoginViewModel(
 
 
     fun signUp() {
-        viewModelScope.launch {
-            val response = signUpUseCase.execute(
-                loginParams = LoginInformation(
-                    username = loginTextState.value,
-                    password = passwordTextState.value
+        if (_passwordTextState.value == _passwordRepeatTextState.value) {
+            viewModelScope.launch {
+                val response = signUpUseCase.execute(
+                    loginParams = LoginInformation(
+                        username = _loginTextState.value,
+                        password = _passwordTextState.value
+                    )
                 )
-            )
 
-            when(response) {
-                is Either.Right -> {
-                    _toastNotification.value = "Registration is successful!"
-                }
-                is Either.Left -> {
-                    _toastNotification.value = "${response.a}"
-                    Log.e("LoginVM", "error: ${response.a}")
-                }
+                when(response) {
+                    is Either.Right -> {
+                        _toastNotification.value = "Registration is successful!"
+                    }
+                    is Either.Left -> {
+                        _toastNotification.value = "${response.a}"
+                        Log.e("LoginVM", "error: ${response.a}")
+                    }
 
+                }
             }
+        } else {
+            _toastNotification.value = "Passwords don't match!"
         }
     }
 
@@ -85,12 +88,11 @@ class LoginViewModel(
                     _toastNotification.value = "Login is successful!"
                 }
                 is Either.Left -> {
-                    _toastNotification.value = "${response.a}"
+
                     Log.e("LoginVM", "error: ${response.a}")
                 }
 
             }
         }
     }
-
 }

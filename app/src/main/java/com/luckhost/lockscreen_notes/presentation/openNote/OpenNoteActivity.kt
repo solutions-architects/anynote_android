@@ -2,6 +2,7 @@ package com.luckhost.lockscreen_notes.presentation.openNote
 
 import android.os.Build
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -22,6 +23,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +44,8 @@ class OpenNoteActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        window.setDecorFitsSystemWindows(false)
+
         val extras = intent.extras
         
         extras?.let {
@@ -53,7 +57,8 @@ class OpenNoteActivity : ComponentActivity() {
 
         setContent {
             Lockscreen_notesTheme {
-                var isEditMode by remember { mutableStateOf(false) }
+                val isEditMode by vm.isEditMode.collectAsState()
+
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     containerColor = colorResource(id = R.color.main_bg),
@@ -64,7 +69,7 @@ class OpenNoteActivity : ComponentActivity() {
                                 modifier = Modifier
                                     .padding(10.dp)
                                     .size(65.dp),
-                                onClick = { isEditMode = !isEditMode },
+                                onClick = { vm.changeEditModeState() },
                                 containerColor =
                                 if (isEditMode)
                                     colorResource(id = R.color.grey_neutral)
@@ -112,7 +117,8 @@ class OpenNoteActivity : ComponentActivity() {
             FloatingActionButton(modifier = Modifier
                 .padding(10.dp)
                 .size(65.dp),
-                onClick = { vm.saveChanges() },
+                onClick = { vm.saveChanges()
+                          vm.changeEditModeState() },
                 containerColor =
                     colorResource(id = R.color.heavy_metal),
                 contentColor =

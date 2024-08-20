@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import com.google.gson.Gson
 import com.luckhost.data.localStorage.models.Note
+import kotlinx.coroutines.flow.flow
 
 class SharedPrefNotesStorage(context: Context): NotesStorage {
     companion object {
@@ -17,17 +18,15 @@ class SharedPrefNotesStorage(context: Context): NotesStorage {
         sharedPreferences.edit().putString(saveObject.noteHash.toString(), noteJson).apply()
     }
 
-    override fun getNotes(noteHashes: List<Int>): List<Note> {
+    override suspend fun getNotes(noteHashes: List<Int>) = flow<Note> {
         val gson = Gson()
-        val result: MutableList<Note> = mutableListOf()
         noteHashes.forEach{
             val noteJson = sharedPreferences.getString(it.toString(),
                 null)
             if(noteJson != null) {
-                result.add(gson.fromJson(noteJson, Note::class.java))
+                emit(gson.fromJson(noteJson, Note::class.java))
             }
         }
-        return result
     }
 
     override fun deleteNote(noteHash: Int) {

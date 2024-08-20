@@ -75,6 +75,9 @@ dependencies {
     implementation (libs.jetbrains.kotlin.stdlib)
     implementation (libs.kotlinx.coroutines.core)
 
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.kotlinx.coroutines.core)
+
 
     implementation(libs.androidx.constraintlayout.compose)
 

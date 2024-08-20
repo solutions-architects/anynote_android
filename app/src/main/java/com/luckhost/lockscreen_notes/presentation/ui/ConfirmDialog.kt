@@ -1,4 +1,4 @@
-package com.example.yourapp.ui.components
+package com.luckhost.lockscreen_notes.presentation.ui
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button

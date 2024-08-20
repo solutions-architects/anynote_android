@@ -15,7 +15,7 @@
     <string name="login_activity_sign_in_button">Sing up</string>
     <string name="login_activity_next_button">Apply</string>
 
-    <string name="confirm_dialog_question">Are you sure?</string>
+    <string name="confirm_dialog_question">Wait a minute!</string>
     <string name="confirm_dialog_answer_yes">Yes</string>
     <string name="confirm_dialog_answer_no">No</string>
 

@@ -26,6 +26,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -54,7 +56,7 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun ScreenLayout() {
-        val notesListState = remember { vm.notesList }
+        val notesListState by vm.notesList.collectAsState()
         val context = LocalContext.current
 
         Scaffold(
@@ -78,8 +80,10 @@ class MainActivity : ComponentActivity() {
                     IconButton(
                         modifier = Modifier
                             .wrapContentSize()
-                            .padding(end = 8.dp,
-                                top = 8.dp),
+                            .padding(
+                                end = 8.dp,
+                                top = 8.dp
+                            ),
                         onClick = {
                             val intent = Intent(context, LoginActivity::class.java)
                             context.startActivity(intent)
@@ -118,7 +122,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun NotesList(notes: SnapshotStateList<NoteModel>,
+    fun NotesList(notes: List<NoteModel>,
                   onDeleteButClick: (NoteModel) -> Unit ) {
         val context = LocalContext.current
         LazyColumn(modifier = Modifier.wrapContentSize(),

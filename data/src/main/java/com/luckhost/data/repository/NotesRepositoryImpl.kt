@@ -1,9 +1,18 @@
 package com.luckhost.data.repository
 
+import android.util.Log
 import com.luckhost.data.localStorage.models.Note
 import com.luckhost.data.localStorage.materials.NotesStorage
 import com.luckhost.domain.models.NoteModel
 import com.luckhost.domain.repository.NotesRepositoryInterface
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 open class NotesRepositoryImpl(
     private val notesStorage: NotesStorage,
@@ -17,19 +26,16 @@ open class NotesRepositoryImpl(
         notesStorage.saveNote(note)
     }
 
-    override fun getNotes(noteHashes: List<Int>): List<NoteModel> {
-        val getData = notesStorage.getNotes(noteHashes)
-        val result: MutableList<NoteModel> = mutableListOf()
-        getData.forEach{
-            result.add(
-                NoteModel(
-                    content = it.content.toMutableList(),
-                    hashCode = it.noteHash,
+    override suspend fun getNotes(noteHashes: List<Int>) = flow<NoteModel> {
+        notesStorage.getNotes(noteHashes)
+            .onEach { note ->
+                emit(
+                    NoteModel(
+                        content = note.content.toMutableList(),
+                        hashCode = note.noteHash,
+                    )
                 )
-
-            )
-        }
-        return result
+            }.collect()
     }
 
     override fun deleteNote(noteHash: Int) {

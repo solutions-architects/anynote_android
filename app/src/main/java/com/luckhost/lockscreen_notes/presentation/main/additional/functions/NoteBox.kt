@@ -31,7 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.example.yourapp.ui.components.ConfirmDialog
+import com.luckhost.lockscreen_notes.presentation.ui.ConfirmDialog
 import com.luckhost.lockscreen_notes.R
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
@@ -44,10 +44,10 @@ fun NoteBox(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(20.dp)
+            .padding(10.dp)
             .shadow(
                 elevation = 10.dp,
-                shape = RoundedCornerShape(20.dp)
+                shape = RoundedCornerShape(10.dp)
             )
             .background(color = colorResource(R.color.notebox_bg))
             .wrapContentHeight()

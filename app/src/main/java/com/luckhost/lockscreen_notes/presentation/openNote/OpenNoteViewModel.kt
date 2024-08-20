@@ -2,6 +2,7 @@ package com.luckhost.lockscreen_notes.presentation.openNote
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.luckhost.domain.models.NoteModel
 import com.luckhost.domain.useCases.keys.AddHashUseCase
 import com.luckhost.domain.useCases.objects.ChangeNoteUseCase
@@ -9,6 +10,11 @@ import com.luckhost.domain.useCases.objects.GetNotesUseCase
 import com.luckhost.domain.useCases.objects.SaveNoteUseCase
 import com.luckhost.lockscreen_notes.R
 import com.luckhost.lockscreen_notes.di.ResourceProvider
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class OpenNoteViewModel(
     private val saveNoteUseCase: SaveNoteUseCase,
@@ -17,12 +23,15 @@ class OpenNoteViewModel(
     private val addHashUseCase: AddHashUseCase,
     private val resourceProvider: ResourceProvider,
 ) : ViewModel() {
+
+    private val _isEditMode = MutableStateFlow(false)
+    val isEditMode: StateFlow<Boolean> = _isEditMode.asStateFlow()
+
     lateinit var note: NoteModel
     lateinit var titleText: String
 
-
-    init {
-        Log.d("OpenNoteVM", "init")
+    fun changeEditModeState() {
+        _isEditMode.value = !_isEditMode.value
     }
 
     fun createEmptyNote() {
@@ -44,7 +53,9 @@ class OpenNoteViewModel(
     }
 
     fun getNote(hashCode: Int) {
-        note = getNotesUseCase.execute(listOf(hashCode)).first()
+        viewModelScope.launch {
+            note = getNotesUseCase.execute(listOf(hashCode)).first()
+        }
         note.content.forEach{
             if (it["name"] == "info") {
                 titleText = it["header"].toString()
@@ -58,7 +69,6 @@ class OpenNoteViewModel(
 
     fun updateMdText(index: Int, newText: String) {
         note.content[index]["text"] = newText
-        Log.d("OpenNoteVM", note.content[index]["text"].toString())
     }
 
     fun saveChanges() {
