@@ -42,9 +42,9 @@ class MainViewModel(
     }
 
     fun refreshNotesList() {
-        _notesList.value.clear()
         Log.d("MainVM", "start refresh")
-        CoroutineScope(Dispatchers.IO).launch {
+        _notesList.value.clear()
+        viewModelScope.launch {
             getNotesUseCase.execute(getHashesUseCase.execute())
                 .collect{
                     value -> _notesList.value.add(value)

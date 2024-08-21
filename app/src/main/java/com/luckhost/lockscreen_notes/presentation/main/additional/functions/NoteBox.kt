@@ -1,5 +1,6 @@
 package com.luckhost.lockscreen_notes.presentation.main.additional.functions
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -16,9 +17,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,21 +46,44 @@ fun NoteBox(
     onItemClick: () -> Unit,
     onDeleteIconClick: () -> Unit,
 ) {
-    Box(
+
+    val titleText = remember { mutableStateOf("") }
+    val mdText = remember { mutableStateOf("") }
+
+    LaunchedEffect(content) {
+        for (entry in content) {
+            when (entry["name"]) {
+                "info" -> {
+                    if (titleText.value.isNotEmpty()) continue
+
+                    entry["header"]?.let {
+                        titleText.value = it
+                    }
+                }
+                "md" -> {
+                    if (mdText.value.isNotEmpty()) continue
+
+                    entry["text"]?.let {
+                        mdText.value = it
+                    }
+                }
+                "map" -> { /* Обработка других данных */ }
+            }
+        }
+    }
+
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp)
-            .shadow(
-                elevation = 10.dp,
-                shape = RoundedCornerShape(10.dp)
-            )
-            .background(color = colorResource(R.color.notebox_bg))
-            .wrapContentHeight()
-            .clickable {
-                onItemClick()
-            },
-        contentAlignment = Alignment.Center,
-        
+            .clickable { onItemClick() },
+        colors = CardDefaults.cardColors(
+            containerColor = colorResource(R.color.notebox_bg)
+        ),
+        elevation = CardDefaults.elevatedCardElevation(
+            defaultElevation = 15.dp,
+            pressedElevation = 0.dp
+        ),
     ) {
         ConstraintLayout(
             modifier = Modifier
@@ -65,13 +93,15 @@ fun NoteBox(
 
             var showDialog by remember { mutableStateOf(false) }
 
-            IconButton(onClick = { showDialog = true },
+            IconButton(
+                onClick = { showDialog = true },
                 modifier = Modifier
                     .constrainAs(buttonRef) {
                         end.linkTo(parent.end)
                         top.linkTo(parent.top)
                     }
-                    .size(30.dp)) {
+                    .size(30.dp)
+            ) {
                 Icon(
                     imageVector = Icons.Outlined.Close,
                     contentDescription = null,
@@ -90,45 +120,39 @@ fun NoteBox(
                 )
             }
 
+            HorizontalDivider(
+                modifier = Modifier.constrainAs(dividerRef) {
+                    top.linkTo(titleRef.bottom, margin = 4.dp)
+                },
+                thickness = 1.dp,
+                color = colorResource(id = R.color.grey_neutral)
+            )
 
-            /*TODO*/ // слишком громостко и долго
-            for (entry in content) {
-                when(entry["name"]) {
-                    "info" -> {
-                        entry["header"]?.let {
-                            TitlePart(modifier = Modifier
-                                .constrainAs(titleRef) {
-                                    top.linkTo(parent.top)
-                                    start.linkTo(parent.start, margin = 4.dp)
-                                    end.linkTo(parent.end)
-                                }
-                                .fillMaxWidth(), title = it)
-                            HorizontalDivider(
-                                modifier = Modifier.constrainAs(dividerRef) {
-                                    top.linkTo(titleRef.bottom, margin = 4.dp)
-                                },
-                                thickness = 1.dp,
-                                color = colorResource(id = R.color.grey_neutral)
-                            )
+            if (titleText.value.isNotEmpty()) {
+                TitlePart(
+                    modifier = Modifier
+                        .constrainAs(titleRef) {
+                            top.linkTo(parent.top)
+                            start.linkTo(parent.start, margin = 4.dp)
+                            end.linkTo(parent.end)
                         }
-                    }
-                    "md" -> {
-                        entry["text"]?.let {
-                            MarkdownPart(
-                                modifier = Modifier.constrainAs(contentRef) {
-                                    top.linkTo(dividerRef.bottom, margin = 4.dp)
-                                    bottom.linkTo(parent.bottom, margin = 4.dp)
-                                    start.linkTo(parent.start, margin = 4.dp)
-                                    width = Dimension.fillToConstraints },
-                                string = it,
-                                onItemClick = onItemClick,
-                            )
-                        }
-                    }
-                    "map" -> { }
-                }
+                        .fillMaxWidth(),
+                    title = titleText.value
+                )
             }
 
+            if (mdText.value.isNotEmpty()) {
+                MarkdownPart(
+                    modifier = Modifier.constrainAs(contentRef) {
+                        top.linkTo(titleRef.bottom, margin = 4.dp)
+                        bottom.linkTo(parent.bottom, margin = 4.dp)
+                        start.linkTo(parent.start, margin = 4.dp)
+                        width = Dimension.fillToConstraints
+                    },
+                    string = mdText.value,
+                    onItemClick = onItemClick,
+                )
+            }
         }
     }
 }
@@ -150,6 +174,7 @@ private fun MarkdownPart(
         onClick = { onItemClick() }
     )
 }
+
 @Composable
 private fun TitlePart(
     modifier: Modifier,

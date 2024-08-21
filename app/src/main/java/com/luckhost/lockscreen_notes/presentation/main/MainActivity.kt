@@ -1,6 +1,5 @@
 package com.luckhost.lockscreen_notes.presentation.main
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -28,8 +28,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -37,7 +35,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import com.luckhost.domain.models.NoteModel
 import com.luckhost.lockscreen_notes.R
-import com.luckhost.lockscreen_notes.presentation.openNote.OpenNoteActivity
 import com.luckhost.lockscreen_notes.presentation.main.additional.functions.NoteBox
 import com.luckhost.lockscreen_notes.presentation.userLogin.LoginActivity
 import com.luckhost.lockscreen_notes.ui.theme.Lockscreen_notesTheme
@@ -56,7 +53,6 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun ScreenLayout() {
-        val notesListState by vm.notesList.collectAsState()
         val context = LocalContext.current
 
         Scaffold(
@@ -110,34 +106,32 @@ class MainActivity : ComponentActivity() {
                 .padding(innerPadding)) {
                 Column(modifier = Modifier.padding(top = 15.dp)) {
                     HorizontalDivider()
-                    NotesList(
-                        notes = notesListState,
-                        onDeleteButClick = {
-                                model: NoteModel -> vm.deleteNote(model)
-                        }
-                    )
+                    NotesList()
                 }
             }
         }
     }
 
     @Composable
-    fun NotesList(notes: List<NoteModel>,
-                  onDeleteButClick: (NoteModel) -> Unit ) {
+    fun NotesList() {
         val context = LocalContext.current
-        LazyColumn(modifier = Modifier.wrapContentSize(),
-            horizontalAlignment = Alignment.CenterHorizontally) {
-            items(notes){
-                    item ->
+        val notesListState by vm.notesList.collectAsState()
+
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            items(notesListState) { item ->
                 NoteBox(
                     content = item.content,
                     onItemClick = {
                         vm.startOpenNoteActivity(context = context, item)
                     },
-                    onDeleteIconClick = { onDeleteButClick(item) }
+                    onDeleteIconClick = { vm.deleteNote(item) }
                 )
             }
         }
+
     }
 
     override fun onResume() {
