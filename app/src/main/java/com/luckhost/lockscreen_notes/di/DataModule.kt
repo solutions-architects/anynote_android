@@ -5,7 +5,7 @@ import com.luckhost.data.repository.NotesRepositoryImpl
 import com.luckhost.data.localStorage.keys.hashes.HashStorage
 import com.luckhost.data.localStorage.keys.hashes.SharedPrefHashesStorage
 import com.luckhost.data.localStorage.materials.NotesStorage
-import com.luckhost.data.localStorage.materials.SharedPrefNotesStorage
+import com.luckhost.data.localStorage.materials.sqlite.SQLiteNotesStorage
 import com.luckhost.data.network.NetworkModule
 import com.luckhost.data.network.retrofit.RetrofitModule
 import com.luckhost.data.repository.NetworkServiceImpl
@@ -16,7 +16,7 @@ import org.koin.dsl.module
 
 val dataModule = module {
     single<NotesStorage> {
-        SharedPrefNotesStorage(context = get())
+        SQLiteNotesStorage(context = get())
     }
 
     single<NotesRepositoryInterface> {

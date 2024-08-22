@@ -1,6 +1,6 @@
 package com.luckhost.lockscreen_notes.presentation.openNote.additional.functions
 
-import android.app.Activity
+
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,17 +16,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -36,27 +31,26 @@ import androidx.compose.ui.unit.sp
 import com.luckhost.lockscreen_notes.R
 import com.luckhost.lockscreen_notes.presentation.openNote.OpenNoteViewModel
 import com.luckhost.lockscreen_notes.presentation.ui.ConfirmDialog
-import kotlinx.coroutines.launch
 
 @Composable
 fun EditNoteFragment(vm: OpenNoteViewModel) {
 
-    val showDialog = remember { mutableStateOf(false) }
+    val showDialog by vm.showDialog.collectAsState()
 
-    if (showDialog.value) {
+    if (showDialog) {
         ConfirmDialog(
             text = "Save changes?",
             onConfirm = { vm.saveChanges()
                 vm.changeEditModeState() },
-            onDismiss = { vm.changeEditModeState() })
+            onDismiss = { vm.changeShowDialogState() })
     }
 
     BackHandler {
-        showDialog.value = !showDialog.value
+        vm.changeShowDialogState()
     }
     
     Column {
-        var titleTextState by remember { mutableStateOf(vm.titleText) }
+        val titleTextState by vm.titleTextState.collectAsState()
 
         val maxLength = 20
         TextField(
@@ -66,8 +60,7 @@ fun EditNoteFragment(vm: OpenNoteViewModel) {
             value = titleTextState,
             onValueChange = {
                 if (it.length <= maxLength){
-                    titleTextState = it
-                    vm.updateTitleText(titleTextState)
+                    vm.updateTitleStateText(it)
                 }
             },
             textStyle = TextStyle(
@@ -82,7 +75,7 @@ fun EditNoteFragment(vm: OpenNoteViewModel) {
             ),
             trailingIcon = {
                 if (titleTextState.isNotEmpty()) {
-                    IconButton(onClick = { titleTextState = "" }) {
+                    IconButton(onClick = { vm.updateTitleStateText("") }) {
                         Icon(
                             imageVector = Icons.Outlined.Close,
                             contentDescription = null
@@ -94,7 +87,7 @@ fun EditNoteFragment(vm: OpenNoteViewModel) {
 
         val scrollState = rememberScrollState()
 
-        val coroutineScope = rememberCoroutineScope()
+        val mainNotePart by vm.mainPartState.collectAsState()
 
         Column(
             modifier = Modifier
@@ -102,17 +95,15 @@ fun EditNoteFragment(vm: OpenNoteViewModel) {
                 .imePadding()
                 .verticalScroll(scrollState)
         ) {
-            vm.note.content.forEachIndexed { index, map ->
+            mainNotePart.forEachIndexed { index, map ->
                 when (map["name"]) {
                     "md" -> TextPart(
                         modifier = Modifier
                             .weight(1f, fill = false)
                             .wrapContentSize()
                             .fillMaxWidth(),
-                        initialVale = map["text"].toString(),
-                        onTextChange = { newText ->
-                            vm.updateMdText(index, newText)
-                        }
+                        vm = vm,
+                        index = index,
                     )
                 }
             }
@@ -123,24 +114,29 @@ fun EditNoteFragment(vm: OpenNoteViewModel) {
 @Composable
 private fun TextPart(
     modifier: Modifier,
-    initialVale: String,
-    onTextChange: (String) -> Unit
+    vm: OpenNoteViewModel,
+    index: Int,
     ) {
-    var contentTextState by remember { mutableStateOf(initialVale) }
-    TextField(
-        modifier = modifier,
-        value = contentTextState,
-        onValueChange = {
-            contentTextState = it
-            onTextChange(it)
-        },
-        textStyle = TextStyle(
-            color = colorResource(id = R.color.grey_neutral),
-            fontSize = 24.sp
-        ),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = colorResource(id = R.color.main_bg),
-            unfocusedContainerColor = colorResource(id = R.color.main_bg),
-        ),
-    )
+        val mainNotePart by vm.mainPartState.collectAsState()
+
+        var textValue by remember{mutableStateOf(mainNotePart[index]["text"])}
+
+        textValue?.let { it1 ->
+            TextField(
+            modifier = modifier,
+            value = it1,
+            onValueChange = { newText ->
+                textValue = newText
+                vm.updateMdStateText(index, newText)
+            },
+            textStyle = TextStyle(
+                color = colorResource(id = R.color.grey_neutral),
+                fontSize = 24.sp
+            ),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = colorResource(id = R.color.main_bg),
+                unfocusedContainerColor = colorResource(id = R.color.main_bg),
+            ),
+        )
+    }
 }

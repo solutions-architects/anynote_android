@@ -4,14 +4,13 @@ import com.luckhost.domain.useCases.keys.AddHashUseCase
 import com.luckhost.domain.useCases.keys.DeleteHashUseCase
 import com.luckhost.domain.useCases.keys.GetHashesUseCase
 import com.luckhost.domain.useCases.keys.SaveHashesUseCase
-import com.luckhost.domain.useCases.network.ChangeNoteOnServer
+import com.luckhost.domain.useCases.network.ChangeNoteOnServerUseCase
 import com.luckhost.domain.useCases.network.ChangeUserAccountParamsUseCase
 import com.luckhost.domain.useCases.network.CreateNoteOnServerUseCase
 import com.luckhost.domain.useCases.network.GetAllNotesFromServerUseCase
 import com.luckhost.domain.useCases.objects.ChangeNoteUseCase
 import com.luckhost.domain.useCases.objects.DeleteNoteUseCase
 import com.luckhost.domain.useCases.network.GetAuthTokenUseCase
-import com.luckhost.domain.useCases.network.GetLocalAuthTokenUseCase
 import com.luckhost.domain.useCases.network.GetUserAccountParamsUseCase
 import com.luckhost.domain.useCases.network.RefreshAccTokenUseCase
 import com.luckhost.domain.useCases.network.SignUpUseCase
@@ -63,8 +62,8 @@ val domainModule = module {
         )
     }
 
-    factory<ChangeNoteOnServer> {
-        ChangeNoteOnServer(
+    factory<ChangeNoteOnServerUseCase> {
+        ChangeNoteOnServerUseCase(
             netApi = get(),
         )
     }

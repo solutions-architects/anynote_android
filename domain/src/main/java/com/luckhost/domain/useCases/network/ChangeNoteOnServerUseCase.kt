@@ -7,7 +7,7 @@ import com.luckhost.domain.models.network.NetworkErrorDescription
 import com.luckhost.domain.models.network.SuccessDescription
 import com.luckhost.domain.repository.NetworkServiceInterface
 
-class ChangeNoteOnServer(
+class ChangeNoteOnServerUseCase(
     private val netApi: NetworkServiceInterface,
 ) {
     suspend fun execute(

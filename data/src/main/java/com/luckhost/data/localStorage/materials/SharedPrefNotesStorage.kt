@@ -13,18 +13,16 @@ class SharedPrefNotesStorage(context: Context): NotesStorage {
 
     private val sharedPreferences = context.getSharedPreferences(SHARED_PREFS_NAME, MODE_PRIVATE)
     override fun saveNote(saveObject: Note) {
-        val gson = Gson()
-        val noteJson = gson.toJson(saveObject)
+        val noteJson = Gson().toJson(saveObject)
         sharedPreferences.edit().putString(saveObject.noteHash.toString(), noteJson).apply()
     }
 
     override suspend fun getNotes(noteHashes: List<Int>) = flow<Note> {
-        val gson = Gson()
         noteHashes.forEach{
             val noteJson = sharedPreferences.getString(it.toString(),
                 null)
             if(noteJson != null) {
-                emit(gson.fromJson(noteJson, Note::class.java))
+                emit(Gson().fromJson(noteJson, Note::class.java))
             }
         }
     }
@@ -34,8 +32,7 @@ class SharedPrefNotesStorage(context: Context): NotesStorage {
     }
 
     override fun changeNote(noteHash: Int, saveObject: Note) {
-        val gson = Gson()
-        val noteJson = gson.toJson(saveObject)
+        val noteJson = Gson().toJson(saveObject)
         sharedPreferences.edit().putString(noteHash.toString(), noteJson).apply()
     }
 }

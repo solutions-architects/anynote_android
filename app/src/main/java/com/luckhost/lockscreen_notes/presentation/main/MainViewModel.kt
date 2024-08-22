@@ -11,15 +11,11 @@ import com.luckhost.domain.models.NoteModel
 import com.luckhost.domain.useCases.keys.DeleteHashUseCase
 import com.luckhost.domain.useCases.keys.GetHashesUseCase
 import com.luckhost.domain.useCases.objects.DeleteNoteUseCase
-import com.luckhost.domain.useCases.network.GetAuthTokenUseCase
 import com.luckhost.domain.useCases.objects.GetNotesUseCase
 import com.luckhost.lockscreen_notes.presentation.openNote.OpenNoteActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MainViewModel(
@@ -42,15 +38,15 @@ class MainViewModel(
     }
 
     fun refreshNotesList() {
-        Log.d("MainVM", "start refresh")
         _notesList.value.clear()
-        viewModelScope.launch {
-            getNotesUseCase.execute(getHashesUseCase.execute())
-                .collect{
-                    value -> _notesList.value.add(value)
-                    Log.d("MainVM", value.toString())
-                }
+
+        val getNotes = viewModelScope.launch {
+            _notesList.value = getNotesUseCase.execute(getHashesUseCase.execute())
+                .toMutableStateList()
         }
+
+        getNotes.start()
+
         Log.d("MainVM", "end refresh")
     }
 

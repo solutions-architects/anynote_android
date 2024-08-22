@@ -1,13 +1,11 @@
 package com.luckhost.domain.repository
 
 import com.luckhost.domain.models.NoteModel
-import kotlinx.coroutines.flow.Flow
-
 
 interface NotesRepositoryInterface {
     fun saveNote(saveObject: NoteModel)
 
-    suspend fun getNotes(noteHashes: List<Int>): Flow<NoteModel>
+    suspend fun getNotes(noteHashes: List<Int>): List<NoteModel>
 
     fun deleteNote(noteHash: Int)
 
