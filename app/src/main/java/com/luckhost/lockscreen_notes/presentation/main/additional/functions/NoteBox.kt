@@ -1,20 +1,26 @@
 package com.luckhost.lockscreen_notes.presentation.main.additional.functions
 
+import android.graphics.BitmapFactory
 import android.util.Log
-import androidx.compose.foundation.background
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkOut
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.Card
@@ -23,11 +29,16 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -36,19 +47,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.luckhost.domain.models.NoteModel
 import com.luckhost.lockscreen_notes.presentation.ui.ConfirmDialog
 import com.luckhost.lockscreen_notes.R
+import com.luckhost.lockscreen_notes.presentation.main.MainViewModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
 @Composable
 fun NoteBox(
-    content: List<Map<String, String>>,
-    onItemClick: () -> Unit,
-    onDeleteIconClick: () -> Unit,
+    noteToOpen: NoteModel,
+    viewModel: MainViewModel,
 ) {
+    Log.d("NoteBox", noteToOpen.content.toString())
 
+    val content = noteToOpen.content.toList()
+
+    /*TODO move to VM*/
     val titleText = remember { mutableStateOf("") }
     val mdText = remember { mutableStateOf("") }
+    val imageSource = remember { mutableStateOf("") }
+    val isLoaded = remember { mutableStateOf(false) }
 
     LaunchedEffect(content) {
         for (entry in content) {
@@ -64,19 +82,51 @@ fun NoteBox(
                     if (mdText.value.isNotEmpty()) continue
 
                     entry["text"]?.let {
-                        mdText.value = it
+                        extractAndFilter(it)
+                        val filteredString = extractAndFilter(it)
+
+                        mdText.value = filteredString.first
+                        filteredString.second?.let { it1 -> imageSource.value = it1 }
                     }
                 }
                 "map" -> { /* Обработка других данных */ }
             }
         }
+        isLoaded.value = true
     }
+
+    AnimatedVisibility(
+        visible = isLoaded.value,
+        enter = fadeIn(animationSpec = tween(durationMillis = 200))
+                + expandIn(expandFrom = Alignment.TopCenter),
+        exit = fadeOut()
+                + shrinkOut(shrinkTowards = Alignment.Center)
+    ) {
+        NoteBoxContainer(
+            vm = viewModel,
+            noteToOpen = noteToOpen,
+            titleText = titleText,
+            mdText = mdText,
+            imageSource = imageSource
+        )
+    }
+}
+
+@Composable
+private fun NoteBoxContainer(
+    vm: MainViewModel,
+    noteToOpen: NoteModel,
+    titleText: MutableState<String>,
+    mdText: MutableState<String>,
+    imageSource: MutableState<String>,
+) {
+    val context = LocalContext.current
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp)
-            .clickable { onItemClick() },
+            .clickable { vm.startOpenNoteActivity(context = context, noteToOpen) },
         colors = CardDefaults.cardColors(
             containerColor = colorResource(R.color.notebox_bg)
         ),
@@ -113,7 +163,7 @@ fun NoteBox(
                 ConfirmDialog(
                     text = stringResource(id = R.string.question_of_note_deleting),
                     onConfirm = {
-                        onDeleteIconClick()
+                        vm.deleteNote(noteToOpen)
                         showDialog = false
                     },
                     onDismiss = { showDialog = false }
@@ -144,17 +194,49 @@ fun NoteBox(
             if (mdText.value.isNotEmpty()) {
                 MarkdownPart(
                     modifier = Modifier.constrainAs(contentRef) {
-                        top.linkTo(titleRef.bottom, margin = 4.dp)
+                        top.linkTo(dividerRef.bottom, margin = 4.dp)
                         bottom.linkTo(parent.bottom, margin = 4.dp)
                         start.linkTo(parent.start, margin = 4.dp)
                         width = Dimension.fillToConstraints
                     },
                     string = mdText.value,
-                    onItemClick = onItemClick,
+                    onItemClick = { vm.startOpenNoteActivity(context = context, noteToOpen) },
+                )
+            }
+
+            if (imageSource.value.isNotEmpty()) {
+                ImagePart(
+                    modifier = Modifier
+                        .constrainAs(imageRef) {
+                            top.linkTo(dividerRef.bottom, margin = 4.dp)
+                            bottom.linkTo(parent.bottom, margin = 4.dp)
+                            start.linkTo(contentRef.end, margin = 4.dp)
+                            end.linkTo(parent.end, margin = 4.dp)
+                            width = Dimension.fillToConstraints
+                        }
+                    ,
+                    imageLocalStorageLink = imageSource.value
                 )
             }
         }
     }
+}
+
+@Composable
+private fun TitlePart(
+    modifier: Modifier,
+    title: String,) {
+    Text(
+        text = title,
+        modifier = modifier,
+        maxLines = 1,
+        style = TextStyle(
+            color = colorResource(id = R.color.main_title_text),
+            fontSize = 26.sp,
+            fontWeight = FontWeight.Bold,
+            fontFamily = FontFamily.SansSerif
+        ),
+    )
 }
 
 @Composable
@@ -176,18 +258,24 @@ private fun MarkdownPart(
 }
 
 @Composable
-private fun TitlePart(
+private fun ImagePart(
     modifier: Modifier,
-    title: String,) {
-    Text(
-        text = title,
-        modifier = modifier,
-        maxLines = 1,
-        style = TextStyle(
-            color = colorResource(id = R.color.main_title_text),
-            fontSize = 26.sp,
-            fontWeight = FontWeight.Bold,
-            fontFamily = FontFamily.SansSerif
-        ),
-    )
+    imageLocalStorageLink: String,) {
+
+    val bitmap = BitmapFactory.decodeFile(imageLocalStorageLink)
+
+    bitmap?.let {
+        Image(
+            bitmap = it.asImageBitmap(),
+            alignment = Alignment.CenterEnd,
+            contentDescription = "Round corner image",
+            contentScale = ContentScale.FillHeight,
+            modifier = modifier
+                .size(84.dp)
+                .wrapContentSize()
+                .clip(RoundedCornerShape(10))
+                .border(1.dp, Color.Gray, RoundedCornerShape(10))
+        )
+    }
 }
+

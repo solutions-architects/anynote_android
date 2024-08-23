@@ -2,7 +2,6 @@ package com.luckhost.lockscreen_notes.presentation.main
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
@@ -46,8 +45,6 @@ class MainViewModel(
         }
 
         getNotes.start()
-
-        Log.d("MainVM", "end refresh")
     }
 
     fun startOpenNoteActivity(context: Context) {

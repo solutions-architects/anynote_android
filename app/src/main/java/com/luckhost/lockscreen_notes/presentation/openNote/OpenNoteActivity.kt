@@ -2,9 +2,12 @@ package com.luckhost.lockscreen_notes.presentation.openNote
 
 import android.os.Build
 import android.os.Bundle
-import android.view.WindowManager
+import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -25,11 +28,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.luckhost.lockscreen_notes.R
 import com.luckhost.lockscreen_notes.presentation.openNote.additional.functions.EditNoteFragment
@@ -65,24 +66,8 @@ class OpenNoteActivity : ComponentActivity() {
                     floatingActionButton = {
                         Column {
                             SaveFloatingButton(isEditMode)
-                            FloatingActionButton(
-                                modifier = Modifier
-                                    .padding(10.dp)
-                                    .size(65.dp),
-                                onClick = { vm.changeEditModeState() },
-                                containerColor =
-                                if (isEditMode)
-                                    colorResource(id = R.color.grey_neutral)
-                                else
-                                    colorResource(id = R.color.heavy_metal),
-                                contentColor =
-                                if (isEditMode)
-                                    colorResource(id = R.color.heavy_metal)
-                                else
-                                    colorResource(id = R.color.grey_neutral)
-                            ) {
-                                Icon(Icons.Default.Edit, contentDescription = "Edit")
-                            }
+                            AttachButton(isEditMode)
+                            EnterEditModeButton(!isEditMode)
                         }
                     }
                 ) {
@@ -125,6 +110,62 @@ class OpenNoteActivity : ComponentActivity() {
                     colorResource(id = R.color.grey_neutral)
             ) {
                 Icon(Icons.Default.Check, contentDescription = "save")
+            }
+        }
+    }
+
+    @Composable
+    private fun AttachButton(shouldDisplay: Boolean) {
+
+        val photoPicker = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.PickVisualMedia()
+        ) {
+            if (it != null) {
+                Log.d("PhotoPicker", "Selected URI: $it")
+            } else {
+                Log.d("PhotoPicker", "No media selected")
+            }
+        }
+
+        AnimatedVisibility(
+            visible = shouldDisplay,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            FloatingActionButton(modifier = Modifier
+                .padding(10.dp)
+                .size(65.dp),
+                onClick = { photoPicker.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                ) },
+                containerColor =
+                colorResource(id = R.color.heavy_metal),
+                contentColor =
+                colorResource(id = R.color.grey_neutral)
+            ) {
+                Icon(painterResource(id = R.drawable.attach_file), contentDescription = "save")
+            }
+        }
+    }
+
+    @Composable
+    private fun EnterEditModeButton(shouldNotDisplay: Boolean) {
+        AnimatedVisibility(
+            visible = shouldNotDisplay,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            FloatingActionButton(
+                modifier = Modifier
+                    .padding(10.dp)
+                    .size(65.dp),
+                onClick = { vm.changeEditModeState() },
+                containerColor =
+                colorResource(id = R.color.heavy_metal),
+                contentColor =
+                colorResource(id = R.color.grey_neutral)
+            ) {
+                Icon(Icons.Default.Edit, contentDescription = "Edit")
             }
         }
     }

@@ -12,10 +12,11 @@ import com.luckhost.lockscreen_notes.R
 fun ConfirmDialog(
     text: String,
     onConfirm: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onBackHandler: () -> Unit = { }
 ) {
     AlertDialog(
-        onDismissRequest = { onDismiss() },
+        onDismissRequest = { onBackHandler() },
         title = { Text(text = stringResource(id = R.string.confirm_dialog_question)) },
         text = { Text(text) },
         confirmButton = {

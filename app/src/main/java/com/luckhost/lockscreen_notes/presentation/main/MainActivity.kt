@@ -33,7 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
-import com.luckhost.domain.models.NoteModel
 import com.luckhost.lockscreen_notes.R
 import com.luckhost.lockscreen_notes.presentation.main.additional.functions.NoteBox
 import com.luckhost.lockscreen_notes.presentation.userLogin.LoginActivity
@@ -114,7 +113,6 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun NotesList() {
-        val context = LocalContext.current
         val notesListState by vm.notesList.collectAsState()
 
         LazyColumn(
@@ -123,11 +121,8 @@ class MainActivity : ComponentActivity() {
         ) {
             items(notesListState) { item ->
                 NoteBox(
-                    content = item.content,
-                    onItemClick = {
-                        vm.startOpenNoteActivity(context = context, item)
-                    },
-                    onDeleteIconClick = { vm.deleteNote(item) }
+                    noteToOpen = item,
+                    viewModel = vm,
                 )
             }
         }

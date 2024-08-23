@@ -26,7 +26,6 @@ class OpenNoteViewModel(
     private val addHashUseCase: AddHashUseCase,
     private val resourceProvider: ResourceProvider,
 ) : ViewModel() {
-
     private lateinit var note: NoteModel
 
     private val _showDialog = MutableStateFlow(false)
@@ -47,14 +46,17 @@ class OpenNoteViewModel(
         _isEditMode.value = !_isEditMode.value
     }
 
-    fun changeShowDialogState() {
-        _showDialog.value = !_showDialog.value
+    fun hideDialogState() {
+        _showDialog.value = false
+    }
+    fun showDialogState() {
+        _showDialog.value = true
     }
 
     fun createEmptyNote() {
-        val infoBlock = mutableMapOf<String, String>("name" to "info",
+        val infoBlock = mutableMapOf("name" to "info",
             "header" to resourceProvider.getString(R.string.empty_note_title))
-        val essenceBlock = mutableMapOf<String, String>("name" to "md",
+        val essenceBlock = mutableMapOf("name" to "md",
             "text" to resourceProvider.getString(R.string.empty_note_content))
 
         _titleTextState.value = resourceProvider.getString(R.string.empty_note_title)
@@ -72,8 +74,11 @@ class OpenNoteViewModel(
 
     fun getNote(hashCode: Int) {
         viewModelScope.launch {
+            Log.d("OpenNoteVM", hashCode.toString())
             note = getNotesUseCase.execute(listOf(hashCode)).first()
 
+            Log.d("OpenNoteVM", note.hashCode.toString())
+            Log.d("OpenNoteVM", note.content.toString())
             withContext(Dispatchers.Main) {
                 _mainPartState.value = note.content.toMutableStateList()
                 note.content.forEach{
@@ -83,7 +88,14 @@ class OpenNoteViewModel(
                 }
             }
         }
+    }
 
+    fun returnOldValues() {
+        note.hashCode?.let {
+            getNote(it)
+        } ?: {
+            throw NullPointerException("Note hash was null!")
+        }
     }
 
     fun updateTitleStateText(newTitle: String) {

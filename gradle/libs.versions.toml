@@ -27,6 +27,7 @@ retrofit = "2.9.0"
 navigationCompose = "2.8.0-beta05"
 serializationVersion = "2.0.0"
 serializationKotlin = "1.7.1"
+glanceAppwidget = "1.1.0"
 
 [libraries]
 androidx-lifecycle-runtime-ktx-v240beta01 = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtxVersion" }
@@ -63,6 +64,7 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+androidx-glance-appwidget = { group = "androidx.glance", name = "glance-appwidget", version.ref = "glanceAppwidget" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

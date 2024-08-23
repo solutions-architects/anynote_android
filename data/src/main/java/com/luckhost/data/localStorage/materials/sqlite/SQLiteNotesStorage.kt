@@ -27,24 +27,33 @@ class SQLiteNotesStorage(context: Context): NotesStorage {
     }
 
     override suspend fun getNotes(noteHashes: List<Int>) = flow<Note> {
+        if (noteHashes.isEmpty()) {
+            throw IllegalArgumentException("An empty noteHashes list is set")
+        }
+
+        val selection = "${NotesContract.COLUMN_NAME_HASHCODE} IN " +
+                "(${noteHashes.joinToString(",") { "?" }})"
+        val selectionArgs = noteHashes.map { it.toString() }.toTypedArray()
+
         val cursor = db?.query(
-            NotesContract.TABLE_NAME,   // The table to query
-            null,             // The array of columns to return (pass null to get all)
-            null,              // The columns for the WHERE clause
-            null,          // The values for the WHERE clause
-            null,                   // don't group the rows
-            null,                   // don't filter by row groups
-            null,               // The sort order
+            NotesContract.TABLE_NAME,
+            null,
+            selection,
+            selectionArgs,
+            null,
+            null,
+            null
         )
 
-        while (cursor?.moveToNext()!!) {
+        Log.d("SQLite in", noteHashes.toString())
+
+        while (cursor?.moveToNext() == true) {
             val getContent = cursor.getString(
                 cursor.getColumnIndexOrThrow(NotesContract.COLUMN_NAME_CONTENT)
             )
 
             val type = object : TypeToken<List<MutableMap<String, String>>>() {}.type
-            val convertedContent:
-                    List<MutableMap<String, String>> = Gson().fromJson(getContent, type)
+            val convertedContent: List<MutableMap<String, String>> = Gson().fromJson(getContent, type)
 
             emit(
                 Note(
@@ -57,8 +66,11 @@ class SQLiteNotesStorage(context: Context): NotesStorage {
                     )
                 )
             )
+            Log.d("SQLite return", cursor.getInt(
+                cursor.getColumnIndexOrThrow(NotesContract.COLUMN_NAME_HASHCODE)
+            ).toString())
         }
-        cursor.close()
+        cursor?.close()
     }
 
     override fun deleteNote(noteHash: Int) {
