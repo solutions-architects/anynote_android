@@ -12,8 +12,10 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,7 +30,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -67,8 +71,8 @@ class OpenNoteActivity : ComponentActivity() {
                         Column {
                             SaveFloatingButton(isEditMode)
                             AttachButton(isEditMode)
-                            EnterEditModeButton(!isEditMode)
                         }
+                        EnterEditModeButton(!isEditMode)
                     }
                 ) {
                     innerPadding  ->
@@ -96,8 +100,8 @@ class OpenNoteActivity : ComponentActivity() {
     private fun SaveFloatingButton(shouldDisplay: Boolean) {
         AnimatedVisibility(
             visible = shouldDisplay,
-            enter = fadeIn(),
-            exit = fadeOut()
+            enter = fadeIn() + expandIn(expandFrom = Alignment.TopCenter),
+            exit = fadeOut() + shrinkOut(shrinkTowards = Alignment.TopCenter)
         ) {
             FloatingActionButton(modifier = Modifier
                 .padding(10.dp)
@@ -117,20 +121,23 @@ class OpenNoteActivity : ComponentActivity() {
     @Composable
     private fun AttachButton(shouldDisplay: Boolean) {
 
+        val context = LocalContext.current
         val photoPicker = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.PickVisualMedia()
         ) {
             if (it != null) {
-                Log.d("PhotoPicker", "Selected URI: $it")
-            } else {
-                Log.d("PhotoPicker", "No media selected")
+                val realPath = vm.getRealPathFromUri(context, it)
+                if (realPath != null) {
+                    vm.changePasteTextState(realPath)
+                }
+                Log.d("PhotoPicker", "Selected path: ${realPath}")
             }
         }
 
         AnimatedVisibility(
             visible = shouldDisplay,
-            enter = fadeIn(),
-            exit = fadeOut()
+            enter = fadeIn() + expandIn(expandFrom = Alignment.TopCenter),
+            exit = fadeOut() + shrinkOut(shrinkTowards = Alignment.TopCenter)
         ) {
             FloatingActionButton(modifier = Modifier
                 .padding(10.dp)
@@ -152,8 +159,8 @@ class OpenNoteActivity : ComponentActivity() {
     private fun EnterEditModeButton(shouldNotDisplay: Boolean) {
         AnimatedVisibility(
             visible = shouldNotDisplay,
-            enter = fadeIn(),
-            exit = fadeOut()
+            enter = fadeIn() + expandIn(expandFrom = Alignment.TopCenter),
+            exit = fadeOut() + shrinkOut(shrinkTowards = Alignment.TopCenter)
         ) {
             FloatingActionButton(
                 modifier = Modifier

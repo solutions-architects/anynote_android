@@ -14,6 +14,10 @@
     <string name="login_activity_repeat_password_text_field">Repeat password</string>
     <string name="login_activity_sign_in_button">Sing up</string>
     <string name="login_activity_next_button">Apply</string>
+    <string name="login_activity_loading_text">ЛОАДИНГ, ПЛИС ВЭЙТ</string>
+    <string name="login_activity_passwords_does_not_match">Passwords don\'t match!</string>
+    <string name="login_activity_registration_successful">Registration is successful!</string>
+    <string name="login_activity_login_successful">Login is successful!</string>
 
     <string name="confirm_dialog_question">Wait a minute!</string>
     <string name="confirm_dialog_answer_yes">Yes</string>

@@ -5,19 +5,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,7 +29,6 @@ import androidx.compose.ui.text.font.FontFamily
 
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.luckhost.lockscreen_notes.R
 import com.luckhost.lockscreen_notes.presentation.openNote.OpenNoteViewModel
@@ -39,7 +36,6 @@ import com.luckhost.lockscreen_notes.presentation.ui.ConfirmDialog
 
 @Composable
 fun EditNoteFragment(vm: OpenNoteViewModel) {
-
     val showDialog by vm.showDialog.collectAsState()
 
     if (showDialog) {
@@ -113,7 +109,6 @@ fun EditNoteFragment(vm: OpenNoteViewModel) {
                     "md" -> TextPart(
                         modifier = Modifier
                             .weight(1f, fill = false)
-                            .wrapContentSize()
                             .fillMaxWidth(),
                         vm = vm,
                         index = index,
@@ -132,16 +127,48 @@ private fun TextPart(
     vm: OpenNoteViewModel,
     index: Int,
 ) {
-    val mainNotePart by vm.mainPartState.collectAsState()
-    var textValue by remember {
-        mutableStateOf(TextFieldValue(mainNotePart[index]["text"] ?: "")) }
+    val textFieldStates by vm.textFieldStates.collectAsState()
+    var textValue by remember { mutableStateOf(textFieldStates[index] ?: TextFieldValue("")) }
+
+    val pasteText by vm.textPastState.collectAsState()
+
+    LaunchedEffect(pasteText) {
+        if (pasteText.isNotEmpty()) {
+            val cursorPosition = textValue.selection.start
+            val newText = textValue.text.substring(0, cursorPosition) +
+                    "![image]($pasteText)" +
+                    textValue.text.substring(cursorPosition)
+
+            textValue = textValue.copy(
+                text = newText,
+                selection = TextRange(cursorPosition + "![image]($pasteText)".length)
+            )
+            vm.updateMdStateText(index, textValue.text)
+        }
+    }
 
     TextField(
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         value = textValue,
+        trailingIcon = {
+            if (textValue.text.isNotEmpty()) {
+                IconButton(
+                    modifier = Modifier
+                        ,
+                    onClick = {
+                    textValue = TextFieldValue("")
+                    vm.updateTextFieldState(index, textValue)
+                }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Close,
+                        contentDescription = null
+                    )
+                }
+            }
+        },
         onValueChange = { newText ->
             textValue = newText
+            vm.updateTextFieldState(index, newText)
             vm.updateMdStateText(index, newText.text)
         },
         textStyle = TextStyle(
@@ -153,24 +180,4 @@ private fun TextPart(
             unfocusedContainerColor = colorResource(id = R.color.main_bg),
         ),
     )
-
-    Button(
-        onClick = {
-            val cursorPosition = textValue.selection.start
-            val newText = textValue.text.substring(0, cursorPosition) +
-                    "![image](/sdcard/DCIM/MyAlbums/anynote/image.jpg)" + // Текст для вставки
-                    textValue.text.substring(cursorPosition)
-
-            // Обновляем положение курсора после вставки текста
-            textValue = textValue.copy(
-                text = newText,
-                selection = TextRange(cursorPosition +
-                        "![image](/sdcard/DCIM/MyAlbums/anynote/image.jpg)".length)
-            )
-            vm.updateMdStateText(index, textValue.text)
-        },
-        modifier = Modifier.padding(16.dp)
-    ) {
-        Text("Paste")
-    }
 }

@@ -1,6 +1,5 @@
 package com.luckhost.lockscreen_notes.presentation.userLogin.additional.functions
 
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,12 +15,10 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -37,6 +34,7 @@ import com.luckhost.lockscreen_notes.presentation.userLogin.LoginViewModel
 @Composable
 fun LoginLayout(
     vm: LoginViewModel,
+    onApplyButClick: () -> Unit,
     onSignUpButClick: () -> Unit,
 ) {
     val loginTextState by vm.loginTextState.collectAsState()
@@ -131,7 +129,7 @@ fun LoginLayout(
                         disabledContentColor = colorResource(id = R.color.light_grey),
                     ),
                     onClick = {
-                        vm.getToken()
+                        onApplyButClick()
                     }) {
                     Text(text = stringResource(id = R.string.login_activity_next_button),
                         style = TextStyle(fontSize = 26.sp),

@@ -9,3 +9,7 @@ object Login {
 @Serializable
 object SignUp {
 }
+
+@Serializable
+object Loading {
+}

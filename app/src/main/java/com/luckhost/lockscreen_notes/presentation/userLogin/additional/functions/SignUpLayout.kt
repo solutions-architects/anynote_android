@@ -33,7 +33,8 @@ import com.luckhost.lockscreen_notes.presentation.userLogin.LoginViewModel
 
 @Composable
 fun SignUpLayout(
-    vm: LoginViewModel
+    vm: LoginViewModel,
+    onApplyButClick: () -> Unit,
 ) {
     val loginTextState by vm.loginTextState.collectAsState()
     val passwordTextState by vm.passwordTextState.collectAsState()
@@ -141,7 +142,7 @@ fun SignUpLayout(
                         disabledContentColor = colorResource(id = R.color.light_grey),
                     ),
                     onClick = {
-                        vm.signUp()
+                        onApplyButClick()
                     }) {
                     Text(text = stringResource(id = R.string.login_activity_next_button),
                         style = TextStyle(fontSize = 26.sp),

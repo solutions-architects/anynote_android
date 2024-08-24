@@ -1,8 +1,12 @@
 package com.luckhost.lockscreen_notes.presentation.openNote
 
-import android.util.Log
+import android.content.ContentResolver
+import android.content.Context
+import android.net.Uri
+import android.provider.OpenableColumns
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.luckhost.domain.models.NoteModel
@@ -18,6 +22,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class OpenNoteViewModel(
     private val saveNoteUseCase: SaveNoteUseCase,
@@ -37,10 +42,16 @@ class OpenNoteViewModel(
     private val _titleTextState = MutableStateFlow("")
     val titleTextState: StateFlow<String> = _titleTextState.asStateFlow()
 
+    private val _textFieldStates = MutableStateFlow<Map<Int, TextFieldValue>>(emptyMap())
+    val textFieldStates: StateFlow<Map<Int, TextFieldValue>> = _textFieldStates
+
     private val _mainPartState =
         MutableStateFlow(mutableStateListOf<MutableMap<String, String>>())
     val mainPartState: StateFlow<MutableList<MutableMap<String, String>>> =
         _mainPartState.asStateFlow()
+
+    private val _textPasteState = MutableStateFlow("")
+    val textPastState: StateFlow<String> = _textPasteState.asStateFlow()
 
     fun changeEditModeState() {
         _isEditMode.value = !_isEditMode.value
@@ -49,8 +60,35 @@ class OpenNoteViewModel(
     fun hideDialogState() {
         _showDialog.value = false
     }
+
     fun showDialogState() {
         _showDialog.value = true
+    }
+
+    fun updateTextFieldState(index: Int, newText: TextFieldValue) {
+        _textFieldStates.value = _textFieldStates.value.toMutableMap().apply {
+            this[index] = newText
+        }
+    }
+
+    fun updateTitleStateText(newTitle: String) {
+        _titleTextState.value = newTitle
+    }
+
+    fun updateMdStateText(index: Int, newText: String) {
+        _mainPartState.value[index]["text"] = newText
+    }
+
+    fun changePasteTextState(newText: String) {
+        _textPasteState.value = newText
+    }
+
+    fun returnOldValues() {
+        note.hashCode?.let {
+            getNote(it)
+        } ?: {
+            throw NullPointerException("Note hash was null!")
+        }
     }
 
     fun createEmptyNote() {
@@ -74,36 +112,24 @@ class OpenNoteViewModel(
 
     fun getNote(hashCode: Int) {
         viewModelScope.launch {
-            Log.d("OpenNoteVM", hashCode.toString())
             note = getNotesUseCase.execute(listOf(hashCode)).first()
-
-            Log.d("OpenNoteVM", note.hashCode.toString())
-            Log.d("OpenNoteVM", note.content.toString())
             withContext(Dispatchers.Main) {
                 _mainPartState.value = note.content.toMutableStateList()
-                note.content.forEach{
+                note.content.forEachIndexed { index, it ->
                     if (it["name"] == "info") {
                         _titleTextState.value = it["header"].toString()
+                    }
+
+                    if (it["name"] == "md") {
+                        _textFieldStates.value = _textFieldStates.value.toMutableMap().apply {
+                            it["text"]?.let { text ->
+                                this[index] = TextFieldValue(text)
+                            }
+                        }
                     }
                 }
             }
         }
-    }
-
-    fun returnOldValues() {
-        note.hashCode?.let {
-            getNote(it)
-        } ?: {
-            throw NullPointerException("Note hash was null!")
-        }
-    }
-
-    fun updateTitleStateText(newTitle: String) {
-        _titleTextState.value = newTitle
-    }
-
-    fun updateMdStateText(index: Int, newText: String) {
-        _mainPartState.value[index]["text"] = newText
     }
 
     fun saveChanges() {
@@ -112,7 +138,32 @@ class OpenNoteViewModel(
             note.content[0]["header"] = _titleTextState.value
             changeNoteUseCase.execute(it, note)
         } ?: {
-            Log.d("OpenNoteVM", "The changes is not saved, hashcode is null")
+            throw NullPointerException("The changes is not saved, hashcode is null")
         }
+    }
+
+    private fun getFileName(uri: Uri, contentResolver: ContentResolver): String {
+        var name = ""
+        val cursor = contentResolver.query(
+            uri, null, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                name = it.getString(it.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME))
+            }
+        }
+        return name
+    }
+
+    fun getRealPathFromUri(context: Context, uri: Uri): String? {
+        val contentResolver = context.contentResolver
+        val fileName = getFileName(uri, contentResolver)
+        val file = File(context.cacheDir, fileName)
+
+        contentResolver.openInputStream(uri)?.use { inputStream ->
+            file.outputStream().use { outputStream ->
+                inputStream.copyTo(outputStream)
+            }
+        }
+        return file.absolutePath
     }
 }

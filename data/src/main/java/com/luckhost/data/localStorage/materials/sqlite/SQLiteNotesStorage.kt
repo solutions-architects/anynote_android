@@ -22,8 +22,6 @@ class SQLiteNotesStorage(context: Context): NotesStorage {
             put(NotesContract.COLUMN_NAME_HASHCODE, saveObject.noteHash)
         }
         db?.insert(NotesContract.TABLE_NAME, null, values)
-
-        Log.d("SQLite", saveObject.noteHash.toString())
     }
 
     override suspend fun getNotes(noteHashes: List<Int>) = flow<Note> {
@@ -44,8 +42,6 @@ class SQLiteNotesStorage(context: Context): NotesStorage {
             null,
             null
         )
-
-        Log.d("SQLite in", noteHashes.toString())
 
         while (cursor?.moveToNext() == true) {
             val getContent = cursor.getString(
@@ -80,7 +76,21 @@ class SQLiteNotesStorage(context: Context): NotesStorage {
     }
 
     override fun changeNote(noteHash: Int, saveObject: Note) {
-        deleteNote(noteHash)
-        saveNote(saveObject)
+        val selection = "${NotesContract.COLUMN_NAME_HASHCODE} = ?"
+        val selectionArgs = arrayOf(noteHash.toString())
+
+        val noteContent = Gson().toJson(saveObject.content)
+        val values = ContentValues().apply {
+            put(NotesContract.COLUMN_NAME_SERVER_ID, saveObject.id)
+            put(NotesContract.COLUMN_NAME_CONTENT, noteContent)
+            put(NotesContract.COLUMN_NAME_HASHCODE, saveObject.noteHash)
+        }
+
+        db?.update(
+            NotesContract.TABLE_NAME,
+            values,
+            selection,
+            selectionArgs
+        )
     }
 }
