@@ -64,6 +64,7 @@ class LoginActivity : ComponentActivity() {
                             vm = vm,
                             onLoadingEnd = {
                                 navController.navigate(Login)
+                                navController.clearBackStack<Loading>()
                             }
                         )
                     }

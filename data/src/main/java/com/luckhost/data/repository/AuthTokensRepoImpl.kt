@@ -14,7 +14,7 @@ class AuthTokensRepoImpl(
     }
 
     override fun getTokens(): Either<NotFoundInRepoError, AuthToken> {
-        val result = storage.getTokens()
+        val result = storage.getTokensOrNull()
         result?.let {
             return Either.Right(it)
         }

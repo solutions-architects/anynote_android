@@ -15,6 +15,8 @@ import com.luckhost.domain.useCases.network.GetUserAccountParamsUseCase
 import com.luckhost.domain.useCases.network.RefreshAccTokenUseCase
 import com.luckhost.domain.useCases.network.SignUpUseCase
 import com.luckhost.domain.useCases.network.VerifyTokenUseCase
+import com.luckhost.domain.useCases.network.localActions.GetLocalAuthTokenUseCase
+import com.luckhost.domain.useCases.network.localActions.SaveLocalAuthTokenUseCase
 import com.luckhost.domain.useCases.objects.GetNotesUseCase
 import com.luckhost.domain.useCases.objects.SaveNoteUseCase
 import org.koin.dsl.module
@@ -87,11 +89,16 @@ val domainModule = module {
             netApi = get(),
         )
     }
-//    factory<GetLocalAuthTokenUseCase> {
-//        GetLocalAuthTokenUseCase(
-//            repository = get(),
-//        )
-//    }
+    factory<GetLocalAuthTokenUseCase> {
+        GetLocalAuthTokenUseCase(
+            repository = get(),
+        )
+    }
+    factory<SaveLocalAuthTokenUseCase> {
+        SaveLocalAuthTokenUseCase(
+            repository = get(),
+        )
+    }
     factory<GetUserAccountParamsUseCase> {
         GetUserAccountParamsUseCase(
             netApi = get(),

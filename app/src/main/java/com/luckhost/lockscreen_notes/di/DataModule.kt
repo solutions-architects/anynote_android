@@ -4,11 +4,15 @@ import com.luckhost.data.repository.NoteHashesRepoImpl
 import com.luckhost.data.repository.NotesRepositoryImpl
 import com.luckhost.data.localStorage.keys.hashes.HashStorage
 import com.luckhost.data.localStorage.keys.hashes.SharedPrefHashesStorage
+import com.luckhost.data.localStorage.keys.tokens.SharedPrefTokensStorage
+import com.luckhost.data.localStorage.keys.tokens.TokensStorage
 import com.luckhost.data.localStorage.materials.NotesStorage
 import com.luckhost.data.localStorage.materials.sqlite.SQLiteNotesStorage
 import com.luckhost.data.network.NetworkModule
 import com.luckhost.data.network.retrofit.RetrofitModule
+import com.luckhost.data.repository.AuthTokensRepoImpl
 import com.luckhost.data.repository.NetworkServiceImpl
+import com.luckhost.domain.repository.AuthTokensRepoInterface
 import com.luckhost.domain.repository.NetworkServiceInterface
 import com.luckhost.domain.repository.NoteHashesRepoInterface
 import com.luckhost.domain.repository.NotesRepositoryInterface
@@ -37,5 +41,13 @@ val dataModule = module {
 
     single<NetworkServiceInterface> {
         NetworkServiceImpl(networkModule = get())
+    }
+
+    single<AuthTokensRepoInterface> {
+        AuthTokensRepoImpl(storage = get())
+    }
+
+    single<TokensStorage> {
+        SharedPrefTokensStorage(context = get())
     }
 }

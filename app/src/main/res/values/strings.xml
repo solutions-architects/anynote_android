@@ -18,6 +18,13 @@
     <string name="login_activity_passwords_does_not_match">Passwords don\'t match!</string>
     <string name="login_activity_registration_successful">Registration is successful!</string>
     <string name="login_activity_login_successful">Login is successful!</string>
+    <string name="login_activity_failed_connect_message">Failed to connect to the server!
+        Please check your internet connection or try later :/</string>
+    <string name="login_activity_no_such_account_message">The server said that there
+        is no such account :0 ! Please check the entered data </string>
+    <string name="login_activity_unexpected_error_message">\"An unknown error has occurred.\" -
+        that\'s what they usually say when they don\'t know what the error is. And that\'s
+        exactly how it is now .-.</string>
 
     <string name="confirm_dialog_question">Wait a minute!</string>
     <string name="confirm_dialog_answer_yes">Yes</string>

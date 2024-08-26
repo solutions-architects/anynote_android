@@ -14,7 +14,7 @@ open class NotesRepositoryImpl(
 ): NotesRepositoryInterface {
     override fun saveNote(saveObject: NoteModel) {
         val note = Note(
-            id = null,
+            serverId = null,
             content= saveObject.content,
             noteHash = saveObject.hashCode()
         )
@@ -39,7 +39,7 @@ open class NotesRepositoryImpl(
 
     override fun changeNote(noteHash: Int, saveObject: NoteModel) {
         val note = Note(
-            id = null,
+            serverId = null,
             content= saveObject.content,
             noteHash = noteHash
         )

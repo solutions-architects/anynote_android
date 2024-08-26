@@ -4,7 +4,6 @@ import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.luckhost.data.localStorage.keys.hashes.SharedPrefHashesStorage
-import com.luckhost.data.localStorage.keys.hashes.SharedPrefHashesStorage.Companion
 import com.luckhost.domain.models.network.AuthToken
 
 class SharedPrefTokensStorage(context: Context): TokensStorage {
@@ -26,7 +25,7 @@ class SharedPrefTokensStorage(context: Context): TokensStorage {
             .putString(SHARED_PREFS_NAME, jsonString).apply()
     }
 
-    override fun getTokens(): AuthToken? {
+    override fun getTokensOrNull(): AuthToken? {
         val gson = Gson()
         val jsonString = sharedPreferences.getString(
             SHARED_PREFS_NAME, null)?: return null

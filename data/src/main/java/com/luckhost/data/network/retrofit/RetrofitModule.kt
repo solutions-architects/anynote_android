@@ -118,7 +118,7 @@ class RetrofitModule: NetworkModule  {
 
     override suspend fun changeNoteById(
         accessToken: AccessTokens, note: Note): Either<NetworkError, SuccessMessage> {
-        note.id?.let {
+        note.serverId?.let {
             return makeNullableRequest(
                 responseCall = { netApi.changeNoteById(
                     token = "Bearer ${accessToken.accessToken}",

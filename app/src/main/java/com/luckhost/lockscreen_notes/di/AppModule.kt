@@ -15,6 +15,8 @@ val appModule = module {
             deleteNoteUseCase = get(),
             getHashesUseCase = get(),
             deleteHashUseCase = get(),
+            getLocalAuthTokenUseCase = get(),
+            saveLocalAuthTokenUseCase = get()
         )
     }
     viewModel<OpenNoteViewModel>{

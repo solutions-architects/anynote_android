@@ -1,4 +1,4 @@
-package com.luckhost.domain.useCases.network
+package com.luckhost.domain.useCases.network.localActions
 
 import com.luckhost.domain.models.Either
 import com.luckhost.domain.models.NotFoundInRepoError

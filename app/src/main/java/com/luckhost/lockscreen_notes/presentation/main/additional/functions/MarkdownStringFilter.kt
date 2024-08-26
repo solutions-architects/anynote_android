@@ -8,6 +8,8 @@ import android.util.Log
  *
  * That`s needed to show text and images in the different parts of NoteBox on the main screen
  */
+
+/* TODO move this guy in to the domain module */
 fun extractAndFilter(input: String): Pair<String, String?> {
     val regex = Regex("""!\[.*?\]\(.*?\)""")
 

@@ -9,6 +9,9 @@
 - This project was created to study Clean Architecture
 - Jetpack Compose
 - MVVM
+- SQLite
+- Retrofit
+- Koin
 ---
 # Diagram
 ![](images/ArchitectureDiagram.png)

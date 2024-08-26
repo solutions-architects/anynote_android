@@ -113,15 +113,15 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun NotesList() {
-        val notesListState by vm.notesList.collectAsState()
+        val noteBoxesList by vm.noteBoxesList.collectAsState()
 
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(notesListState) { item ->
+            items(noteBoxesList) { item ->
                 NoteBox(
-                    noteToOpen = item,
+                    noteBoxModel = item,
                     viewModel = vm,
                 )
             }

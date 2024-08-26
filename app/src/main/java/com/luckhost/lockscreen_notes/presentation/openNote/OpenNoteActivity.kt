@@ -54,8 +54,10 @@ class OpenNoteActivity : ComponentActivity() {
         val extras = intent.extras
         
         extras?.let {
-            val noteHash = intent.getIntExtra("noteHash", 0)
-            vm.getNote(noteHash)
+            val noteHash = intent.getStringExtra("noteHash")
+            if (noteHash != null) {
+                vm.getNote(noteHash.toInt())
+            }
         }?: run {
             vm.createEmptyNote()
         }

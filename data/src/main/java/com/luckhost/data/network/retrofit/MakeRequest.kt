@@ -33,10 +33,10 @@ fun <T> makeRequest(
         }
     } catch (e: SocketTimeoutException) {
         emit(Either.Left(NetworkError.Unexpected(
-            "Timeout: Failed to connect to the server.")))
+            "Timeout: ${e.message}")))
     } catch (e: IOException) {
         emit(Either.Left(NetworkError.Unexpected(
-            "Network error: Please check your connection.")))
+            "Network error: ${e.message}")))
     } catch (e: HttpException) {
         emit(Either.Left(NetworkError.Unexpected(
             "HTTP error: ${e.message()}")))

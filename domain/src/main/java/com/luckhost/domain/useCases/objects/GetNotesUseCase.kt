@@ -9,6 +9,7 @@ class GetNotesUseCase(
     suspend fun execute(
         noteHashes: List<Int>
     ): List<NoteModel> {
+        if (noteHashes.isEmpty()) return listOf<NoteModel>()
         return repository.getNotes(noteHashes)
     }
 }

@@ -17,7 +17,7 @@ class SQLiteNotesStorage(context: Context): NotesStorage {
     override fun saveNote(saveObject: Note) {
         val noteContent = Gson().toJson(saveObject.content)
         val values = ContentValues().apply {
-            put(NotesContract.COLUMN_NAME_SERVER_ID, saveObject.id)
+            put(NotesContract.COLUMN_NAME_SERVER_ID, saveObject.serverId)
             put(NotesContract.COLUMN_NAME_CONTENT, noteContent)
             put(NotesContract.COLUMN_NAME_HASHCODE, saveObject.noteHash)
         }
@@ -53,7 +53,7 @@ class SQLiteNotesStorage(context: Context): NotesStorage {
 
             emit(
                 Note(
-                    id = cursor.getInt(
+                    serverId = cursor.getInt(
                         cursor.getColumnIndexOrThrow(NotesContract.COLUMN_NAME_SERVER_ID)
                     ),
                     content = convertedContent,
@@ -81,7 +81,7 @@ class SQLiteNotesStorage(context: Context): NotesStorage {
 
         val noteContent = Gson().toJson(saveObject.content)
         val values = ContentValues().apply {
-            put(NotesContract.COLUMN_NAME_SERVER_ID, saveObject.id)
+            put(NotesContract.COLUMN_NAME_SERVER_ID, saveObject.serverId)
             put(NotesContract.COLUMN_NAME_CONTENT, noteContent)
             put(NotesContract.COLUMN_NAME_HASHCODE, saveObject.noteHash)
         }

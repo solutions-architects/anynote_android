@@ -1,13 +1,6 @@
 package com.luckhost.lockscreen_notes.presentation.main.additional.functions
 
 import android.graphics.BitmapFactory
-import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandIn
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -28,8 +21,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,86 +39,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.luckhost.domain.models.NoteModel
 import com.luckhost.lockscreen_notes.presentation.ui.ConfirmDialog
 import com.luckhost.lockscreen_notes.R
 import com.luckhost.lockscreen_notes.presentation.main.MainViewModel
+import com.luckhost.lockscreen_notes.presentation.openNote.additional.models.NoteBoxModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
+@Stable
 @Composable
 fun NoteBox(
-    noteToOpen: NoteModel,
+    noteBoxModel: NoteBoxModel,
     viewModel: MainViewModel,
 ) {
-    Log.d("NoteBox", noteToOpen.content.toString())
-
-    val content = noteToOpen.content.toList()
-
     /*TODO move to VM*/
-    val titleText = remember { mutableStateOf("") }
-    val mdText = remember { mutableStateOf("") }
-    val imageSource = remember { mutableStateOf("") }
-    val isLoaded = remember { mutableStateOf(false) }
 
-    LaunchedEffect(content) {
-        for (entry in content) {
-            when (entry["name"]) {
-                "info" -> {
-                    if (titleText.value.isNotEmpty()) continue
-
-                    entry["header"]?.let {
-                        titleText.value = it
-                    }
-                }
-                "md" -> {
-                    if (mdText.value.isNotEmpty()) continue
-
-                    entry["text"]?.let {
-                        extractAndFilter(it)
-                        val filteredString = extractAndFilter(it)
-
-                        mdText.value = filteredString.first
-                        filteredString.second?.let { it1 -> imageSource.value = it1 }
-                    }
-                }
-                "map" -> { /* Обработка других данных */ }
-            }
-        }
-        isLoaded.value = true
-    }
-
-    AnimatedVisibility(
-        visible = isLoaded.value,
-        enter = fadeIn(animationSpec = tween(durationMillis = 200))
-                + expandIn(expandFrom = Alignment.TopCenter),
-        exit = fadeOut()
-                + shrinkOut(shrinkTowards = Alignment.Center)
-    ) {
-        NoteBoxContainer(
-            vm = viewModel,
-            noteToOpen = noteToOpen,
-            titleText = titleText,
-            mdText = mdText,
-            imageSource = imageSource
-        )
-    }
-}
-
-@Composable
-private fun NoteBoxContainer(
-    vm: MainViewModel,
-    noteToOpen: NoteModel,
-    titleText: MutableState<String>,
-    mdText: MutableState<String>,
-    imageSource: MutableState<String>,
-) {
     val context = LocalContext.current
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp)
-            .clickable { vm.startOpenNoteActivity(context = context, noteToOpen) },
+            .clickable { viewModel.startOpenNoteActivity(context = context,
+                noteBoxModel.parentHash) },
         colors = CardDefaults.cardColors(
             containerColor = colorResource(R.color.notebox_bg)
         ),
@@ -163,7 +97,7 @@ private fun NoteBoxContainer(
                 ConfirmDialog(
                     text = stringResource(id = R.string.question_of_note_deleting),
                     onConfirm = {
-                        vm.deleteNote(noteToOpen)
+                        viewModel.deleteNote(noteBoxModel.parentHash)
                         showDialog = false
                     },
                     onDismiss = { showDialog = false }
@@ -178,33 +112,31 @@ private fun NoteBoxContainer(
                 color = colorResource(id = R.color.grey_neutral)
             )
 
-            if (titleText.value.isNotEmpty()) {
-                TitlePart(
-                    modifier = Modifier
-                        .constrainAs(titleRef) {
-                            top.linkTo(parent.top)
-                            start.linkTo(parent.start, margin = 4.dp)
-                            end.linkTo(parent.end)
-                        }
-                        .fillMaxWidth(),
-                    title = titleText.value
-                )
-            }
-
-            if (mdText.value.isNotEmpty()) {
-                MarkdownPart(
-                    modifier = Modifier.constrainAs(contentRef) {
-                        top.linkTo(dividerRef.bottom, margin = 4.dp)
-                        bottom.linkTo(parent.bottom, margin = 4.dp)
+            TitlePart(
+                modifier = Modifier
+                    .constrainAs(titleRef) {
+                        top.linkTo(parent.top)
                         start.linkTo(parent.start, margin = 4.dp)
-                        width = Dimension.fillToConstraints
-                    },
-                    string = mdText.value,
-                    onItemClick = { vm.startOpenNoteActivity(context = context, noteToOpen) },
-                )
-            }
+                        end.linkTo(parent.end)
+                    }
+                    .fillMaxWidth(),
+                title = noteBoxModel.title
+            )
 
-            if (imageSource.value.isNotEmpty()) {
+
+            MarkdownPart(
+                modifier = Modifier.constrainAs(contentRef) {
+                    top.linkTo(dividerRef.bottom, margin = 4.dp)
+                    bottom.linkTo(parent.bottom, margin = 4.dp)
+                    start.linkTo(parent.start, margin = 4.dp)
+                    width = Dimension.fillToConstraints
+                },
+                string = noteBoxModel.mdText,
+                onItemClick = { viewModel.startOpenNoteActivity(context = context,
+                    noteBoxModel.parentHash) },
+            )
+
+            noteBoxModel.imageSource?.let {
                 ImagePart(
                     modifier = Modifier
                         .constrainAs(imageRef) {
@@ -215,7 +147,7 @@ private fun NoteBoxContainer(
                             width = Dimension.fillToConstraints
                         }
                     ,
-                    imageLocalStorageLink = imageSource.value
+                    imageLocalStorageLink = it
                 )
             }
         }
