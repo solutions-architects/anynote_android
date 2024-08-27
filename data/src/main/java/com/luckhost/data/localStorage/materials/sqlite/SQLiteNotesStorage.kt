@@ -24,14 +24,14 @@ class SQLiteNotesStorage(context: Context): NotesStorage {
         db?.insert(NotesContract.TABLE_NAME, null, values)
     }
 
-    override suspend fun getNotes(noteHashes: List<Int>) = flow<Note> {
+    override suspend fun getNotes(noteHashes: List<String>) = flow<Note> {
         if (noteHashes.isEmpty()) {
             throw IllegalArgumentException("An empty noteHashes list is set")
         }
 
         val selection = "${NotesContract.COLUMN_NAME_HASHCODE} IN " +
                 "(${noteHashes.joinToString(",") { "?" }})"
-        val selectionArgs = noteHashes.map { it.toString() }.toTypedArray()
+        val selectionArgs = noteHashes.map { it }.toTypedArray()
 
         val cursor = db?.query(
             NotesContract.TABLE_NAME,
@@ -57,27 +57,27 @@ class SQLiteNotesStorage(context: Context): NotesStorage {
                         cursor.getColumnIndexOrThrow(NotesContract.COLUMN_NAME_SERVER_ID)
                     ),
                     content = convertedContent,
-                    noteHash = cursor.getInt(
+                    noteHash = cursor.getString(
                         cursor.getColumnIndexOrThrow(NotesContract.COLUMN_NAME_HASHCODE)
                     )
                 )
             )
-            Log.d("SQLite return", cursor.getInt(
+            Log.d("SQLite return", cursor.getString(
                 cursor.getColumnIndexOrThrow(NotesContract.COLUMN_NAME_HASHCODE)
-            ).toString())
+            ))
         }
         cursor?.close()
     }
 
-    override fun deleteNote(noteHash: Int) {
+    override fun deleteNote(noteHash: String) {
         val selection = "${NotesContract.COLUMN_NAME_HASHCODE} = ?"
-        val selectionArgs = arrayOf(noteHash.toString())
+        val selectionArgs = arrayOf(noteHash)
         db?.delete(NotesContract.TABLE_NAME, selection, selectionArgs)
     }
 
-    override fun changeNote(noteHash: Int, saveObject: Note) {
+    override fun changeNote(noteHash: String, saveObject: Note) {
         val selection = "${NotesContract.COLUMN_NAME_HASHCODE} = ?"
-        val selectionArgs = arrayOf(noteHash.toString())
+        val selectionArgs = arrayOf(noteHash)
 
         val noteContent = Gson().toJson(saveObject.content)
         val values = ContentValues().apply {

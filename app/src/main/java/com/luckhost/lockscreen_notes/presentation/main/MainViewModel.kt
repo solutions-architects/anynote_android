@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,10 +17,11 @@ import com.luckhost.domain.useCases.network.localActions.GetLocalAuthTokenUseCas
 import com.luckhost.domain.useCases.network.localActions.SaveLocalAuthTokenUseCase
 import com.luckhost.domain.useCases.objects.DeleteNoteUseCase
 import com.luckhost.domain.useCases.objects.GetNotesUseCase
-import com.luckhost.lockscreen_notes.presentation.main.additional.functions.extractAndFilter
+import com.luckhost.lockscreen_notes.presentation.main.additional.functions.getFilteredMdAndFirstImage
 import com.luckhost.lockscreen_notes.presentation.openNote.OpenNoteActivity
 import com.luckhost.lockscreen_notes.presentation.openNote.additional.models.NoteBoxModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -41,6 +43,9 @@ class MainViewModel(
     private val _noteBoxesList = MutableStateFlow(mutableStateListOf<NoteBoxModel>())
     val noteBoxesList: StateFlow<List<NoteBoxModel>> = _noteBoxesList.asStateFlow()
 
+    private val _noteBoxesVisibleStateList =
+        mutableStateMapOf<String, MutableStateFlow<Boolean>>()
+
     init {
         val localSavedTokens = getLocalAuthTokenUseCase.execute()
 
@@ -59,7 +64,6 @@ class MainViewModel(
     fun deleteNote(
         noteHash: String
     ) {
-
         val noteHashInt = noteHash.toInt()
 
         val noteToDelete = _notesList.value.find { predicate ->
@@ -70,12 +74,15 @@ class MainViewModel(
             predicate.parentHash.equals(noteHash)
         }
 
-        _notesList.value.remove(noteToDelete)
-        _noteBoxesList.value.remove(noteBoxToDelete)
+        _noteBoxesVisibleStateList[noteHash]?.value = false
 
-        noteHashInt.let {
-            deleteNoteUseCase.execute(it)
-            deleteHashUseCase.execute(it)
+        viewModelScope.launch {
+            delay(300)
+            _notesList.value.remove(noteToDelete)
+            _noteBoxesList.value.remove(noteBoxToDelete)
+
+            deleteNoteUseCase.execute(noteHash)
+            deleteHashUseCase.execute(noteHash)
         }
     }
 
@@ -83,21 +90,28 @@ class MainViewModel(
         _notesList.value.clear()
         _noteBoxesList.value.clear()
 
+        var delayBeforeAnimation: Long = 50
+
         viewModelScope.launch {
             _notesList.value = getNotesUseCase.execute(getHashesUseCase.execute())
                 .toMutableStateList()
 
             withContext(Dispatchers.Main) {
                 _notesList.value.forEach {
-                    createNoteBoxModels(it)
+                    createNoteBoxModels(it, delayBeforeAnimation)
+                    delayBeforeAnimation += 25
                 }
             }
         }
     }
 
-    private fun createNoteBoxModels(noteModel: NoteModel) {
+    private fun createNoteBoxModels(noteModel: NoteModel, delayBeforeAnimation: Long) {
+        val noteHash = noteModel.hashCode.toString()
+
+        _noteBoxesVisibleStateList[noteHash] = MutableStateFlow(false)
+
         val result = NoteBoxModel("", "", null,
-            noteModel.hashCode.toString())
+            noteHash, _noteBoxesVisibleStateList[noteHash]!!.asStateFlow())
 
         for (entry in noteModel.content) {
             when (entry["name"]) {
@@ -114,8 +128,8 @@ class MainViewModel(
                     if (result.mdText.isNotEmpty()) continue
 
                     entry["text"]?.let {
-                        extractAndFilter(it)
-                        val filteredString = extractAndFilter(it)
+                        getFilteredMdAndFirstImage(it)
+                        val filteredString = getFilteredMdAndFirstImage(it)
 
                         result.mdText = filteredString.first
                         filteredString.second?.let { it1 -> result.imageSource = it1 }
@@ -125,6 +139,11 @@ class MainViewModel(
             }
         }
         _noteBoxesList.value.add(result)
+
+        viewModelScope.launch {
+            delay(delayBeforeAnimation)
+            _noteBoxesVisibleStateList[noteHash]!!.value = true
+        }
     }
 
     fun startOpenNoteActivity(context: Context) {

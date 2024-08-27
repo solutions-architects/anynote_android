@@ -5,7 +5,7 @@ import com.luckhost.domain.repository.NoteHashesRepoInterface
 class AddHashUseCase(
     private val hashesRepository: NoteHashesRepoInterface,
 ) {
-    fun execute(hash: Int) {
+    fun execute(hash: String) {
         hashesRepository.addHash(hash)
     }
 }

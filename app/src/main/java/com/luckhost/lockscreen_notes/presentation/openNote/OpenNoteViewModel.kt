@@ -106,11 +106,11 @@ class OpenNoteViewModel(
         )
 
         saveNoteUseCase.execute(note)
-        note.hashCode = note.hashCode()
+        note.hashCode = note.hashCode().toString()
         addHashUseCase.execute(note.hashCode!!)
     }
 
-    fun getNote(hashCode: Int) {
+    fun getNote(hashCode: String) {
         viewModelScope.launch {
             note = getNotesUseCase.execute(listOf(hashCode)).first()
             withContext(Dispatchers.Main) {
@@ -144,6 +144,7 @@ class OpenNoteViewModel(
 
     private fun getFileName(uri: Uri, contentResolver: ContentResolver): String {
         var name = ""
+        Uri.Builder()
         val cursor = contentResolver.query(
             uri, null, null, null, null)
         cursor?.use {
@@ -158,6 +159,10 @@ class OpenNoteViewModel(
         val contentResolver = context.contentResolver
         val fileName = getFileName(uri, contentResolver)
         val file = File(context.cacheDir, fileName)
+
+        if (file.exists()) {
+            return file.absolutePath
+        }
 
         contentResolver.openInputStream(uri)?.use { inputStream ->
             file.outputStream().use { outputStream ->

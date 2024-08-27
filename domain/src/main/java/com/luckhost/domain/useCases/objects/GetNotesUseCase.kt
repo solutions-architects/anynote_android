@@ -7,7 +7,7 @@ class GetNotesUseCase(
     private val repository: NotesRepositoryInterface,
 ) {
     suspend fun execute(
-        noteHashes: List<Int>
+        noteHashes: List<String>
     ): List<NoteModel> {
         if (noteHashes.isEmpty()) return listOf<NoteModel>()
         return repository.getNotes(noteHashes)

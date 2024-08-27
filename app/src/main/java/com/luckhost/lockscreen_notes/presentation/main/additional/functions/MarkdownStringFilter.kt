@@ -1,7 +1,5 @@
 package com.luckhost.lockscreen_notes.presentation.main.additional.functions
 
-import android.util.Log
-
 
 /**
  * This function is needed to filter md text and remove images from them
@@ -10,7 +8,7 @@ import android.util.Log
  */
 
 /* TODO move this guy in to the domain module */
-fun extractAndFilter(input: String): Pair<String, String?> {
+fun getFilteredMdAndFirstImage(input: String): Pair<String, String?> {
     val regex = Regex("""!\[.*?\]\(.*?\)""")
 
     val firstImageLink = regex.find(input)
@@ -26,7 +24,5 @@ fun extractAndFilter(input: String): Pair<String, String?> {
 private fun extractLinkValue(input: String): String? {
     val regex = Regex("""!\[.*?\]\((.*?)\)""")
     val matchResult = regex.find(input)
-    Log.d("LinkExtract input", input)
-    Log.d("LinkExtract return", matchResult?.groups?.get(1)?.value.toString())
     return matchResult?.groups?.get(1)?.value
 }

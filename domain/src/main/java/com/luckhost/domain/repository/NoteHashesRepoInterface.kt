@@ -1,8 +1,8 @@
 package com.luckhost.domain.repository
 
 interface NoteHashesRepoInterface {
-    fun saveHashes(noteHashes: List<Int>)
-    fun getHashes(): List<Int>
-    fun deleteHash(hashToDelete: Int)
-    fun addHash(hash: Int)
+    fun saveHashes(noteHashes: List<String>)
+    fun getHashes(): List<String>
+    fun deleteHash(hashToDelete: String)
+    fun addHash(hash: String)
 }

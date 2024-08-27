@@ -6,9 +6,9 @@ import kotlinx.coroutines.flow.Flow
 interface NotesStorage {
     fun saveNote(saveObject: Note)
 
-    suspend fun getNotes(noteHashes: List<Int>): Flow<Note>
+    suspend fun getNotes(noteHashes: List<String>): Flow<Note>
 
-    fun deleteNote(noteHash: Int)
+    fun deleteNote(noteHash: String)
 
-    fun changeNote(noteHash: Int, saveObject: Note)
+    fun changeNote(noteHash: String, saveObject: Note)
 }

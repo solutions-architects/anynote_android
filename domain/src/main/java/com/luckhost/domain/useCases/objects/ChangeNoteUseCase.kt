@@ -7,7 +7,7 @@ class ChangeNoteUseCase(
     private val repository: NotesRepositoryInterface,
 ) {
     fun execute(
-        noteHash: Int,
+        noteHash: String,
         saveObject: NoteModel,
     ) {
         repository.changeNote(noteHash, saveObject)

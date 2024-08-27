@@ -1,8 +1,7 @@
 package com.luckhost.domain.models
 
 
-class NoteModel(
+data class NoteModel(
     var content: MutableList<MutableMap<String, String>>,
-    var hashCode: Int?,
-) {
-}
+    var hashCode: String?,
+)

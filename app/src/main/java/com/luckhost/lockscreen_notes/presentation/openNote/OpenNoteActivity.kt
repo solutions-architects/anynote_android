@@ -2,7 +2,6 @@ package com.luckhost.lockscreen_notes.presentation.openNote
 
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -56,7 +55,7 @@ class OpenNoteActivity : ComponentActivity() {
         extras?.let {
             val noteHash = intent.getStringExtra("noteHash")
             if (noteHash != null) {
-                vm.getNote(noteHash.toInt())
+                vm.getNote(noteHash)
             }
         }?: run {
             vm.createEmptyNote()
@@ -132,7 +131,6 @@ class OpenNoteActivity : ComponentActivity() {
                 if (realPath != null) {
                     vm.changePasteTextState(realPath)
                 }
-                Log.d("PhotoPicker", "Selected path: ${realPath}")
             }
         }
 

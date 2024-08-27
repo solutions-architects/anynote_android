@@ -4,6 +4,8 @@ import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -51,16 +53,18 @@ fun NoteBox(
     noteBoxModel: NoteBoxModel,
     viewModel: MainViewModel,
 ) {
-    /*TODO move to VM*/
-
     val context = LocalContext.current
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp)
-            .clickable { viewModel.startOpenNoteActivity(context = context,
-                noteBoxModel.parentHash) },
+            .clickable {
+                viewModel.startOpenNoteActivity(
+                    context = context,
+                    noteBoxModel.parentHash
+                )
+            },
         colors = CardDefaults.cardColors(
             containerColor = colorResource(R.color.notebox_bg)
         ),
@@ -73,7 +77,7 @@ fun NoteBox(
             modifier = Modifier
                 .padding(15.dp)
         ) {
-            val (titleRef, contentRef, imageRef, dividerRef, buttonRef) = createRefs()
+            val (titleRef, contentRef, dividerRef, buttonRef) = createRefs()
 
             var showDialog by remember { mutableStateOf(false) }
 
@@ -123,32 +127,27 @@ fun NoteBox(
                 title = noteBoxModel.title
             )
 
-
-            MarkdownPart(
+            Row(
                 modifier = Modifier.constrainAs(contentRef) {
                     top.linkTo(dividerRef.bottom, margin = 4.dp)
                     bottom.linkTo(parent.bottom, margin = 4.dp)
                     start.linkTo(parent.start, margin = 4.dp)
                     width = Dimension.fillToConstraints
-                },
-                string = noteBoxModel.mdText,
-                onItemClick = { viewModel.startOpenNoteActivity(context = context,
-                    noteBoxModel.parentHash) },
-            )
-
-            noteBoxModel.imageSource?.let {
-                ImagePart(
-                    modifier = Modifier
-                        .constrainAs(imageRef) {
-                            top.linkTo(dividerRef.bottom, margin = 4.dp)
-                            bottom.linkTo(parent.bottom, margin = 4.dp)
-                            start.linkTo(contentRef.end, margin = 4.dp)
-                            end.linkTo(parent.end, margin = 4.dp)
-                            width = Dimension.fillToConstraints
-                        }
-                    ,
-                    imageLocalStorageLink = it
+                }.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                MarkdownPart(
+                    modifier = Modifier.weight(1f),
+                    string = noteBoxModel.mdText,
+                    onItemClick = { viewModel.startOpenNoteActivity(context = context,
+                        noteBoxModel.parentHash) },
                 )
+
+                noteBoxModel.imageSource?.let {
+                    ImagePart(
+                        imageLocalStorageLink = it
+                    )
+                }
             }
         }
     }
@@ -156,7 +155,7 @@ fun NoteBox(
 
 @Composable
 private fun TitlePart(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     title: String,) {
     Text(
         text = title,
@@ -173,7 +172,7 @@ private fun TitlePart(
 
 @Composable
 private fun MarkdownPart(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     string: String,
     onItemClick: () -> Unit
 ) {
@@ -191,7 +190,7 @@ private fun MarkdownPart(
 
 @Composable
 private fun ImagePart(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     imageLocalStorageLink: String,) {
 
     val bitmap = BitmapFactory.decodeFile(imageLocalStorageLink)

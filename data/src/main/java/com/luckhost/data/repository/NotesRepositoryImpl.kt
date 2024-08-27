@@ -16,12 +16,12 @@ open class NotesRepositoryImpl(
         val note = Note(
             serverId = null,
             content= saveObject.content,
-            noteHash = saveObject.hashCode()
+            noteHash = saveObject.hashCode().toString()
         )
         notesStorage.saveNote(note)
     }
 
-    override suspend fun getNotes(noteHashes: List<Int>): List<NoteModel> {
+    override suspend fun getNotes(noteHashes: List<String>): List<NoteModel> {
         return withContext(Dispatchers.IO) {
             notesStorage.getNotes(noteHashes)
                 .map { note ->
@@ -33,11 +33,11 @@ open class NotesRepositoryImpl(
         }
     }
 
-    override fun deleteNote(noteHash: Int) {
+    override fun deleteNote(noteHash: String) {
         notesStorage.deleteNote(noteHash)
     }
 
-    override fun changeNote(noteHash: Int, saveObject: NoteModel) {
+    override fun changeNote(noteHash: String, saveObject: NoteModel) {
         val note = Note(
             serverId = null,
             content= saveObject.content,

@@ -98,6 +98,7 @@ fun EditNoteFragment(vm: OpenNoteViewModel) {
 
         val mainNotePart by vm.mainPartState.collectAsState()
 
+        /* TODO change to lazy column */
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -128,7 +129,8 @@ private fun TextPart(
     index: Int,
 ) {
     val textFieldStates by vm.textFieldStates.collectAsState()
-    var textValue by remember { mutableStateOf(textFieldStates[index] ?: TextFieldValue("")) }
+    var textValue by remember {
+        mutableStateOf(textFieldStates[index] ?: TextFieldValue("")) }
 
     val pasteText by vm.textPastState.collectAsState()
 
@@ -156,8 +158,9 @@ private fun TextPart(
                     modifier = Modifier
                         ,
                     onClick = {
-                    textValue = TextFieldValue("")
-                    vm.updateTextFieldState(index, textValue)
+                        textValue = TextFieldValue("")
+                        vm.updateTextFieldState(index, textValue)
+                        vm.updateMdStateText(index, textValue.text)
                 }) {
                     Icon(
                         imageVector = Icons.Outlined.Close,

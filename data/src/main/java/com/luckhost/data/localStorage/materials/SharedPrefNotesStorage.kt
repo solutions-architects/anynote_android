@@ -14,12 +14,12 @@ class SharedPrefNotesStorage(context: Context): NotesStorage {
     private val sharedPreferences = context.getSharedPreferences(SHARED_PREFS_NAME, MODE_PRIVATE)
     override fun saveNote(saveObject: Note) {
         val noteJson = Gson().toJson(saveObject)
-        sharedPreferences.edit().putString(saveObject.noteHash.toString(), noteJson).apply()
+        sharedPreferences.edit().putString(saveObject.noteHash, noteJson).apply()
     }
 
-    override suspend fun getNotes(noteHashes: List<Int>) = flow<Note> {
+    override suspend fun getNotes(noteHashes: List<String>) = flow<Note> {
         noteHashes.forEach{
-            val noteJson = sharedPreferences.getString(it.toString(),
+            val noteJson = sharedPreferences.getString(it,
                 null)
             if(noteJson != null) {
                 emit(Gson().fromJson(noteJson, Note::class.java))
@@ -27,12 +27,12 @@ class SharedPrefNotesStorage(context: Context): NotesStorage {
         }
     }
 
-    override fun deleteNote(noteHash: Int) {
-        sharedPreferences.edit().remove(noteHash.toString()).apply()
+    override fun deleteNote(noteHash: String) {
+        sharedPreferences.edit().remove(noteHash).apply()
     }
 
-    override fun changeNote(noteHash: Int, saveObject: Note) {
+    override fun changeNote(noteHash: String, saveObject: Note) {
         val noteJson = Gson().toJson(saveObject)
-        sharedPreferences.edit().putString(noteHash.toString(), noteJson).apply()
+        sharedPreferences.edit().putString(noteHash, noteJson).apply()
     }
 }
