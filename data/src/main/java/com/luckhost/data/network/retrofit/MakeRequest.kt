@@ -1,5 +1,6 @@
 package com.luckhost.data.network.retrofit
 
+import android.util.Log
 import com.luckhost.data.network.models.Either
 import com.luckhost.data.network.models.NetworkError
 import kotlinx.coroutines.flow.flow
@@ -17,6 +18,12 @@ internal fun <T> makeRequest(
 ): Flow<Either<NetworkError, T>> = flow {
     try {
         val response = responseCall()
+
+        Log.d("makeRequest", "response ${response.code()}")
+        Log.d("makeRequest", "response ${response.body()}")
+        Log.d("makeRequest", "response ${response.errorBody()}")
+        Log.d("makeRequest", "response ${response.message()}")
+        Log.d("makeRequest", "response ${response.raw()}")
 
         if (response.isSuccessful && response.body() != null) {
             emit(Either.Right(response.body()!!))

@@ -7,6 +7,7 @@ package com.luckhost.domain.models
  * @param hashCode is needed to perform CRUD operations in the note repository
  */
 data class NoteModel(
+    val serverId: Int? = null,
     var content: MutableList<MutableMap<String, String>>,
     var hashCode: String?,
 )

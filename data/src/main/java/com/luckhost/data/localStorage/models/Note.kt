@@ -1,6 +1,7 @@
 package com.luckhost.data.localStorage.models
 
 import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
 import java.security.MessageDigest
 /**
  * The Note model only for Data module
@@ -16,10 +17,17 @@ import java.security.MessageDigest
  * @param noteHash is needed to provide local CRUD operations
  */
 data class Note(
-    var serverId: Int?,
+    @field:SerializedName("id")
+    var serverId: Int? = null,
+
     var content: List<MutableMap<String, String>>,
-    var contentHash: String = "",
-    val noteHash: String
+
+    @field:SerializedName("hash")
+    val noteHash: String,
+
+    var user: Int = 0,
+
+    var contentHash: String? = null
 ) {
     init {
         if (contentHash == "") {

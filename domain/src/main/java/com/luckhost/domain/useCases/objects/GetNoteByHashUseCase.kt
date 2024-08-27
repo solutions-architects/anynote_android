@@ -6,7 +6,7 @@ import com.luckhost.domain.repository.NotesRepositoryInterface
 class GetNoteByHashUseCase(
     private val repository: NotesRepositoryInterface,
 ) {
-    fun execute(hash: String): NoteModel {
+    suspend fun execute(hash: String): NoteModel {
         return repository.getNoteByHash(hash)
     }
 }

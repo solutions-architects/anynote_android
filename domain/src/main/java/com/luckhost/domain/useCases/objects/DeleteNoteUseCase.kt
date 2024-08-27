@@ -5,7 +5,7 @@ import com.luckhost.domain.repository.NotesRepositoryInterface
 class DeleteNoteUseCase(
     private val repository: NotesRepositoryInterface,
 ) {
-    fun execute(noteHash: String) {
+    suspend fun execute(noteHash: String) {
         repository.deleteNote(noteHash)
     }
 }

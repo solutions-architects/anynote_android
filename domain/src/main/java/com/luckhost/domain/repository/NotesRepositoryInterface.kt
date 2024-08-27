@@ -10,9 +10,9 @@ interface NotesRepositoryInterface {
 
     suspend fun getNotes(): List<NoteModel>
 
-    fun getNoteByHash(noteHash: String): NoteModel
+    suspend fun getNoteByHash(noteHash: String): NoteModel
 
-    fun deleteNote(noteHash: String)
+    suspend fun deleteNote(noteHash: String)
 
-    fun changeNote(noteHash: String, saveObject: NoteModel)
+    suspend fun changeNote(noteHash: String, saveObject: NoteModel)
 }

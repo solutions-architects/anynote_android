@@ -28,8 +28,17 @@ interface NetworkModule {
 
     suspend fun getAllNotes(accessToken: AccessTokens):
             Either<NetworkError, List<Note>>
-    suspend fun createNewNote(accessToken: AccessTokens, note: Note):
-            Either<NetworkError, Note>
+
+    suspend fun createNewNote(
+        accessToken: AccessTokens,
+        note: Note,
+        user: Int,
+        noteHash: String? = null,
+    ): Either<NetworkError, Note>
+
     suspend fun changeNoteById(accessToken: AccessTokens, note: Note):
+            Either<NetworkError, SuccessMessage>
+
+    suspend fun deleteNoteById(accessToken: AccessTokens, note: Note):
             Either<NetworkError, SuccessMessage>
 }

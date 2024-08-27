@@ -19,7 +19,8 @@ internal fun NetworkError.toDomainNetworkErrorDescription(): NetworkErrorDescrip
 internal fun LoginAnswerBody.toDomainAuthToken(): AuthToken {
     return AuthToken(
         accessToken = this.access,
-        refreshToken = this.refresh
+        refreshToken = this.refresh,
+        userId = this.userId
     )
 }
 

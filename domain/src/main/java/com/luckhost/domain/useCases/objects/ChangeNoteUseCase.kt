@@ -6,7 +6,7 @@ import com.luckhost.domain.repository.NotesRepositoryInterface
 class ChangeNoteUseCase(
     private val repository: NotesRepositoryInterface,
 ) {
-    fun execute(
+    suspend fun execute(
         noteHash: String,
         saveObject: NoteModel,
     ) {

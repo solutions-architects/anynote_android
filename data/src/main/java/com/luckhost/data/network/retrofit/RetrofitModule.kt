@@ -101,15 +101,19 @@ class RetrofitModule: NetworkModule  {
         ).last()
     }
 
-    override suspend fun createNewNote(accessToken: AccessTokens, note: Note):
-            Either<NetworkError, Note> {
-
+    override suspend fun createNewNote(
+        accessToken: AccessTokens,
+        note: Note,
+        user: Int,
+        noteHash: String?,
+    ): Either<NetworkError, Note> {
         return makeRequest(
             responseCall = { netApi.createNewNote(
                 token = "Bearer ${accessToken.accessToken}",
                 note = CreateNoteRequest(
                     content = note.content,
-                    noteHash = note.noteHash,
+                    noteHash = noteHash,
+                    user = user
                 )
             ) },
             errorStringToGet = "detail",
@@ -126,6 +130,25 @@ class RetrofitModule: NetworkModule  {
                     request = note,
                 ) },
                 errorStringToGet = "detail",
+            ).last()
+        }
+
+        return Either.Left(NetworkError.Unexpected(error = "Note id is null :("))
+    }
+
+    override suspend fun deleteNoteById(
+        accessToken: AccessTokens,
+        note: Note
+    ): Either<NetworkError, SuccessMessage> {
+        note.serverId?.let {
+            return makeNullableRequest(
+                responseCall = {
+                    netApi.deleteNote(
+                        token = "Bearer ${accessToken.accessToken}",
+                        id = it,
+                    )
+                },
+                errorStringToGet = "detail"
             ).last()
         }
 

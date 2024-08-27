@@ -24,7 +24,11 @@ val dataModule = module {
     }
 
     single<NotesRepositoryInterface> {
-        NotesRepositoryImpl(notesStorage = get())
+        NotesRepositoryImpl(
+            notesStorage = get(),
+            networkModule = get<NetworkModule>(),
+            authTokensRepoImp = get<AuthTokensRepoInterface>(),
+        )
     }
 
     single<NetworkModule> {

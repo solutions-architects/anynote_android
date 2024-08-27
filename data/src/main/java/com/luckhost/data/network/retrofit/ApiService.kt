@@ -12,6 +12,7 @@ import com.luckhost.data.localStorage.models.Note
 import okhttp3.Request
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.PATCH
@@ -19,11 +20,31 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface ApiService {
-    @POST("auth/login/")
+    @POST("auth/reg/")
+    suspend fun register(@Body request: LoginRequest): Response<AccountAnswerBody>
+
+
+    @GET("note/")
+    suspend fun getAllNotes(@Header("Authorization") token: String): Response<List<Note>>
+
+    @POST("note/")
+    suspend fun createNewNote(@Header("Authorization") token: String,
+                              @Body note: CreateNoteRequest): Response<Note>
+
+    @DELETE("note/{id}")
+    suspend fun deleteNote(@Header("Authorization") token: String,
+        @Path("id") id: Int,
+    ): Response<Request>
+
+    @PATCH("note/{id}")
+    suspend fun changeNoteById(@Header("Authorization") token: String,
+                               @Path("id") id: Int, @Body request: Note): Response<Request>
+
+    @POST("token/")
     suspend fun login(@Body request: LoginRequest): Response<LoginAnswerBody>
 
-    @POST("auth/register/")
-    suspend fun register(@Body request: LoginRequest): Response<AccountAnswerBody>
+
+
 
     @POST("auth/refresh/")
     suspend fun refreshAccessToken(@Body request: RefreshToken): Response<AccessToken>
@@ -38,16 +59,4 @@ interface ApiService {
     @PATCH("account")
     suspend fun changeAccountParams(@Header("Authorization") token: String,
                                     @Body request: AccountParams): Response<Request>
-
-    @GET("account/notes")
-    suspend fun getAllNotes(@Header("Authorization") token: String): Response<List<Note>>
-
-    @POST("account/notes")
-    suspend fun createNewNote(@Header("Authorization") token: String,
-                              @Body note: CreateNoteRequest): Response<Note>
-
-    // still in development on the server
-    @PATCH("account/notes/{id}")
-    suspend fun changeNoteById(@Header("Authorization") token: String,
-                            @Path("id") id: Int, @Body request: Note): Response<Request>
 }

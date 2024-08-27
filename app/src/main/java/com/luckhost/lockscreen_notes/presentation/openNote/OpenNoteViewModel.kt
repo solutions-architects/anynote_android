@@ -146,12 +146,14 @@ class OpenNoteViewModel(
     }
 
     fun saveChanges() {
-        note.hashCode?.let {
-            note.content = _mainPartState
-            note.content[0]["header"] = _titleTextState.value
-            changeNoteUseCase.execute(it, note)
-        } ?: {
-            throw NullPointerException("The changes is not saved, hashcode is null")
+        viewModelScope.launch(Dispatchers.IO) {
+            note.hashCode?.let {
+                note.content = _mainPartState
+                note.content[0]["header"] = _titleTextState.value
+                changeNoteUseCase.execute(it, note)
+            } ?: run {
+                throw NullPointerException("The changes is not saved, hashcode is null")
+            }
         }
     }
 

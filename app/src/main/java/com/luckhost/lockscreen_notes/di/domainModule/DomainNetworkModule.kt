@@ -1,5 +1,6 @@
 package com.luckhost.lockscreen_notes.di.domainModule
 
+import com.luckhost.domain.repository.AuthTokensRepoInterface
 import com.luckhost.domain.useCases.network.ChangeNoteOnServerUseCase
 import com.luckhost.domain.useCases.network.ChangeUserAccountParamsUseCase
 import com.luckhost.domain.useCases.network.CreateNoteOnServerUseCase
@@ -37,6 +38,7 @@ val domainNetworkModule = module {
     factory<GetAuthTokenUseCase> {
         GetAuthTokenUseCase(
             netApi = get(),
+            tokenStorage = get<AuthTokensRepoInterface>()
         )
     }
     factory<GetLocalAuthTokenUseCase> {
