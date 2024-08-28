@@ -16,6 +16,7 @@ val appModule = module {
             getHashesUseCase = get(),
             deleteHashUseCase = get(),
             getLocalAuthTokenUseCase = get(),
+            getFilteredMdAndFirstImgUseCase = get(),
             saveLocalAuthTokenUseCase = get()
         )
     }
@@ -25,6 +26,7 @@ val appModule = module {
             getNotesUseCase = get(),
             changeNoteUseCase = get(),
             addHashUseCase = get(),
+            getCachedImageLinkUseCase = get(),
             resourceProvider = get(),
         )
     }

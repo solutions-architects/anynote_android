@@ -1,6 +1,11 @@
 package com.luckhost.domain.useCases.filters
 
-class GetFilteredMdAndFirstImage() {
+/**
+ * This function is needed to filter md text and remove images from them
+ *
+ * That`s needed to show text and images in the different parts of NoteBox on the main screen
+ */
+class GetFilteredMdAndFirstImgUseCase() {
     fun execute(input: String): Pair<String, String?> {
         val regex = Regex("""!\[.*?\]\(.*?\)""")
 

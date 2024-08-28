@@ -29,7 +29,6 @@ fun LoadingLayout(
     onLoadingEnd: () -> Unit,
     ) {
 
-    /*TODO*/
     val isLoading = vm.isLoadingState.collectAsState()
     Log.d("LoadingLayout", isLoading.toString())
 

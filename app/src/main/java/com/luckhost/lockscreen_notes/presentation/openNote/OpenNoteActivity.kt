@@ -127,10 +127,8 @@ class OpenNoteActivity : ComponentActivity() {
             contract = ActivityResultContracts.PickVisualMedia()
         ) {
             if (it != null) {
-                val realPath = vm.getRealPathFromUri(context, it)
-                if (realPath != null) {
-                    vm.changePasteTextState(realPath)
-                }
+                val realPath = vm.getRealPathFromUri(it)
+                vm.changePasteTextState(realPath)
             }
         }
 

@@ -10,6 +10,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.luckhost.domain.models.NoteModel
+import com.luckhost.domain.useCases.cache.GetCachedImageLinkUseCase
 import com.luckhost.domain.useCases.keys.AddHashUseCase
 import com.luckhost.domain.useCases.objects.ChangeNoteUseCase
 import com.luckhost.domain.useCases.objects.GetNotesUseCase
@@ -29,6 +30,7 @@ class OpenNoteViewModel(
     private val getNotesUseCase: GetNotesUseCase,
     private val changeNoteUseCase: ChangeNoteUseCase,
     private val addHashUseCase: AddHashUseCase,
+    private val getCachedImageLinkUseCase: GetCachedImageLinkUseCase,
     private val resourceProvider: ResourceProvider,
 ) : ViewModel() {
     private lateinit var note: NoteModel
@@ -142,33 +144,7 @@ class OpenNoteViewModel(
         }
     }
 
-    private fun getFileName(uri: Uri, contentResolver: ContentResolver): String {
-        var name = ""
-        Uri.Builder()
-        val cursor = contentResolver.query(
-            uri, null, null, null, null)
-        cursor?.use {
-            if (it.moveToFirst()) {
-                name = it.getString(it.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME))
-            }
-        }
-        return name
-    }
-
-    fun getRealPathFromUri(context: Context, uri: Uri): String? {
-        val contentResolver = context.contentResolver
-        val fileName = getFileName(uri, contentResolver)
-        val file = File(context.cacheDir, fileName)
-
-        if (file.exists()) {
-            return file.absolutePath
-        }
-
-        contentResolver.openInputStream(uri)?.use { inputStream ->
-            file.outputStream().use { outputStream ->
-                inputStream.copyTo(outputStream)
-            }
-        }
-        return file.absolutePath
+    fun getRealPathFromUri(uri: Uri): String {
+        return getCachedImageLinkUseCase.execute(uri.toString())
     }
 }

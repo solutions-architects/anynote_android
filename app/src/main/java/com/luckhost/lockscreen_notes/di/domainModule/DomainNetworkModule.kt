@@ -1,15 +1,9 @@
-package com.luckhost.lockscreen_notes.di
+package com.luckhost.lockscreen_notes.di.domainModule
 
-import com.luckhost.domain.useCases.keys.AddHashUseCase
-import com.luckhost.domain.useCases.keys.DeleteHashUseCase
-import com.luckhost.domain.useCases.keys.GetHashesUseCase
-import com.luckhost.domain.useCases.keys.SaveHashesUseCase
 import com.luckhost.domain.useCases.network.ChangeNoteOnServerUseCase
 import com.luckhost.domain.useCases.network.ChangeUserAccountParamsUseCase
 import com.luckhost.domain.useCases.network.CreateNoteOnServerUseCase
 import com.luckhost.domain.useCases.network.GetAllNotesFromServerUseCase
-import com.luckhost.domain.useCases.objects.ChangeNoteUseCase
-import com.luckhost.domain.useCases.objects.DeleteNoteUseCase
 import com.luckhost.domain.useCases.network.GetAuthTokenUseCase
 import com.luckhost.domain.useCases.network.GetUserAccountParamsUseCase
 import com.luckhost.domain.useCases.network.RefreshAccTokenUseCase
@@ -17,53 +11,9 @@ import com.luckhost.domain.useCases.network.SignUpUseCase
 import com.luckhost.domain.useCases.network.VerifyTokenUseCase
 import com.luckhost.domain.useCases.network.localActions.GetLocalAuthTokenUseCase
 import com.luckhost.domain.useCases.network.localActions.SaveLocalAuthTokenUseCase
-import com.luckhost.domain.useCases.objects.GetNotesUseCase
-import com.luckhost.domain.useCases.objects.SaveNoteUseCase
 import org.koin.dsl.module
 
-val domainModule = module {
-    factory<GetNotesUseCase> {
-        GetNotesUseCase(
-            repository = get(),
-        )
-    }
-    factory<SaveNoteUseCase> {
-        SaveNoteUseCase(
-            repository = get(),
-        )
-    }
-    factory<DeleteNoteUseCase> {
-        DeleteNoteUseCase(
-            repository = get(),
-        )
-    }
-    factory<ChangeNoteUseCase> {
-        ChangeNoteUseCase(
-            repository = get(),
-        )
-    }
-
-    factory<GetHashesUseCase> {
-        GetHashesUseCase(
-            hashesRepo = get(),
-        )
-    }
-    factory<SaveHashesUseCase> {
-        SaveHashesUseCase(
-            hashesRepository = get(),
-        )
-    }
-    factory<DeleteHashUseCase> {
-        DeleteHashUseCase(
-            hashesRepository = get(),
-        )
-    }
-    factory<AddHashUseCase> {
-        AddHashUseCase(
-            hashesRepository = get(),
-        )
-    }
-
+val domainNetworkModule = module {
     factory<ChangeNoteOnServerUseCase> {
         ChangeNoteOnServerUseCase(
             netApi = get(),

@@ -11,13 +11,13 @@ import androidx.lifecycle.viewModelScope
 import com.luckhost.domain.models.Either
 import com.luckhost.domain.models.NoteModel
 import com.luckhost.domain.models.network.AuthToken
+import com.luckhost.domain.useCases.filters.GetFilteredMdAndFirstImgUseCase
 import com.luckhost.domain.useCases.keys.DeleteHashUseCase
 import com.luckhost.domain.useCases.keys.GetHashesUseCase
 import com.luckhost.domain.useCases.network.localActions.GetLocalAuthTokenUseCase
 import com.luckhost.domain.useCases.network.localActions.SaveLocalAuthTokenUseCase
 import com.luckhost.domain.useCases.objects.DeleteNoteUseCase
 import com.luckhost.domain.useCases.objects.GetNotesUseCase
-import com.luckhost.lockscreen_notes.presentation.main.additional.functions.getFilteredMdAndFirstImage
 import com.luckhost.lockscreen_notes.presentation.openNote.OpenNoteActivity
 import com.luckhost.lockscreen_notes.presentation.openNote.additional.models.NoteBoxModel
 import kotlinx.coroutines.Dispatchers
@@ -35,6 +35,7 @@ class MainViewModel(
     private val deleteHashUseCase: DeleteHashUseCase,
     private val getLocalAuthTokenUseCase: GetLocalAuthTokenUseCase,
     private val saveLocalAuthTokenUseCase: SaveLocalAuthTokenUseCase,
+    private val getFilteredMdAndFirstImgUseCase: GetFilteredMdAndFirstImgUseCase
 ): ViewModel() {
     private var accessTokens: AuthToken = AuthToken(accessToken = null, refreshToken = null)
 
@@ -128,11 +129,10 @@ class MainViewModel(
                     if (result.mdText.isNotEmpty()) continue
 
                     entry["text"]?.let {
-                        getFilteredMdAndFirstImage(it)
-                        val filteredString = getFilteredMdAndFirstImage(it)
+                        val filteredObjects = getFilteredMdAndFirstImgUseCase.execute(it)
 
-                        result.mdText = filteredString.first
-                        filteredString.second?.let { it1 -> result.imageSource = it1 }
+                        result.mdText = filteredObjects.first
+                        filteredObjects.second?.let { it1 -> result.imageSource = it1 }
                     }
                 }
                 "map" -> { /* TODO */ }
