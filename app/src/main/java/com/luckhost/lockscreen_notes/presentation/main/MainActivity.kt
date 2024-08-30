@@ -1,10 +1,17 @@
 package com.luckhost.lockscreen_notes.presentation.main
 
+import android.Manifest
+import android.app.Activity
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
@@ -28,14 +35,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -52,11 +66,77 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            RequestPermissionAtStart()
             Lockscreen_notesTheme {
                 ScreenLayout()
             }
         }
     }
+
+    @Composable
+    fun RequestPermissionAtStart() {
+        val context = LocalContext.current
+        var showDialog by remember { mutableStateOf(false) }
+        var hasPermission by remember { mutableStateOf(false) }
+
+        val activity = (context as? Activity)
+
+        val permission = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+                Manifest.permission.READ_MEDIA_IMAGES
+            }
+            else -> {
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            }
+        }
+
+        val permissionLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                hasPermission = true
+                showDialog = false
+            } else {
+                showDialog = true
+            }
+        }
+
+
+        /* TODO убрать хардкод */
+        LaunchedEffect(Unit) {
+            permissionLauncher.launch(permission)
+        }
+
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { /* Ничего не делаем, диалог остается */ },
+                title = { Text("Необходимо разрешение") },
+                text = { Text("Для корректной работы приложения необходимо " +
+                        "разрешение на чтение изображений.") },
+                confirmButton = {
+                    Button(onClick = {
+                        showDialog = false
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.fromParts("package",
+                                context.packageName, null)
+                        }
+                        context.startActivity(intent)
+                    }) {
+                        Text("Разрешить")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = {
+                        showDialog = false
+                        activity?.finish()
+                    }) {
+                        Text("Отклонить")
+                    }
+                }
+            )
+        }
+    }
+
 
     @Composable
     fun ScreenLayout() {

@@ -1,0 +1,15 @@
+-dontwarn com.luckhost.data.localStorage.cache.images.ImageCacheStorageImpl
+-dontwarn com.luckhost.data.localStorage.cache.images.ImageCacheStorageInterface
+-dontwarn com.luckhost.data.localStorage.keys.hashes.HashStorage
+-dontwarn com.luckhost.data.localStorage.keys.hashes.SharedPrefHashesStorage
+-dontwarn com.luckhost.data.localStorage.keys.tokens.SharedPrefTokensStorage
+-dontwarn com.luckhost.data.localStorage.keys.tokens.TokensStorage
+-dontwarn com.luckhost.data.localStorage.materials.NotesStorage
+-dontwarn com.luckhost.data.localStorage.materials.sqlite.SQLiteNotesStorage
+-dontwarn com.luckhost.data.network.NetworkModule
+-dontwarn com.luckhost.data.network.retrofit.RetrofitModule
+-dontwarn com.luckhost.data.repository.AuthTokensRepoImpl
+-dontwarn com.luckhost.data.repository.MediaCacheRepoImpl
+-dontwarn com.luckhost.data.repository.NetworkServiceImpl
+-dontwarn com.luckhost.data.repository.NoteHashesRepoImpl
+-dontwarn com.luckhost.data.repository.NotesRepositoryImpl

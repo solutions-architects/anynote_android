@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.luckhost.domain.models.Either
 import com.luckhost.domain.models.NoteModel
 import com.luckhost.domain.models.network.AuthToken
+import com.luckhost.domain.useCases.cache.DeleteCachedImagesUseCase
 import com.luckhost.domain.useCases.filters.GetFilteredMdAndFirstImgUseCase
 import com.luckhost.domain.useCases.keys.DeleteHashUseCase
 import com.luckhost.domain.useCases.keys.GetHashesUseCase
@@ -35,6 +36,7 @@ class MainViewModel(
     private val deleteHashUseCase: DeleteHashUseCase,
     private val getLocalAuthTokenUseCase: GetLocalAuthTokenUseCase,
     private val saveLocalAuthTokenUseCase: SaveLocalAuthTokenUseCase,
+    private val deleteCachedImagesUseCase: DeleteCachedImagesUseCase,
     private val getFilteredMdAndFirstImgUseCase: GetFilteredMdAndFirstImgUseCase
 ): ViewModel() {
     private var accessTokens: AuthToken = AuthToken(accessToken = null, refreshToken = null)
@@ -61,24 +63,38 @@ class MainViewModel(
         }
     }
 
-
     fun deleteNote(
         noteHash: String
     ) {
-        val noteHashInt = noteHash.toInt()
-
         val noteToDelete = _notesList.value.find { predicate ->
-            predicate.hashCode?.equals(noteHashInt)
-                ?: throw NoSuchElementException("no note with such a hashcode was found")
+            predicate.hashCode?.equals(noteHash) == true
         }
+
+        if (noteToDelete == null) {
+            throw IllegalArgumentException("no note with such a hashcode was found")
+        }
+
         val noteBoxToDelete = _noteBoxesList.value.find { predicate ->
-            predicate.parentHash.equals(noteHash)
+            predicate.parentHash == noteHash
         }
 
         _noteBoxesVisibleStateList[noteHash]?.value = false
 
         viewModelScope.launch {
             delay(300)
+
+            for (entry in noteToDelete.content) {
+                when (entry["name"]) {
+                    "md" -> {
+                        entry["text"]?.let {
+                            val filteredObjects = getFilteredMdAndFirstImgUseCase.execute(it)
+
+                            deleteCachedImagesUseCase.execute(filteredObjects.second)
+                        }
+                    }
+                }
+            }
+
             _notesList.value.remove(noteToDelete)
             _noteBoxesList.value.remove(noteBoxToDelete)
 
@@ -132,7 +148,9 @@ class MainViewModel(
                         val filteredObjects = getFilteredMdAndFirstImgUseCase.execute(it)
 
                         result.mdText = filteredObjects.first
-                        filteredObjects.second?.let { it1 -> result.imageSource = it1 }
+                        if (filteredObjects.second.isNotEmpty()) {
+                            result.imageSource = filteredObjects.second.first()
+                        }
                     }
                 }
                 "map" -> { /* TODO */ }

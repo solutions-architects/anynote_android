@@ -30,7 +30,6 @@ fun LoadingLayout(
     ) {
 
     val isLoading = vm.isLoadingState.collectAsState()
-    Log.d("LoadingLayout", isLoading.toString())
 
     Box(modifier = Modifier,
         contentAlignment = Alignment.Center

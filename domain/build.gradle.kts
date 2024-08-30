@@ -10,4 +10,14 @@ java {
 
 dependencies {
     implementation(libs.kotlinx.coroutines.core)
+
+    testImplementation(kotlin("test"))
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.jupiter.junit.jupiter)
+}
+
+tasks.test {
+    useJUnitPlatform()
 }

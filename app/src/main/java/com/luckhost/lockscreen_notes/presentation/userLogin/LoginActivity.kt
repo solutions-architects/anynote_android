@@ -1,5 +1,6 @@
 package com.luckhost.lockscreen_notes.presentation.userLogin
 
+import android.app.Activity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -34,6 +35,7 @@ class LoginActivity : ComponentActivity() {
                 color = colorResource(id = R.color.main_bg)
             ) {
                 val navController = rememberNavController()
+                val activity = LocalContext.current as Activity
 
                 NavHost(navController = navController, startDestination = Login) {
                     composable<Login> {
@@ -45,6 +47,9 @@ class LoginActivity : ComponentActivity() {
                             },
                             onSignUpButClick = {
                                 navController.navigate(SignUp)
+                            },
+                            onBackHandler = {
+                                activity.finish()
                             }
                         )
                     }
@@ -63,8 +68,8 @@ class LoginActivity : ComponentActivity() {
                         LoadingLayout(
                             vm = vm,
                             onLoadingEnd = {
-                                navController.navigate(Login)
                                 navController.clearBackStack<Loading>()
+                                navController.navigate(Login)
                             }
                         )
                     }

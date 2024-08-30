@@ -24,12 +24,19 @@ android {
     }
 
     buildTypes {
+        debug {
+            versionNameSuffix = ".dev"
+            isDebuggable = true
+        }
         release {
+            isDebuggable = false
+            isShrinkResources = false
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {

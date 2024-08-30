@@ -25,10 +25,15 @@ class SharedPrefTokensStorage(context: Context): TokensStorage {
             .putString(SHARED_PREFS_NAME, jsonString).apply()
     }
 
-    override fun getTokensOrNull(): AuthToken? {
+    override fun getTokensOrThrow(): AuthToken {
         val gson = Gson()
         val jsonString = sharedPreferences.getString(
-            SHARED_PREFS_NAME, null)?: return null
+            SHARED_PREFS_NAME, null)
+
+        if (jsonString == null) {
+            throw NoSuchElementException("There is no saved tokens")
+        }
+
         val type = object : TypeToken<AuthToken>() {}.type
         return gson.fromJson(jsonString, type)
     }

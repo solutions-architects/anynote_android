@@ -1,5 +1,6 @@
 package com.luckhost.lockscreen_notes.presentation.userLogin.additional.functions
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,10 +38,15 @@ fun LoginLayout(
     vm: LoginViewModel,
     onApplyButClick: () -> Unit,
     onSignUpButClick: () -> Unit,
+    onBackHandler: () -> Unit
 ) {
     val loginTextState by vm.loginTextState.collectAsState()
     val passwordTextState by vm.passwordTextState.collectAsState()
     val errorText by vm.errorTextState.collectAsState()
+
+    BackHandler {
+        onBackHandler()
+    }
 
     Box(
         modifier = Modifier.fillMaxSize(),

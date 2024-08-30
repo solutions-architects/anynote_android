@@ -131,8 +131,6 @@ class LoginViewModel(
 
                     _isLoadingState.value = false
                     Log.e("LoginVM", "error: ${response.a}")
-
-
                 }
             }
         }

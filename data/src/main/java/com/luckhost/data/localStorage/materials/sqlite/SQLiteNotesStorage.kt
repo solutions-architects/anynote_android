@@ -3,7 +3,7 @@ package com.luckhost.data.localStorage.materials.sqlite
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import android.util.Log
+import androidx.core.database.getIntOrNull
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.luckhost.data.localStorage.materials.NotesStorage
@@ -53,7 +53,7 @@ class SQLiteNotesStorage(context: Context): NotesStorage {
 
             emit(
                 Note(
-                    serverId = cursor.getInt(
+                    serverId = cursor.getIntOrNull(
                         cursor.getColumnIndexOrThrow(NotesContract.COLUMN_NAME_SERVER_ID)
                     ),
                     content = convertedContent,
@@ -62,9 +62,6 @@ class SQLiteNotesStorage(context: Context): NotesStorage {
                     )
                 )
             )
-            Log.d("SQLite return", cursor.getString(
-                cursor.getColumnIndexOrThrow(NotesContract.COLUMN_NAME_HASHCODE)
-            ))
         }
         cursor?.close()
     }

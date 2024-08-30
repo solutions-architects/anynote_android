@@ -5,23 +5,28 @@ package com.luckhost.domain.useCases.filters
  *
  * That`s needed to show text and images in the different parts of NoteBox on the main screen
  */
-class GetFilteredMdAndFirstImgUseCase() {
-    fun execute(input: String): Pair<String, String?> {
-        val regex = Regex("""!\[.*?\]\(.*?\)""")
+class GetFilteredMdAndFirstImgUseCase {
+    fun execute(input: String): Pair<String, List<String>> {
+        val regex = Regex("""!\[.*?]\(.*?\)""")
 
-        val firstImageLink = regex.find(input)
+        val matches = regex.findAll(input).map { extractLinkValue(it.value) }.toList()
 
         val filteredString = regex.replace(input, "")
 
-        if (firstImageLink != null) {
-            return filteredString to extractLinkValue(firstImageLink.value)
-        }
-        return filteredString to null
+        return filteredString to matches
+
     }
 
-    private fun extractLinkValue(input: String): String? {
-        val regex = Regex("""!\[.*?\]\((.*?)\)""")
+    private fun extractLinkValue(input: String): String {
+        val regex = Regex("""!\[.*?]\((.*?)\)""")
         val matchResult = regex.find(input)
-        return matchResult?.groups?.get(1)?.value
+
+        matchResult?.let {
+            it.groups[1]?.let { group ->
+                return group.value
+            }
+        }
+
+        throw IllegalArgumentException("Input string has no link")
     }
 }
