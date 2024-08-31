@@ -1,0 +1,13 @@
+<resources>
+    <string name="main_activity_authorization_failed">
+        Authorization failed, please log in again</string>
+    <string name="main_activity_permission_denied_title">
+        Oops..</string>
+    <string name="main_activity_image_read_permission_needed">
+        To save images, the application needs permission to read them,
+        you don\'t want to be left without pictures of cats in your notes, do you?</string>
+    <string name="main_activity_reject_permission_granting">
+        No, I don\'t need fluffy funny and cute cats!</string>
+    <string name="main_activity_accept_permission_granting">
+        Okay, you talked me into it</string>
+</resources>

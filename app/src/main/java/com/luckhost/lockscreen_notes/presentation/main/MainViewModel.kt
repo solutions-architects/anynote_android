@@ -19,6 +19,8 @@ import com.luckhost.domain.useCases.network.localActions.GetLocalAuthTokenUseCas
 import com.luckhost.domain.useCases.network.localActions.SaveLocalAuthTokenUseCase
 import com.luckhost.domain.useCases.objects.DeleteNoteUseCase
 import com.luckhost.domain.useCases.objects.GetNotesUseCase
+import com.luckhost.lockscreen_notes.R
+import com.luckhost.lockscreen_notes.di.ResourceProvider
 import com.luckhost.lockscreen_notes.presentation.openNote.OpenNoteActivity
 import com.luckhost.lockscreen_notes.presentation.openNote.additional.models.NoteBoxModel
 import kotlinx.coroutines.Dispatchers
@@ -37,7 +39,8 @@ class MainViewModel(
     private val getLocalAuthTokenUseCase: GetLocalAuthTokenUseCase,
     private val saveLocalAuthTokenUseCase: SaveLocalAuthTokenUseCase,
     private val deleteCachedImagesUseCase: DeleteCachedImagesUseCase,
-    private val getFilteredMdAndFirstImgUseCase: GetFilteredMdAndFirstImgUseCase
+    private val getFilteredMdAndFirstImgUseCase: GetFilteredMdAndFirstImgUseCase,
+    private val resourceProvider: ResourceProvider,
 ): ViewModel() {
     private var accessTokens: AuthToken = AuthToken(accessToken = null, refreshToken = null)
 
@@ -45,6 +48,9 @@ class MainViewModel(
 
     private val _noteBoxesList = MutableStateFlow(mutableStateListOf<NoteBoxModel>())
     val noteBoxesList: StateFlow<List<NoteBoxModel>> = _noteBoxesList.asStateFlow()
+
+    private val _toastNotification = MutableStateFlow("")
+    val toastNotification: StateFlow<String> = _toastNotification.asStateFlow()
 
     private val _noteBoxesVisibleStateList =
         mutableStateMapOf<String, MutableStateFlow<Boolean>>()
@@ -56,11 +62,15 @@ class MainViewModel(
             is Either.Right -> {
                 accessTokens = localSavedTokens.b
             }
-
             is Either.Left -> {
-
+                _toastNotification.value = resourceProvider.getString(
+                    R.string.main_activity_authorization_failed)
             }
         }
+    }
+
+    fun clearToastNotification() {
+        _toastNotification.value = ""
     }
 
     fun deleteNote(

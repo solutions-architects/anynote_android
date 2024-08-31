@@ -18,7 +18,8 @@ val appModule = module {
             getLocalAuthTokenUseCase = get(),
             getFilteredMdAndFirstImgUseCase = get(),
             deleteCachedImagesUseCase = get(),
-            saveLocalAuthTokenUseCase = get()
+            saveLocalAuthTokenUseCase = get(),
+            resourceProvider = get()
         )
     }
     viewModel<OpenNoteViewModel>{

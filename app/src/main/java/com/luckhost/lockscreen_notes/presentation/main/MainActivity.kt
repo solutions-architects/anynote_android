@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -19,6 +20,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,34 +33,47 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.luckhost.lockscreen_notes.R
+import com.luckhost.lockscreen_notes.presentation.main.additional.functions.DrawerBody
+import com.luckhost.lockscreen_notes.presentation.main.additional.functions.DrawerHeader
 import com.luckhost.lockscreen_notes.presentation.main.additional.functions.NoteBox
 import com.luckhost.lockscreen_notes.presentation.userLogin.LoginActivity
 import com.luckhost.lockscreen_notes.ui.theme.Lockscreen_notesTheme
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
@@ -109,30 +124,59 @@ class MainActivity : ComponentActivity() {
 
         if (showDialog) {
             AlertDialog(
-                onDismissRequest = { /* Ничего не делаем, диалог остается */ },
-                title = { Text("Необходимо разрешение") },
-                text = { Text("Для корректной работы приложения необходимо " +
-                        "разрешение на чтение изображений.") },
-                confirmButton = {
-                    Button(onClick = {
-                        showDialog = false
-                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                            data = Uri.fromParts("package",
-                                context.packageName, null)
-                        }
-                        context.startActivity(intent)
-                    }) {
-                        Text("Разрешить")
+                onDismissRequest = { },
+                title = { Text(stringResource(id =
+                    R.string.main_activity_permission_denied_title)) },
+                text = { Text(stringResource(id =
+                    R.string.main_activity_image_read_permission_needed)) },
+                containerColor = colorResource(id = R.color.black_and_brown),
+                titleContentColor = colorResource(id = R.color.main_title_text),
+                textContentColor = colorResource(id = R.color.main_title_text),
+                dismissButton = {
+                    Button(
+                        onClick = {
+                            showDialog = false
+                            activity?.finish()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = colorResource(id = R.color.black_and_brown),
+                            contentColor = colorResource(id = R.color.grey_neutral),
+                        ),
+                        border = BorderStroke(
+                            width = 3.dp,
+                            color = colorResource(id = R.color.grey_neutral)
+                        )
+                    ) {
+                        Text(text = stringResource(id =
+                                R.string.main_activity_reject_permission_granting),
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                            )
+                        )
                     }
                 },
-                dismissButton = {
-                    Button(onClick = {
-                        showDialog = false
-                        activity?.finish()
-                    }) {
-                        Text("Отклонить")
+                confirmButton = {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            showDialog = false
+                            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                data = Uri.fromParts("package",
+                                    context.packageName, null)
+                            }
+                            context.startActivity(intent)
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = colorResource(id = R.color.grey_neutral),
+                            contentColor = colorResource(id = R.color.heavy_metal),
+                        )
+                    ) {
+                        Text(
+                            text = stringResource(id =
+                                R.string.main_activity_accept_permission_granting),
+                        )
                     }
-                }
+                },
             )
         }
     }
@@ -141,60 +185,92 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun ScreenLayout() {
         val context = LocalContext.current
+        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+        val scope = rememberCoroutineScope()
 
-        Scaffold(
-            containerColor = colorResource(id = R.color.main_bg),
-            topBar = {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    IconButton(
-                        modifier = Modifier
-                            .padding(start = 8.dp,
-                                top = 8.dp),
-                        onClick = { /*TODO*/ }) {
-                        Icon(Icons.Default.Menu,
-                            modifier = Modifier.size(90.dp),
-                            contentDescription = "Profile",
-                            tint = colorResource(id = R.color.grey_neutral)
-                        )
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                    IconButton(
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .padding(
-                                end = 8.dp,
-                                top = 8.dp
-                            ),
-                        onClick = {
-                            val intent = Intent(context, LoginActivity::class.java)
-                            context.startActivity(intent)
-                        }) {
-                        Icon(Icons.Default.AccountCircle,
-                            modifier = Modifier.size(90.dp),
-                            contentDescription = "Profile",
-                            tint = colorResource(id = R.color.grey_neutral)
-                        )
-                    }
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                ModalDrawerSheet {
+                    DrawerHeader()
+                    DrawerBody()
                 }
             },
-            floatingActionButton = {
-                FloatingActionButton(onClick = {
-                    vm.startOpenNoteActivity(context)
-                }) {
-                    Icon(Icons.Default.Add, contentDescription = "Add")
+        ) {
+            Scaffold(
+                containerColor = colorResource(id = R.color.main_bg),
+                topBar = {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        IconButton(
+                            modifier = Modifier
+                                .padding(
+                                    start = 8.dp,
+                                    top = 8.dp
+                                ),
+                            onClick = {
+                                scope.launch {
+                                drawerState.apply {
+                                    if (isClosed) open() else close()
+                                }
+                            } }) {
+                            Icon(
+                                Icons.Default.Menu,
+                                modifier = Modifier.size(90.dp),
+                                contentDescription = "Profile",
+                                tint = colorResource(id = R.color.grey_neutral)
+                            )
+                        }
+                        Spacer(modifier = Modifier.weight(1f))
+                        IconButton(
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .padding(
+                                    end = 8.dp,
+                                    top = 8.dp
+                                ),
+                            onClick = {
+                                val intent = Intent(context, LoginActivity::class.java)
+                                context.startActivity(intent)
+                            }) {
+                            Icon(
+                                Icons.Default.AccountCircle,
+                                modifier = Modifier.size(90.dp),
+                                contentDescription = "Profile",
+                                tint = colorResource(id = R.color.grey_neutral)
+                            )
+                        }
+                    }
+                },
+                floatingActionButton = {
+                    FloatingActionButton(onClick = {
+                        vm.startOpenNoteActivity(context)
+                    }) {
+                        Icon(Icons.Default.Add, contentDescription = "Add")
+                    }
+                },
+            ) { innerPadding ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                ) {
+                    Column(modifier = Modifier.padding(top = 15.dp)) {
+                        HorizontalDivider()
+                        NotesList()
+                    }
                 }
             }
-        ) {
-            innerPadding  ->
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)) {
-                Column(modifier = Modifier.padding(top = 15.dp)) {
-                    HorizontalDivider()
-                    NotesList()
-                }
+        }
+
+        val toastNotification by vm.toastNotification.collectAsState()
+
+        if (toastNotification.isNotEmpty()) {
+            LaunchedEffect(vm.toastNotification) {
+                Toast.makeText(context, toastNotification,
+                    Toast.LENGTH_SHORT).show()
+                vm.clearToastNotification()
             }
         }
     }
