@@ -11,18 +11,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.luckhost.lockscreen_notes.R
+import dev.jeziellago.compose.markdowntext.MarkdownText
 
 @Composable
-fun ConfirmDialog(
-    text: String,
+fun InfoDialog(
+    title: String,
+    mdText: String,
     onConfirm: () -> Unit,
-    onDismiss: () -> Unit,
-    onBackHandler: () -> Unit = { }
 ) {
     AlertDialog(
-        onDismissRequest = { onBackHandler() },
-        title = { Text(text = stringResource(id = R.string.confirm_dialog_question)) },
-        text = { Text(text) },
+        onDismissRequest = { onConfirm() },
+        title = { Text(text = title) },
+        text = {
+            MarkdownText(
+                markdown = mdText
+            )
+        },
         containerColor = colorResource(id = R.color.black_and_brown),
         titleContentColor = colorResource(id = R.color.main_title_text),
         textContentColor = colorResource(id = R.color.main_title_text),
@@ -41,30 +45,15 @@ fun ConfirmDialog(
                 Text(stringResource(id = R.string.confirm_dialog_answer_yes))
             }
         },
-        dismissButton = {
-            Button(
-                onClick = { onDismiss() },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colorResource(id = R.color.black_and_brown),
-                    contentColor = colorResource(id = R.color.grey_neutral),
-                ),
-                border = BorderStroke(
-                    width = 3.dp,
-                    color = colorResource(id = R.color.grey_neutral)
-                )
-                ) {
-                Text(stringResource(id = R.string.confirm_dialog_answer_no))
-            }
-        }
     )
 }
 
 @Preview
 @Composable
-fun PreviewConfirmDialog() {
-    ConfirmDialog(
+fun PreviewInfoDialog() {
+    InfoDialog(
         stringResource(id = R.string.confirm_dialog_question),
+        mdText = "**some** `text`",
         onConfirm = {},
-        onDismiss = {}
     )
 }

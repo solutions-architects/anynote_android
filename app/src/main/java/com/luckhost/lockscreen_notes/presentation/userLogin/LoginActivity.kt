@@ -17,9 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.luckhost.lockscreen_notes.R
-import com.luckhost.lockscreen_notes.presentation.userLogin.additional.Loading
-import com.luckhost.lockscreen_notes.presentation.userLogin.additional.Login
-import com.luckhost.lockscreen_notes.presentation.userLogin.additional.SignUp
+import com.luckhost.lockscreen_notes.presentation.userLogin.additional.Destination
 import com.luckhost.lockscreen_notes.presentation.userLogin.additional.functions.LoadingLayout
 import com.luckhost.lockscreen_notes.presentation.userLogin.additional.functions.LoginLayout
 import com.luckhost.lockscreen_notes.presentation.userLogin.additional.functions.SignUpLayout
@@ -37,16 +35,20 @@ class LoginActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val activity = LocalContext.current as Activity
 
-                NavHost(navController = navController, startDestination = Login) {
-                    composable<Login> {
+                NavHost(navController = navController, startDestination =
+                Destination.Login.route) {
+                    composable(Destination.Login.route) {
                         LoginLayout(
                             vm = vm,
                             onApplyButClick = {
                                 vm.getToken()
-                                navController.navigate(Loading)
+                                navController.navigate(
+                                    Destination.Loading.createRoute(Destination.Login.route))
                             },
                             onSignUpButClick = {
-                                navController.navigate(SignUp)
+                                navController.navigate(
+                                    Destination.SignUp.route
+                                )
                             },
                             onBackHandler = {
                                 activity.finish()
@@ -54,22 +56,33 @@ class LoginActivity : ComponentActivity() {
                         )
                     }
 
-                    composable<SignUp> {
+                    composable(Destination.SignUp.route) {
                         SignUpLayout(
                             vm = vm,
                             onApplyButClick = {
                                 vm.signUp()
-                                navController.navigate(Loading)
+                                navController.navigate(
+                                    Destination.Loading.createRoute(Destination.SignUp.route))
                             },
+                            onBackHandlerClick = {
+                                navController.navigate(
+                                    Destination.Login.route
+                                )
+                            }
                         )
                     }
 
-                    composable<Loading> {
+                    composable(Destination.Loading.route) { backStackEntry ->
+                        val from = backStackEntry.arguments?.getString("from")
                         LoadingLayout(
                             vm = vm,
                             onLoadingEnd = {
-                                navController.clearBackStack<Loading>()
-                                navController.navigate(Login)
+                                navController.clearBackStack(Destination.Loading.route)
+                                if (from != null) {
+                                    navController.navigate(from)
+                                } else {
+                                    navController.navigate(Destination.Login.route)
+                                }
                             }
                         )
                     }

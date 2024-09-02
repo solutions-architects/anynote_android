@@ -30,10 +30,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
@@ -116,8 +116,6 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-
-        /* TODO убрать хардкод */
         LaunchedEffect(Unit) {
             permissionLauncher.launch(permission)
         }
@@ -191,7 +189,12 @@ class MainActivity : ComponentActivity() {
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
-                ModalDrawerSheet {
+                ModalDrawerSheet(
+                    modifier = Modifier
+                        .width(250.dp),
+                    drawerContainerColor =
+                        colorResource(id = R.color.black_and_brown),
+                ) {
                     DrawerHeader()
                     DrawerBody()
                 }

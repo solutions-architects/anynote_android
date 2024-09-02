@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Lockscreen_notes</string>
+    <string name="app_name">AnyNote</string>
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit,
         sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
         minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
@@ -11,7 +11,22 @@
     <string name="confirm_dialog_answer_yes">Yes</string>
     <string name="confirm_dialog_answer_no">No</string>
 
+    <string name="info_dialog_answer_ok">OK</string>
+
+    <string name="drawer_settings_button">Settings</string>
+    <string name="drawer_about_button">About</string>
+    <string name="drawer_about_button_info_dialog_text">
+        Thank you for asking about our team!
+        You are a **wonderful** person!
+        ---
+        We are the ***SolArc*** team, we design small projects and give them life,
+        you can find us on github! Have a nice day!!
+
+    </string>
+
+
     <string name="question_of_note_deleting">Do you want to delete a note?</string>
+
     <string name="empty_note_title">Empty note</string>
     <string name="empty_note_content">This note wishes you a good day!</string>
 
