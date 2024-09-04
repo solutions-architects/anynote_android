@@ -24,20 +24,14 @@ class SQLiteNotesStorage(context: Context): NotesStorage {
         db?.insert(NotesContract.TABLE_NAME, null, values)
     }
 
-    override suspend fun getNotes(noteHashes: List<String>) = flow<Note> {
-        if (noteHashes.isEmpty()) {
-            throw IllegalArgumentException("An empty noteHashes list is set")
-        }
+    override suspend fun getNotes() = flow<Note> {
 
-        val selection = "${NotesContract.COLUMN_NAME_HASHCODE} IN " +
-                "(${noteHashes.joinToString(",") { "?" }})"
-        val selectionArgs = noteHashes.map { it }.toTypedArray()
 
         val cursor = db?.query(
             NotesContract.TABLE_NAME,
             null,
-            selection,
-            selectionArgs,
+            null,
+            null,
             null,
             null,
             null
@@ -49,7 +43,8 @@ class SQLiteNotesStorage(context: Context): NotesStorage {
             )
 
             val type = object : TypeToken<List<MutableMap<String, String>>>() {}.type
-            val convertedContent: List<MutableMap<String, String>> = Gson().fromJson(getContent, type)
+            val convertedContent:
+                    List<MutableMap<String, String>> = Gson().fromJson(getContent, type)
 
             emit(
                 Note(
@@ -64,6 +59,48 @@ class SQLiteNotesStorage(context: Context): NotesStorage {
             )
         }
         cursor?.close()
+    }
+
+    override fun getNoteByHash(noteHash: String): Note {
+        val cursor = db?.query(
+            NotesContract.TABLE_NAME,
+            null,
+            "${NotesContract.COLUMN_NAME_HASHCODE} = ?",
+            arrayOf(noteHash),
+            null,
+            null,
+            null
+        )
+
+        var note: Note? = null
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                val id = cursor.getIntOrNull(
+                    cursor.getColumnIndexOrThrow(NotesContract.COLUMN_NAME_SERVER_ID)
+                )
+                val getContent = cursor.getString(
+                    cursor.getColumnIndexOrThrow(NotesContract.COLUMN_NAME_CONTENT)
+                )
+
+                val type = object : TypeToken<List<MutableMap<String, String>>>() {}.type
+
+                val content:
+                    List<MutableMap<String, String>> = Gson().fromJson(getContent, type)
+
+                val hash =
+                    cursor.getString(
+                        cursor.getColumnIndexOrThrow(NotesContract.COLUMN_NAME_HASHCODE))
+
+                note = Note(id, content, hash)
+            }
+        }
+        cursor?.close()
+
+        note?.let {
+            return note
+        }
+        throw NoSuchElementException("An attempt to get a note from the " +
+                "database returned null")
     }
 
     override fun deleteNote(noteHash: String) {

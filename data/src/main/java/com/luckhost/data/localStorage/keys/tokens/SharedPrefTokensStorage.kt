@@ -3,7 +3,6 @@ package com.luckhost.data.localStorage.keys.tokens
 import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.luckhost.data.localStorage.keys.hashes.SharedPrefHashesStorage
 import com.luckhost.domain.models.network.AuthToken
 
 class SharedPrefTokensStorage(context: Context): TokensStorage {
@@ -12,7 +11,7 @@ class SharedPrefTokensStorage(context: Context): TokensStorage {
     }
 
     private val sharedPreferences = context.getSharedPreferences(
-        SharedPrefHashesStorage.SHARED_PREFS_NAME,
+        SHARED_PREFS_NAME,
         Context.MODE_PRIVATE
     )
 

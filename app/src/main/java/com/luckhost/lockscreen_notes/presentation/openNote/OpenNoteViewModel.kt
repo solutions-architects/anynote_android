@@ -1,9 +1,6 @@
 package com.luckhost.lockscreen_notes.presentation.openNote
 
-import android.content.ContentResolver
-import android.content.Context
 import android.net.Uri
-import android.provider.OpenableColumns
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.text.input.TextFieldValue
@@ -11,9 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.luckhost.domain.models.NoteModel
 import com.luckhost.domain.useCases.cache.GetCachedImageLinkUseCase
-import com.luckhost.domain.useCases.keys.AddHashUseCase
 import com.luckhost.domain.useCases.objects.ChangeNoteUseCase
-import com.luckhost.domain.useCases.objects.GetNotesUseCase
+import com.luckhost.domain.useCases.objects.GetNoteByHashUseCase
 import com.luckhost.domain.useCases.objects.SaveNoteUseCase
 import com.luckhost.lockscreen_notes.R
 import com.luckhost.lockscreen_notes.di.ResourceProvider
@@ -23,13 +19,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 
 class OpenNoteViewModel(
     private val saveNoteUseCase: SaveNoteUseCase,
-    private val getNotesUseCase: GetNotesUseCase,
+    private val getNoteByHashUseCase: GetNoteByHashUseCase,
     private val changeNoteUseCase: ChangeNoteUseCase,
-    private val addHashUseCase: AddHashUseCase,
     private val getCachedImageLinkUseCase: GetCachedImageLinkUseCase,
     private val resourceProvider: ResourceProvider,
 ) : ViewModel() {
@@ -109,12 +103,11 @@ class OpenNoteViewModel(
 
         saveNoteUseCase.execute(note)
         note.hashCode = note.hashCode().toString()
-        addHashUseCase.execute(note.hashCode!!)
     }
 
     fun getNote(hashCode: String) {
         viewModelScope.launch {
-            note = getNotesUseCase.execute(listOf(hashCode)).first()
+            note = getNoteByHashUseCase.execute(hashCode)
             withContext(Dispatchers.Main) {
                 _mainPartState.value = note.content.toMutableStateList()
                 note.content.forEachIndexed { index, it ->

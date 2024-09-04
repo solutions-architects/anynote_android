@@ -13,8 +13,6 @@ val appModule = module {
         MainViewModel(
             getNotesUseCase = get(),
             deleteNoteUseCase = get(),
-            getHashesUseCase = get(),
-            deleteHashUseCase = get(),
             getLocalAuthTokenUseCase = get(),
             getFilteredMdAndFirstImgUseCase = get(),
             deleteCachedImagesUseCase = get(),
@@ -25,9 +23,8 @@ val appModule = module {
     viewModel<OpenNoteViewModel>{
         OpenNoteViewModel(
             saveNoteUseCase = get(),
-            getNotesUseCase = get(),
+            getNoteByHashUseCase = get(),
             changeNoteUseCase = get(),
-            addHashUseCase = get(),
             getCachedImageLinkUseCase = get(),
             resourceProvider = get(),
         )

@@ -2,10 +2,7 @@ package com.luckhost.lockscreen_notes.di
 
 import com.luckhost.data.localStorage.cache.images.ImageCacheStorageImpl
 import com.luckhost.data.localStorage.cache.images.ImageCacheStorageInterface
-import com.luckhost.data.repository.NoteHashesRepoImpl
 import com.luckhost.data.repository.NotesRepositoryImpl
-import com.luckhost.data.localStorage.keys.hashes.HashStorage
-import com.luckhost.data.localStorage.keys.hashes.SharedPrefHashesStorage
 import com.luckhost.data.localStorage.keys.tokens.SharedPrefTokensStorage
 import com.luckhost.data.localStorage.keys.tokens.TokensStorage
 import com.luckhost.data.localStorage.materials.NotesStorage
@@ -18,7 +15,6 @@ import com.luckhost.data.repository.NetworkServiceImpl
 import com.luckhost.domain.repository.AuthTokensRepoInterface
 import com.luckhost.domain.repository.MediaCacheRepoInterface
 import com.luckhost.domain.repository.NetworkServiceInterface
-import com.luckhost.domain.repository.NoteHashesRepoInterface
 import com.luckhost.domain.repository.NotesRepositoryInterface
 import org.koin.dsl.module
 
@@ -29,14 +25,6 @@ val dataModule = module {
 
     single<NotesRepositoryInterface> {
         NotesRepositoryImpl(notesStorage = get())
-    }
-
-    single<HashStorage> {
-        SharedPrefHashesStorage(context = get())
-    }
-
-    single<NoteHashesRepoInterface> {
-        NoteHashesRepoImpl(hashStorage = get())
     }
 
     single<NetworkModule> {

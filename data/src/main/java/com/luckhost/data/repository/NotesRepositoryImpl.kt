@@ -21,9 +21,9 @@ open class NotesRepositoryImpl(
         notesStorage.saveNote(note)
     }
 
-    override suspend fun getNotes(noteHashes: List<String>): List<NoteModel> {
+    override suspend fun getNotes(): List<NoteModel> {
         return withContext(Dispatchers.IO) {
-            notesStorage.getNotes(noteHashes)
+            notesStorage.getNotes()
                 .map { note ->
                     NoteModel(
                         content = note.content.toMutableList(),
@@ -31,6 +31,15 @@ open class NotesRepositoryImpl(
                     )
                 }.toList()
         }
+    }
+
+    override fun getNoteByHash(noteHash: String): NoteModel {
+        val noteFromDb = notesStorage.getNoteByHash(noteHash)
+
+        return NoteModel(
+            content = noteFromDb.content.toMutableList(),
+            hashCode = noteFromDb.noteHash,
+        )
     }
 
     override fun deleteNote(noteHash: String) {

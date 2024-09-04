@@ -4,7 +4,6 @@ import android.app.Application
 import com.luckhost.lockscreen_notes.di.appModule
 import com.luckhost.lockscreen_notes.di.dataModule
 import com.luckhost.lockscreen_notes.di.domainModule.domainCacheModule
-import com.luckhost.lockscreen_notes.di.domainModule.domainHashRepoModule
 import com.luckhost.lockscreen_notes.di.domainModule.domainModule
 import com.luckhost.lockscreen_notes.di.domainModule.domainNetworkModule
 import com.luckhost.lockscreen_notes.di.domainModule.domainNoteRepoModule
@@ -21,8 +20,7 @@ class App: Application() {
             androidLogger(Level.ERROR)
             androidContext(this@App)
             modules(listOf(appModule, dataModule, domainModule,
-                domainCacheModule, domainNetworkModule,
-                domainHashRepoModule, domainNoteRepoModule
+                domainCacheModule, domainNetworkModule, domainNoteRepoModule
                 )
             )
         }

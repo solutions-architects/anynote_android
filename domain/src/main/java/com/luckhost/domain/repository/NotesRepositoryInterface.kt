@@ -5,7 +5,9 @@ import com.luckhost.domain.models.NoteModel
 interface NotesRepositoryInterface {
     fun saveNote(saveObject: NoteModel)
 
-    suspend fun getNotes(noteHashes: List<String>): List<NoteModel>
+    suspend fun getNotes(): List<NoteModel>
+
+    fun getNoteByHash(noteHash: String): NoteModel
 
     fun deleteNote(noteHash: String)
 

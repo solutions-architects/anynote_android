@@ -13,8 +13,6 @@ import com.luckhost.domain.models.NoteModel
 import com.luckhost.domain.models.network.AuthToken
 import com.luckhost.domain.useCases.cache.DeleteCachedImagesUseCase
 import com.luckhost.domain.useCases.filters.GetFilteredMdAndFirstImgUseCase
-import com.luckhost.domain.useCases.keys.DeleteHashUseCase
-import com.luckhost.domain.useCases.keys.GetHashesUseCase
 import com.luckhost.domain.useCases.network.localActions.GetLocalAuthTokenUseCase
 import com.luckhost.domain.useCases.network.localActions.SaveLocalAuthTokenUseCase
 import com.luckhost.domain.useCases.objects.DeleteNoteUseCase
@@ -34,8 +32,6 @@ import kotlinx.coroutines.withContext
 class MainViewModel(
     private val getNotesUseCase: GetNotesUseCase,
     private val deleteNoteUseCase: DeleteNoteUseCase,
-    private val getHashesUseCase: GetHashesUseCase,
-    private val deleteHashUseCase: DeleteHashUseCase,
     private val getLocalAuthTokenUseCase: GetLocalAuthTokenUseCase,
     private val saveLocalAuthTokenUseCase: SaveLocalAuthTokenUseCase,
     private val deleteCachedImagesUseCase: DeleteCachedImagesUseCase,
@@ -109,7 +105,6 @@ class MainViewModel(
             _noteBoxesList.value.remove(noteBoxToDelete)
 
             deleteNoteUseCase.execute(noteHash)
-            deleteHashUseCase.execute(noteHash)
         }
     }
 
@@ -120,7 +115,7 @@ class MainViewModel(
         var delayBeforeAnimation: Long = 50
 
         viewModelScope.launch {
-            _notesList.value = getNotesUseCase.execute(getHashesUseCase.execute())
+            _notesList.value = getNotesUseCase.execute()
                 .toMutableStateList()
 
             withContext(Dispatchers.Main) {

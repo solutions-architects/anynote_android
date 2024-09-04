@@ -2,6 +2,7 @@ package com.luckhost.lockscreen_notes.di.domainModule
 
 import com.luckhost.domain.useCases.objects.ChangeNoteUseCase
 import com.luckhost.domain.useCases.objects.DeleteNoteUseCase
+import com.luckhost.domain.useCases.objects.GetNoteByHashUseCase
 import com.luckhost.domain.useCases.objects.GetNotesUseCase
 import com.luckhost.domain.useCases.objects.SaveNoteUseCase
 import org.koin.dsl.module
@@ -25,6 +26,11 @@ val domainNoteRepoModule = module{
     factory<ChangeNoteUseCase> {
         ChangeNoteUseCase(
             repository = get(),
+        )
+    }
+    factory<GetNoteByHashUseCase> {
+        GetNoteByHashUseCase(
+            repository = get()
         )
     }
 }
