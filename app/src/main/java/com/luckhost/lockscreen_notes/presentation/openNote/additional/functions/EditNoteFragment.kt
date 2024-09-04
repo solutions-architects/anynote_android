@@ -1,6 +1,11 @@
 package com.luckhost.lockscreen_notes.presentation.openNote.additional.functions
 
+import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,16 +22,20 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
-
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.sp
@@ -96,31 +105,49 @@ fun EditNoteFragment(vm: OpenNoteViewModel) {
 
         val scrollState = rememberScrollState()
 
-        val mainNotePart by vm.mainPartState.collectAsState()
+        val mainNotePart by remember { derivedStateOf { vm.mainPartState.value } }
 
-        /* TODO change to lazy column */
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .imePadding()
-                .verticalScroll(scrollState)
-        ) {
-            mainNotePart.forEachIndexed { index, map ->
-                when (map["name"]) {
-                    "md" -> TextPart(
-                        modifier = Modifier
-                            .weight(1f, fill = false)
-                            .fillMaxWidth(),
-                        vm = vm,
-                        index = index,
-                    )
+        var isColumnVisible by remember{mutableStateOf(false)}
+
+        /* TODO change to lazy column
+        *   move to VM */
+        LaunchedEffect(mainNotePart) {
+            isColumnVisible = true
+        }
+        AnimatedVisibility(visible = isColumnVisible) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .imePadding()
+                    .verticalScroll(scrollState)
+            ) {
+                mainNotePart.forEachIndexed { index, map ->
+                    when (map["name"]) {
+                        "md" -> TextPart(
+                            modifier = Modifier
+                                .weight(1f, fill = false)
+                                .fillMaxWidth(),
+                            vm = vm,
+                            index = index,
+                        )
+                        "image" -> {
+                            map["mediaLink"]?.let {
+                                ImagePart(
+                                    modifier = Modifier
+                                        .weight(1f, fill = false)
+                                        .fillMaxWidth(),
+                                    vm = vm,
+                                    mediaLink = it,
+                                    index = index
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
     }
 }
-
-
 
 @Composable
 private fun TextPart(
@@ -129,39 +156,40 @@ private fun TextPart(
     index: Int,
 ) {
     val textFieldStates by vm.textFieldStates.collectAsState()
-    var textValue by remember {
-        mutableStateOf(textFieldStates[index] ?: TextFieldValue("")) }
+    val mediaGetResult by vm.mediaGetResult.collectAsState()
 
-    val pasteText by vm.textPastState.collectAsState()
+    val focusRequester = remember { FocusRequester() }
+    var isFocused by remember { mutableStateOf(false) }
+    val interactionSource = remember { MutableInteractionSource() }
 
-    LaunchedEffect(pasteText) {
-        if (pasteText.isNotEmpty()) {
-            val cursorPosition = textValue.selection.start
-            val newText = textValue.text.substring(0, cursorPosition) +
-                    "![image]($pasteText)" +
-                    textValue.text.substring(cursorPosition)
-
-            textValue = textValue.copy(
-                text = newText,
-                selection = TextRange(cursorPosition + "![image]($pasteText)".length)
-            )
-            vm.updateMdStateText(index, textValue.text)
+    LaunchedEffect(mediaGetResult) {
+        if (mediaGetResult.isNotEmpty() && isFocused) {
+            textFieldStates[index]?.let {
+                val cursorPosition = it.selection.start
+                val beforeCursorText = it.text.substring(0, cursorPosition)
+                val afterCursorText = it.text.substring(cursorPosition)
+                vm.splitTextFieldWithImage(index, beforeCursorText, afterCursorText)
+                vm.changeMediaGetResult("")
+            }
         }
     }
 
-    TextField(
-        modifier = modifier.fillMaxWidth(),
-        value = textValue,
+    textFieldStates[index]?.let {
+        TextField(
+        modifier = modifier
+            .focusRequester(focusRequester)
+            .onFocusChanged { focusState ->
+                isFocused = focusState.isFocused }
+            .fillMaxWidth(),
+        interactionSource = interactionSource,
+        value = it,
         trailingIcon = {
-            if (textValue.text.isNotEmpty()) {
+            if (it.text.isNotEmpty()) {
                 IconButton(
-                    modifier = Modifier
-                        ,
                     onClick = {
-                        textValue = TextFieldValue("")
-                        vm.updateTextFieldState(index, textValue)
-                        vm.updateMdStateText(index, textValue.text)
-                }) {
+                        vm.updateTextFieldState(index, TextFieldValue(""))
+                        vm.updateMdStateText(index, it.text)
+                    }) {
                     Icon(
                         imageVector = Icons.Outlined.Close,
                         contentDescription = null
@@ -170,7 +198,7 @@ private fun TextPart(
             }
         },
         onValueChange = { newText ->
-            textValue = newText
+
             vm.updateTextFieldState(index, newText)
             vm.updateMdStateText(index, newText.text)
         },
@@ -183,4 +211,26 @@ private fun TextPart(
             unfocusedContainerColor = colorResource(id = R.color.main_bg),
         ),
     )
+    }
+}
+
+@Composable
+fun ImagePart(
+    modifier: Modifier,
+    vm: OpenNoteViewModel,
+    mediaLink: String,
+    index: Int
+) {
+    val bitmap = BitmapFactory.decodeFile(mediaLink)
+    Log.d("OpenNoteView", mediaLink)
+
+    bitmap?.let {
+        Image(
+            bitmap = bitmap.asImageBitmap(),
+            contentDescription = null,
+            modifier = modifier
+                .fillMaxWidth(),
+            contentScale = ContentScale.Fit,
+        )
+    }
 }

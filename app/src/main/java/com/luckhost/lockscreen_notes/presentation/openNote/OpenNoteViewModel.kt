@@ -1,6 +1,7 @@
 package com.luckhost.lockscreen_notes.presentation.openNote
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.text.input.TextFieldValue
@@ -46,8 +47,8 @@ class OpenNoteViewModel(
     val mainPartState: StateFlow<MutableList<MutableMap<String, String>>> =
         _mainPartState.asStateFlow()
 
-    private val _textPasteState = MutableStateFlow("")
-    val textPastState: StateFlow<String> = _textPasteState.asStateFlow()
+    private val _mediaGetResult = MutableStateFlow("")
+    val mediaGetResult: StateFlow<String> = _mediaGetResult.asStateFlow()
 
     fun changeEditModeState() {
         _isEditMode.value = !_isEditMode.value
@@ -75,8 +76,8 @@ class OpenNoteViewModel(
         _mainPartState.value[index]["text"] = newText
     }
 
-    fun changePasteTextState(newText: String) {
-        _textPasteState.value = newText
+    fun changeMediaGetResult(newText: String) {
+        _mediaGetResult.value = newText
     }
 
     fun returnOldValues() {
@@ -136,6 +137,27 @@ class OpenNoteViewModel(
             throw NullPointerException("The changes is not saved, hashcode is null")
         }
     }
+
+    fun splitTextFieldWithImage(
+        index: Int,
+        beforeText: String,
+        afterText: String,
+    ) {
+        Log.d("OpenNoteViewModel", "Splitting text at index: $index")
+        Log.d("OpenNoteViewModel", "Before text: $beforeText")
+        Log.d("OpenNoteViewModel", "After text: $afterText")
+
+        _mainPartState.value[index]["text"] = beforeText
+
+        val newList = _mainPartState.value.toMutableList()
+        newList.add(index + 1, mutableMapOf("name" to "image", "mediaLink" to _mediaGetResult.value))
+        newList.add(index + 2, mutableMapOf("name" to "md", "text" to afterText))
+
+        _mainPartState.value = mutableStateListOf(*newList.toTypedArray())
+
+        Log.d("OpenNoteViewModel", "New mainPartState: $newList")
+    }
+
 
     fun getRealPathFromUri(uri: Uri): String {
         return getCachedImageLinkUseCase.execute(uri.toString())

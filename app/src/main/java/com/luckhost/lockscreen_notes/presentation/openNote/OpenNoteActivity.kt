@@ -121,14 +121,12 @@ class OpenNoteActivity : ComponentActivity() {
 
     @Composable
     private fun AttachButton(shouldDisplay: Boolean) {
-
-        val context = LocalContext.current
         val photoPicker = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.PickVisualMedia()
         ) {
             if (it != null) {
                 val realPath = vm.getRealPathFromUri(it)
-                vm.changePasteTextState(realPath)
+                vm.changeMediaGetResult(realPath)
             }
         }
 
