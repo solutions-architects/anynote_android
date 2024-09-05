@@ -12,7 +12,7 @@ import com.luckhost.domain.models.Either
 import com.luckhost.domain.models.NoteModel
 import com.luckhost.domain.models.network.AuthToken
 import com.luckhost.domain.useCases.cache.DeleteCachedImagesUseCase
-import com.luckhost.domain.useCases.filters.GetFilteredMdAndFirstImgUseCase
+import com.luckhost.domain.useCases.filters.GetFilteredMdUseCase
 import com.luckhost.domain.useCases.network.localActions.GetLocalAuthTokenUseCase
 import com.luckhost.domain.useCases.network.localActions.SaveLocalAuthTokenUseCase
 import com.luckhost.domain.useCases.objects.DeleteNoteUseCase
@@ -35,7 +35,7 @@ class MainViewModel(
     private val getLocalAuthTokenUseCase: GetLocalAuthTokenUseCase,
     private val saveLocalAuthTokenUseCase: SaveLocalAuthTokenUseCase,
     private val deleteCachedImagesUseCase: DeleteCachedImagesUseCase,
-    private val getFilteredMdAndFirstImgUseCase: GetFilteredMdAndFirstImgUseCase,
+    private val getFilteredMdUseCase: GetFilteredMdUseCase,
     private val resourceProvider: ResourceProvider,
 ): ViewModel() {
     private var accessTokens: AuthToken = AuthToken(accessToken = null, refreshToken = null)
@@ -91,12 +91,13 @@ class MainViewModel(
 
             for (entry in noteToDelete.content) {
                 when (entry["name"]) {
-                    "md" -> {
-                        entry["text"]?.let {
-                            val filteredObjects = getFilteredMdAndFirstImgUseCase.execute(it)
-
-                            deleteCachedImagesUseCase.execute(filteredObjects.second)
+                    "image" -> {
+                        entry["mediaLink"]?.let {
+                            deleteCachedImagesUseCase.execute(listOf(it))
                         }
+                    }
+                    "map" -> {
+                        /* TODO */
                     }
                 }
             }
@@ -150,12 +151,14 @@ class MainViewModel(
                     if (result.mdText.isNotEmpty()) continue
 
                     entry["text"]?.let {
-                        val filteredObjects = getFilteredMdAndFirstImgUseCase.execute(it)
+                        result.mdText = getFilteredMdUseCase.execute(it)
+                    }
+                }
+                "image" -> {
+                    if (result.imageSource != null) continue
 
-                        result.mdText = filteredObjects.first
-                        if (filteredObjects.second.isNotEmpty()) {
-                            result.imageSource = filteredObjects.second.first()
-                        }
+                    entry["mediaLink"]?.let {
+                        result.imageSource = it
                     }
                 }
                 "map" -> { /* TODO */ }

@@ -24,46 +24,10 @@ class SQLiteNotesStorageTest {
         )
 
         storage.saveNote(note)
-        val savedNote = storage.getNotes(listOf("hash123")).first()
+        val savedNote = storage.getNotes().first()
         assertEquals(note, savedNote)
     }
 
-    @Test
-    fun `should return a list of notes`() {
-        val context = RuntimeEnvironment.getApplication().applicationContext
-        val storage = SQLiteNotesStorage(context)
-
-        val expectedNotes = listOf<Note>(
-            Note(
-                serverId = 1,
-                content = listOf(mutableMapOf("key" to "value")),
-                noteHash = "hash123"
-            ),
-            Note(
-                serverId = 2,
-                content = listOf(mutableMapOf("md" to "value")),
-                noteHash = "63456324632"
-            ),
-            Note(
-                serverId = 3,
-                content = listOf(mutableMapOf("map" to "value")),
-                noteHash = "6707680760670"
-            )
-        )
-
-        expectedNotes.forEach {
-            storage.saveNote(it)
-        }
-
-        var actualNotes: List<Note>
-
-        runBlocking {
-            actualNotes = storage.getNotes(listOf(
-                "hash123", "63456324632", "6707680760670")).toList()
-        }
-
-        assertEquals(expectedNotes, actualNotes)
-    }
 
     @Test
     fun `should return a note with null in serverId`() {
@@ -85,9 +49,7 @@ class SQLiteNotesStorageTest {
         var actualNotes: List<Note>
 
         runBlocking {
-            actualNotes = storage.getNotes(listOf(
-                "hash123")
-            ).toList()
+            actualNotes = storage.getNotes().toList()
         }
 
         assertEquals(expectedNotes, actualNotes)
@@ -117,8 +79,7 @@ class SQLiteNotesStorageTest {
         var actualNotes: List<Note>
 
         runBlocking {
-            actualNotes = storage.getNotes(listOf(
-                "hash123")).toList()
+            actualNotes = storage.getNotes().toList()
         }
 
         assertEquals(expectedNotes, actualNotes)
@@ -155,8 +116,7 @@ class SQLiteNotesStorageTest {
 
         var actualNotes: List<Note>
         runBlocking {
-            actualNotes = storage.getNotes(listOf(
-                "hash123")).toList()
+            actualNotes = storage.getNotes().toList()
         }
 
         assertEquals(expectedNotes, actualNotes)

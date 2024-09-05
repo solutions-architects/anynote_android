@@ -6,21 +6,21 @@ import org.junit.jupiter.api.Test
 class GetFilteredMdAndFirstImgUseCaseTest {
 
     @Test
-    fun `should return a list with a link from a simple string`() {
-        val useCase = GetFilteredMdAndFirstImgUseCase()
+    fun `should return a text without of link`() {
+        val useCase = GetFilteredMdUseCase()
 
         val inputString = "some wired text bla bla ![image](very://important/link.png)"
 
-        val actual = useCase.execute(inputString).second.first()
+        val actual = useCase.execute(inputString)
 
-        val expected = "very://important/link.png"
+        val expected = "some wired text bla bla "
 
         Assertions.assertEquals(expected, actual)
     }
 
     @Test
     fun `should return a string without of links`() {
-        val useCase = GetFilteredMdAndFirstImgUseCase()
+        val useCase = GetFilteredMdUseCase()
 
         val inputString = "some wired text bla bla " +
                 "![image](very://important/link.png)" +
@@ -28,30 +28,9 @@ class GetFilteredMdAndFirstImgUseCaseTest {
                 "some text again " +
                 "![image](very://important/link.png)"
 
-        val actual = useCase.execute(inputString).first
+        val actual = useCase.execute(inputString)
 
         val expected = "some wired text bla bla some text again "
-
-        Assertions.assertEquals(expected, actual)
-    }
-
-    @Test
-    fun `should return a list of links`() {
-        val useCase = GetFilteredMdAndFirstImgUseCase()
-
-        val inputString = "some wired text bla bla " +
-                "![image](very://important/link.png)" +
-                "![image](very://important/link.png)" +
-                "some text again " +
-                "![image](very://important/link.png)"
-
-        val actual = useCase.execute(inputString).second
-
-        val expected = listOf<String>(
-            "very://important/link.png",
-            "very://important/link.png",
-            "very://important/link.png"
-        )
 
         Assertions.assertEquals(expected, actual)
     }

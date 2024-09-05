@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -105,7 +107,7 @@ fun EditNoteFragment(vm: OpenNoteViewModel) {
 
         val scrollState = rememberScrollState()
 
-        val mainNotePart by remember { derivedStateOf { vm.mainPartState.value } }
+        val mainNotePart by remember { derivedStateOf { vm.mainPartState } }
 
         var isColumnVisible by remember{mutableStateOf(false)}
 
@@ -114,33 +116,31 @@ fun EditNoteFragment(vm: OpenNoteViewModel) {
         LaunchedEffect(mainNotePart) {
             isColumnVisible = true
         }
-        AnimatedVisibility(visible = isColumnVisible) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .imePadding()
-                    .verticalScroll(scrollState)
-            ) {
-                mainNotePart.forEachIndexed { index, map ->
-                    when (map["name"]) {
-                        "md" -> TextPart(
-                            modifier = Modifier
-                                .weight(1f, fill = false)
-                                .fillMaxWidth(),
-                            vm = vm,
-                            index = index,
-                        )
-                        "image" -> {
-                            map["mediaLink"]?.let {
-                                ImagePart(
-                                    modifier = Modifier
-                                        .weight(1f, fill = false)
-                                        .fillMaxWidth(),
-                                    vm = vm,
-                                    mediaLink = it,
-                                    index = index
-                                )
-                            }
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding()
+        ) {
+            itemsIndexed(mainNotePart) { index, map ->
+                when (map["name"]) {
+                    "md" -> TextPart(
+                        modifier = Modifier
+                            .weight(1f, fill = false)
+                            .fillMaxWidth(),
+                        vm = vm,
+                        index = index,
+                    )
+                    "image" -> {
+                        map["mediaLink"]?.let {
+                            ImagePart(
+                                modifier = Modifier
+                                    .weight(1f, fill = false)
+                                    .fillMaxWidth(),
+                                vm = vm,
+                                mediaLink = it,
+                                index = index
+                            )
                         }
                     }
                 }
@@ -163,7 +163,7 @@ private fun TextPart(
     val interactionSource = remember { MutableInteractionSource() }
 
     LaunchedEffect(mediaGetResult) {
-        if (mediaGetResult.isNotEmpty() && isFocused) {
+        if (mediaGetResult != "" && isFocused) {
             textFieldStates[index]?.let {
                 val cursorPosition = it.selection.start
                 val beforeCursorText = it.text.substring(0, cursorPosition)
@@ -179,7 +179,8 @@ private fun TextPart(
         modifier = modifier
             .focusRequester(focusRequester)
             .onFocusChanged { focusState ->
-                isFocused = focusState.isFocused }
+                isFocused = focusState.isFocused
+            }
             .fillMaxWidth(),
         interactionSource = interactionSource,
         value = it,

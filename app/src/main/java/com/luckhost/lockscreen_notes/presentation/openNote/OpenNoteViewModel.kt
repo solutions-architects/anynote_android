@@ -1,9 +1,8 @@
 package com.luckhost.lockscreen_notes.presentation.openNote
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.toMutableStateList
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -43,9 +42,8 @@ class OpenNoteViewModel(
     val textFieldStates: StateFlow<Map<Int, TextFieldValue>> = _textFieldStates
 
     private val _mainPartState =
-        MutableStateFlow(mutableStateListOf<MutableMap<String, String>>())
-    val mainPartState: StateFlow<MutableList<MutableMap<String, String>>> =
-        _mainPartState.asStateFlow()
+        mutableStateListOf<MutableMap<String, String>>()
+    val mainPartState: SnapshotStateList<MutableMap<String, String>> = _mainPartState
 
     private val _mediaGetResult = MutableStateFlow("")
     val mediaGetResult: StateFlow<String> = _mediaGetResult.asStateFlow()
@@ -73,7 +71,7 @@ class OpenNoteViewModel(
     }
 
     fun updateMdStateText(index: Int, newText: String) {
-        _mainPartState.value[index]["text"] = newText
+        _mainPartState[index]["text"] = newText
     }
 
     fun changeMediaGetResult(newText: String) {
@@ -95,10 +93,13 @@ class OpenNoteViewModel(
             "text" to resourceProvider.getString(R.string.empty_note_content))
 
         _titleTextState.value = resourceProvider.getString(R.string.empty_note_title)
-        _mainPartState.value = mutableStateListOf(infoBlock, essenceBlock)
+        _mainPartState.add(infoBlock)
+        _mainPartState.add(essenceBlock)
+        _textFieldStates.value = mapOf(
+            1 to TextFieldValue(resourceProvider.getString(R.string.empty_note_content)))
 
         note = NoteModel(
-            content = _mainPartState.value,
+            content = _mainPartState,
             hashCode = null
         )
 
@@ -110,17 +111,21 @@ class OpenNoteViewModel(
         viewModelScope.launch {
             note = getNoteByHashUseCase.execute(hashCode)
             withContext(Dispatchers.Main) {
-                _mainPartState.value = note.content.toMutableStateList()
+                _mainPartState.addAll(note.content.toList())
                 note.content.forEachIndexed { index, it ->
-                    if (it["name"] == "info") {
-                        _titleTextState.value = it["header"].toString()
-                    }
-
-                    if (it["name"] == "md") {
-                        _textFieldStates.value = _textFieldStates.value.toMutableMap().apply {
-                            it["text"]?.let { text ->
-                                this[index] = TextFieldValue(text)
+                    when(it["name"]) {
+                        "info" -> {
+                            _titleTextState.value = it["header"].toString()
+                        }
+                        "md" -> {
+                            _textFieldStates.value = _textFieldStates.value.toMutableMap().apply {
+                                it["text"]?.let { text ->
+                                    this[index] = TextFieldValue(text)
+                                }
                             }
+                        }
+                        "image" -> {
+
                         }
                     }
                 }
@@ -130,7 +135,7 @@ class OpenNoteViewModel(
 
     fun saveChanges() {
         note.hashCode?.let {
-            note.content = _mainPartState.value
+            note.content = _mainPartState
             note.content[0]["header"] = _titleTextState.value
             changeNoteUseCase.execute(it, note)
         } ?: {
@@ -143,21 +148,29 @@ class OpenNoteViewModel(
         beforeText: String,
         afterText: String,
     ) {
-        Log.d("OpenNoteViewModel", "Splitting text at index: $index")
-        Log.d("OpenNoteViewModel", "Before text: $beforeText")
-        Log.d("OpenNoteViewModel", "After text: $afterText")
+        _mainPartState[index]["text"] = beforeText
+        updateTextFieldState(index, TextFieldValue(beforeText))
 
-        _mainPartState.value[index]["text"] = beforeText
+        _mainPartState.add(
+            index + 1, mutableMapOf(
+            "name" to "image",
+            "mediaLink" to _mediaGetResult.value))
+        _mainPartState.add(
+            index + 2, mutableMapOf(
+                "name" to "md", "text" to afterText))
 
-        val newList = _mainPartState.value.toMutableList()
-        newList.add(index + 1, mutableMapOf("name" to "image", "mediaLink" to _mediaGetResult.value))
-        newList.add(index + 2, mutableMapOf("name" to "md", "text" to afterText))
+        updateTextFieldState(index + 2, TextFieldValue(afterText))
 
-        _mainPartState.value = mutableStateListOf(*newList.toTypedArray())
-
-        Log.d("OpenNoteViewModel", "New mainPartState: $newList")
+        _mainPartState.forEachIndexed { counter, content ->
+            if (content["name"] == "md") {
+                _textFieldStates.value = _textFieldStates.value.toMutableMap().apply {
+                    content["text"]?.let { text ->
+                        this[counter] = TextFieldValue(text)
+                    }
+                }
+            }
+        }
     }
-
 
     fun getRealPathFromUri(uri: Uri): String {
         return getCachedImageLinkUseCase.execute(uri.toString())
