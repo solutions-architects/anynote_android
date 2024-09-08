@@ -137,6 +137,7 @@ class OpenNoteActivity : ComponentActivity() {
         ) {
             FloatingActionButton(modifier = Modifier
                 .padding(10.dp)
+                .padding(bottom = 40.dp)
                 .size(65.dp),
                 onClick = { photoPicker.launch(
                     PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
