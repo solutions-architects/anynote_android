@@ -41,16 +41,19 @@ class LoginActivity : ComponentActivity() {
                         LoginLayout(
                             vm = vm,
                             onApplyButClick = {
+                                vm.clearErrorText()
                                 vm.getToken()
                                 navController.navigate(
                                     Destination.Loading.createRoute(Destination.Login.route))
                             },
                             onSignUpButClick = {
+                                vm.clearErrorText()
                                 navController.navigate(
                                     Destination.SignUp.route
                                 )
                             },
                             onBackHandler = {
+                                vm.clearErrorText()
                                 activity.finish()
                             }
                         )
@@ -60,11 +63,13 @@ class LoginActivity : ComponentActivity() {
                         SignUpLayout(
                             vm = vm,
                             onApplyButClick = {
+                                vm.clearErrorText()
                                 vm.signUp()
                                 navController.navigate(
                                     Destination.Loading.createRoute(Destination.SignUp.route))
                             },
                             onBackHandlerClick = {
+                                vm.clearErrorText()
                                 navController.navigate(
                                     Destination.Login.route
                                 )

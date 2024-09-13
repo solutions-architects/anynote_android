@@ -8,6 +8,7 @@
         non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</string>
 
     <string name="confirm_dialog_question">Wait a minute!</string>
+    <string name="confirm_dialog_save_changes_question">Save changes?</string>
     <string name="confirm_dialog_answer_yes">Yes</string>
     <string name="confirm_dialog_answer_no">No</string>
 

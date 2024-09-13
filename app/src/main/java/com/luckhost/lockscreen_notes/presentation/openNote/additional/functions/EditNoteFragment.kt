@@ -1,13 +1,13 @@
 package com.luckhost.lockscreen_notes.presentation.openNote.additional.functions
 
 import android.graphics.BitmapFactory
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,8 +15,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -62,7 +63,7 @@ fun EditNoteFragment(vm: OpenNoteViewModel) {
 
     if (showDialog) {
         ConfirmDialog(
-            text = "Save changes?",
+            text = stringResource(id = R.string.confirm_dialog_save_changes_question),
             onConfirm = {
                 vm.saveChanges()
                 vm.changeEditModeState()
@@ -83,7 +84,6 @@ fun EditNoteFragment(vm: OpenNoteViewModel) {
         vm.showDialogState()
     }
 
-    // Используем Box для наложения элементов и фиксированной панели инструментов внизу
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -92,7 +92,7 @@ fun EditNoteFragment(vm: OpenNoteViewModel) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 48.dp) // Оставляем место для панели инструментов
+                .padding(bottom = 40.dp)
         ) {
             val titleTextState by vm.titleTextState.collectAsState()
 
@@ -132,7 +132,7 @@ fun EditNoteFragment(vm: OpenNoteViewModel) {
 
             LazyColumn(
                 modifier = Modifier
-                    .weight(1f) // Делаем LazyColumn гибким и занимающим оставшееся место
+                    .weight(1f)
                     .fillMaxSize(),
             ) {
                 itemsIndexed(vm.mainPartState) { index, map ->
@@ -149,6 +149,8 @@ fun EditNoteFragment(vm: OpenNoteViewModel) {
                                     modifier = Modifier
                                         .fillMaxWidth(),
                                     mediaLink = it,
+                                    vm = vm,
+                                    index = index
                                 )
                             }
                         }
@@ -157,12 +159,10 @@ fun EditNoteFragment(vm: OpenNoteViewModel) {
             }
         }
 
-        // Фиксируем панель инструментов внизу
         TextToolbar(
             modifier = Modifier
-                .align(Alignment.BottomCenter) // Панель всегда будет внизу
+                .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .navigationBarsPadding()
                 .background(Color.Gray),
             vm = vm
         )
@@ -186,6 +186,7 @@ fun TextToolbar(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .height(40.dp)
             .background(colorResource(id = R.color.heavy_metal)),
         horizontalArrangement = Arrangement.SpaceAround
     ) {
@@ -198,14 +199,14 @@ fun TextToolbar(
                 tint = colorResource(id = R.color.grey_neutral)
             )
         }
-        IconButton(onClick = { /* Действие кнопки 2 */ }) {
+        IconButton(onClick = { /* TODO */ }) {
             Icon(
                 imageVector = Icons.Default.Build,
                 contentDescription = "Italic",
                 tint = colorResource(id = R.color.grey_neutral)
             )
         }
-        IconButton(onClick = { /* Действие кнопки 3 */ }) {
+        IconButton(onClick = { /* TODO */ }) {
             Icon(
                 imageVector = Icons.Default.Build,
                 contentDescription = "Underline",
@@ -284,15 +285,17 @@ private fun TextPart(
 fun ImagePart(
     modifier: Modifier,
     mediaLink: String,
+    vm: OpenNoteViewModel,
+    index: Int
 ) {
     val bitmap = BitmapFactory.decodeFile(mediaLink)
-    Log.d("OpenNoteView", mediaLink)
 
     bitmap?.let {
         Image(
             bitmap = bitmap.asImageBitmap(),
             contentDescription = null,
             modifier = modifier
+                .clickable { vm.deleteImageAndMergeText(index) }
                 .fillMaxWidth(),
             contentScale = ContentScale.Fit,
         )

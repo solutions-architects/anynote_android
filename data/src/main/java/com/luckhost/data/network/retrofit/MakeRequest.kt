@@ -11,7 +11,7 @@ import retrofit2.HttpException
 import java.io.IOException
 import java.net.SocketTimeoutException
 
-fun <T> makeRequest(
+internal fun <T> makeRequest(
     responseCall: suspend () -> Response<T>,
     errorStringToGet: String
 ): Flow<Either<NetworkError, T>> = flow {

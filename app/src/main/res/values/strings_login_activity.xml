@@ -14,7 +14,7 @@
 
     <string name="login_activity_passwords_does_not_match">Passwords don\'t match!</string>
     <string name="login_activity_entered_password_is_empty">You entered an empty password!
-        We can keep it like this, but it\'s dangerous for you, so we won\'t :(</string>
+        We can keep it like this, but it\'s dangerous for you, so we won\'t \n :(</string>
     <string name="login_activity_entered_login_is_empty">You entered an empty nickname!
         We really want to know your nickname so that we can
         contact you with good news later!</string>

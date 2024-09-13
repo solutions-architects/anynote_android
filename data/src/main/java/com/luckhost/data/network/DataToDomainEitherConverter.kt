@@ -12,7 +12,7 @@ import com.luckhost.domain.models.network.NetworkErrorDescription
 import com.luckhost.domain.models.network.SuccessDescription
 import com.luckhost.domain.models.network.UserAccountParams
 
-fun <L, R, LD, RD> Either<L, R>.toDomainEither(
+internal fun <L, R, LD, RD> Either<L, R>.toDomainEither(
     leftTransform: (L) -> LD,
     rightTransform: (R) -> RD
 ): DomainEither<LD, RD> {
@@ -22,7 +22,7 @@ fun <L, R, LD, RD> Either<L, R>.toDomainEither(
     }
 }
 
-fun <T> Either<NetworkError, T>.toDomainOnlyErrorEither():
+internal fun <T> Either<NetworkError, T>.toDomainOnlyErrorEither():
         DomainEither<NetworkErrorDescription, SuccessDescription> {
     return this.toDomainEither(
         leftTransform = { it.toDomainNetworkErrorDescription() },
@@ -30,7 +30,7 @@ fun <T> Either<NetworkError, T>.toDomainOnlyErrorEither():
     )
 }
 
-fun Either<NetworkError, LoginAnswerBody>.toDomainAuthTokenEither():
+internal fun Either<NetworkError, LoginAnswerBody>.toDomainAuthTokenEither():
         DomainEither<NetworkErrorDescription, AuthToken> {
     return this.toDomainEither(
         leftTransform = { it.toDomainNetworkErrorDescription() },
@@ -38,7 +38,7 @@ fun Either<NetworkError, LoginAnswerBody>.toDomainAuthTokenEither():
     )
 }
 
-fun Either<NetworkError, AccessToken>.toDomainAuthTokenEither(refreshToken: String):
+internal fun Either<NetworkError, AccessToken>.toDomainAuthTokenEither(refreshToken: String):
         DomainEither<NetworkErrorDescription, AuthToken> {
     return this.toDomainEither(
         leftTransform = { it.toDomainNetworkErrorDescription() },
@@ -47,7 +47,7 @@ fun Either<NetworkError, AccessToken>.toDomainAuthTokenEither(refreshToken: Stri
 }
 
 
-fun Either<NetworkError, AccountAnswerBody>.toDomainUserAccountParamsEither():
+internal fun Either<NetworkError, AccountAnswerBody>.toDomainUserAccountParamsEither():
         DomainEither<NetworkErrorDescription, UserAccountParams> {
     return this.toDomainEither(
         leftTransform = { it.toDomainNetworkErrorDescription() },

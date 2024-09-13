@@ -15,7 +15,7 @@ import java.net.SocketTimeoutException
 /**
  * this function is needed in order to send requests that return empty bodies
  */
-fun <T> makeNullableRequest(
+internal fun <T> makeNullableRequest(
     responseCall: suspend () -> Response<T>,
     errorStringToGet: String
 ): Flow<Either<NetworkError, SuccessMessage>> = flow {

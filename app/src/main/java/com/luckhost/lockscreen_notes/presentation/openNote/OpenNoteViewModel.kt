@@ -172,6 +172,39 @@ class OpenNoteViewModel(
         }
     }
 
+    fun deleteImageAndMergeText(
+        index: Int,
+    ) {
+        if (_mainPartState[index]["name"] != "image") {
+            throw NoSuchElementException("No such image by this id!")
+        }
+
+        if (_mainPartState.size > index + 1 &&
+            index > 0 &&
+            _mainPartState[index - 1]["name"] == "md" &&
+            _mainPartState[index + 1]["name"] == "md"
+            ) {
+            val newText =
+                _mainPartState[index - 1]["text"] + _mainPartState[index + 1]["text"]
+            _mainPartState[index - 1]["text"] = newText
+            updateTextFieldState(index -1, TextFieldValue(newText))
+
+            _mainPartState.removeAt(index + 1)
+        }
+
+        _mainPartState.removeAt(index)
+
+        _mainPartState.forEachIndexed { counter, content ->
+            if (content["name"] == "md") {
+                _textFieldStates.value = _textFieldStates.value.toMutableMap().apply {
+                    content["text"]?.let { text ->
+                        this[counter] = TextFieldValue(text)
+                    }
+                }
+            }
+        }
+    }
+
     fun getRealPathFromUri(uri: Uri): String {
         return getCachedImageLinkUseCase.execute(uri.toString())
     }

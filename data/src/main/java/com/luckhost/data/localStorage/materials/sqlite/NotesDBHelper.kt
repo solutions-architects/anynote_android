@@ -15,7 +15,7 @@ private const val SQL_CREATE_ENTRIES =
 private const val SQL_DELETE_ENTRIES =
     "DROP TABLE IF EXISTS ${NotesContract.TABLE_NAME}"
 
-class NotesDBHelper(context: Context) :
+internal class NotesDBHelper(context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
 
     companion object {

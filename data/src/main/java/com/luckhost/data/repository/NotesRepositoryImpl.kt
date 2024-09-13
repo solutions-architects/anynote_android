@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.withContext
 
-open class NotesRepositoryImpl(
+class NotesRepositoryImpl(
     private val notesStorage: NotesStorage,
 ): NotesRepositoryInterface {
     override fun saveNote(saveObject: NoteModel) {

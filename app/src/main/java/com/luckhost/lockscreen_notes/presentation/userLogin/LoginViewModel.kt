@@ -62,17 +62,20 @@ class LoginViewModel(
 
 
     fun signUp() {
-        _errorTextState.value = ""
+        clearErrorText()
         if (_passwordTextState.value != _passwordRepeatTextState.value) {
-            _toastNotification.value = resourceProvider.getString(
+            _errorTextState.value = resourceProvider.getString(
                 R.string.login_activity_passwords_does_not_match
             )
         } else if (_passwordTextState.value == "") {
-            _toastNotification.value = resourceProvider.getString(
+            _errorTextState.value = resourceProvider.getString(
                 R.string.login_activity_entered_password_is_empty
             )
+        } else if (_loginTextState.value == "") {
+            _errorTextState.value = resourceProvider.getString(
+                R.string.login_activity_entered_login_is_empty
+            )
         } else {
-
             _isLoadingState.value = true
             viewModelScope.launch {
                 val response = signUpUseCase.execute(
@@ -89,9 +92,9 @@ class LoginViewModel(
                         _isLoadingState.value = false
                     }
                     is Either.Left -> {
-                        _toastNotification.value = "${response.a}"
                         _isLoadingState.value = false
-                        Log.e("LoginVM", "error: ${response.a}")
+                        val errorMessage = response.a.toString()
+                        showErrorMessage(errorMessage)
                     }
                 }
             }
@@ -127,30 +130,30 @@ class LoginViewModel(
                         _isLoadingState.value = false
                     }
                     is Either.Left -> {
-
-                        val errorMessage = response.a.toString()
-
-                        if (errorMessage.lowercase(Locale.ROOT)
-                                .contains("failed to connect to")) {
-                            _errorTextState.value = resourceProvider.getString(
-                                R.string.login_activity_failed_connect_message)
-                        } else if(errorMessage
-                                .lowercase(Locale.ROOT)
-                                .contains(
-                                    "no active account found with the given credentials")) {
-                            _errorTextState.value = resourceProvider.getString(
-                                R.string.login_activity_no_such_account_message)
-                        } else {
-                            _errorTextState.value = resourceProvider.getString(
-                                R.string.login_activity_unexpected_error_message)
-                        }
-
-
                         _isLoadingState.value = false
-                        Log.e("LoginVM", "error: ${response.a}")
+                        val errorMessage = response.a.toString()
+                        showErrorMessage(errorMessage)
                     }
                 }
             }
         }
+    }
+
+    private fun showErrorMessage(errorMessage: String) {
+        if (errorMessage.lowercase(Locale.ROOT)
+                .contains("failed to connect to")) {
+            _errorTextState.value = resourceProvider.getString(
+                R.string.login_activity_failed_connect_message)
+        } else if(errorMessage
+                .lowercase(Locale.ROOT)
+                .contains(
+                    "no active account found with the given credentials")) {
+            _errorTextState.value = resourceProvider.getString(
+                R.string.login_activity_no_such_account_message)
+        } else {
+            _errorTextState.value = resourceProvider.getString(
+                R.string.login_activity_unexpected_error_message)
+        }
+        Log.e("LoginVM", "error: $errorMessage")
     }
 }

@@ -20,6 +20,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -41,6 +42,7 @@ fun SignUpLayout(
     val loginTextState by vm.loginTextState.collectAsState()
     val passwordTextState by vm.passwordTextState.collectAsState()
     val passwordRepeatTextState by vm.passwordRepeatTextState.collectAsState()
+    val errorText by vm.errorTextState.collectAsState()
 
     BackHandler {
         onBackHandlerClick()
@@ -51,8 +53,28 @@ fun SignUpLayout(
         contentAlignment = Alignment.Center
     ) {
         ConstraintLayout {
-            val (headerRef, nicknameInpRef,
+            val (errTextRef, headerRef, nicknameInpRef,
                 passInpRef, buttonsRowRef, repeatPusRef) = createRefs()
+
+            Text(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .padding(horizontal = 45.dp)
+                    .constrainAs(errTextRef) {
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        bottom.linkTo(headerRef.top, margin = 25.dp)
+                    },
+                text = errorText,
+                style = TextStyle(
+                    color = Color.Red,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.SansSerif,
+                    textAlign = TextAlign.Center
+                ),
+            )
+
             Text(
                 modifier = Modifier
                     .wrapContentSize()
