@@ -29,8 +29,11 @@ class OpenNoteViewModel(
 ) : ViewModel() {
     private lateinit var note: NoteModel
 
-    private val _showDialog = MutableStateFlow(false)
-    val showDialog: StateFlow<Boolean> = _showDialog.asStateFlow()
+    private val _showSaveChangesDialog = MutableStateFlow(false)
+    val showSaveChangesDialog: StateFlow<Boolean> = _showSaveChangesDialog.asStateFlow()
+
+    private val _showDeleteImageDialog = MutableStateFlow(false)
+    val showDeleteImageDialog: StateFlow<Boolean> = _showDeleteImageDialog.asStateFlow()
 
     private val _isEditMode = MutableStateFlow(false)
     val isEditMode: StateFlow<Boolean> = _isEditMode.asStateFlow()
@@ -52,13 +55,11 @@ class OpenNoteViewModel(
         _isEditMode.value = !_isEditMode.value
     }
 
-    fun hideDialogState() {
-        _showDialog.value = false
-    }
+    fun hideSaveChangesDialogState() { _showSaveChangesDialog.value = false }
+    fun showSaveChangesDialogState() { _showSaveChangesDialog.value = true }
 
-    fun showDialogState() {
-        _showDialog.value = true
-    }
+    fun hideDeleteImageDialogState() { _showDeleteImageDialog.value = false }
+    fun showDeleteImageDialogState() { _showDeleteImageDialog.value = true }
 
     fun updateTextFieldState(index: Int, newText: TextFieldValue) {
         _textFieldStates.value = _textFieldStates.value.toMutableMap().apply {
@@ -80,6 +81,7 @@ class OpenNoteViewModel(
 
     fun returnOldValues() {
         note.hashCode?.let {
+            _mainPartState.clear()
             getNote(it)
         } ?: {
             throw NullPointerException("Note hash was null!")
@@ -112,6 +114,8 @@ class OpenNoteViewModel(
             note = getNoteByHashUseCase.execute(hashCode)
             withContext(Dispatchers.Main) {
                 _mainPartState.addAll(note.content.toList())
+
+                // Adding states
                 note.content.forEachIndexed { index, it ->
                     when(it["name"]) {
                         "info" -> {

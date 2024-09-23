@@ -142,9 +142,14 @@ class MainViewModel(
                     if (result.title.isNotEmpty()) {
                         Log.e("MainView_NoteBox", "There is two titles in note!")
                     }
-
                     entry["header"]?.let {
-                        result.title = it
+                        if(it.count() > 10) {
+                            result.title = it
+                                .substring(0..8)
+                                .plus("...")
+                        } else {
+                            result.title = it
+                        }
                     }
                 }
                 "md" -> {

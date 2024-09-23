@@ -146,7 +146,8 @@ class OpenNoteActivity : ComponentActivity() {
                 contentColor =
                 colorResource(id = R.color.grey_neutral)
             ) {
-                Icon(painterResource(id = R.drawable.attach_file), contentDescription = "save")
+                Icon(painterResource(id = R.drawable.attach_file),
+                    contentDescription = "add file")
             }
         }
     }

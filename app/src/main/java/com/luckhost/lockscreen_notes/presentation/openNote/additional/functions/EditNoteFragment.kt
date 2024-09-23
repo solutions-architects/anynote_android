@@ -1,6 +1,7 @@
 package com.luckhost.lockscreen_notes.presentation.openNote.additional.functions
 
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -21,12 +22,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -50,7 +56,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.luckhost.lockscreen_notes.R
@@ -59,7 +64,7 @@ import com.luckhost.lockscreen_notes.presentation.ui.ConfirmDialog
 
 @Composable
 fun EditNoteFragment(vm: OpenNoteViewModel) {
-    val showDialog by vm.showDialog.collectAsState()
+    val showDialog by vm.showSaveChangesDialog.collectAsState()
 
     if (showDialog) {
         ConfirmDialog(
@@ -67,21 +72,21 @@ fun EditNoteFragment(vm: OpenNoteViewModel) {
             onConfirm = {
                 vm.saveChanges()
                 vm.changeEditModeState()
-                vm.hideDialogState()
+                vm.hideSaveChangesDialogState()
             },
             onDismiss = {
                 vm.changeEditModeState()
                 vm.returnOldValues()
-                vm.hideDialogState()
+                vm.hideSaveChangesDialogState()
             },
             onBackHandler = {
-                vm.hideDialogState()
+                vm.hideSaveChangesDialogState()
             }
         )
     }
 
     BackHandler {
-        vm.showDialogState()
+        vm.showSaveChangesDialogState()
     }
 
     Box(
@@ -95,6 +100,7 @@ fun EditNoteFragment(vm: OpenNoteViewModel) {
                 .padding(bottom = 40.dp)
         ) {
             val titleTextState by vm.titleTextState.collectAsState()
+            val lazyListState = rememberLazyListState()
 
             val maxLength = 20
             TextField(
@@ -134,6 +140,7 @@ fun EditNoteFragment(vm: OpenNoteViewModel) {
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxSize(),
+                state = lazyListState
             ) {
                 itemsIndexed(vm.mainPartState) { index, map ->
                     when (map["name"]) {
@@ -142,6 +149,7 @@ fun EditNoteFragment(vm: OpenNoteViewModel) {
                                 .fillMaxWidth(),
                             vm = vm,
                             index = index,
+                            lazyListState
                         )
                         "image" -> {
                             map["mediaLink"]?.let {
@@ -199,22 +207,26 @@ fun TextToolbar(
                 tint = colorResource(id = R.color.grey_neutral)
             )
         }
-        IconButton(onClick = { /* TODO */ }) {
+        IconButton(onClick = {
+            vm.showSaveChangesDialogState()
+        }) {
             Icon(
-                imageVector = Icons.Default.Build,
-                contentDescription = "Italic",
+                imageVector = Icons.Default.Close,
+                contentDescription = "Close",
                 tint = colorResource(id = R.color.grey_neutral)
             )
         }
-        IconButton(onClick = { /* TODO */ }) {
+        IconButton(onClick = {
+            vm.saveChanges()
+            vm.changeEditModeState()
+        }) {
             Icon(
-                imageVector = Icons.Default.Build,
-                contentDescription = "Underline",
+                Icons.Default.Check,
+                contentDescription = "save",
                 tint = colorResource(id = R.color.grey_neutral)
             )
         }
     }
-
 }
 
 @Composable
@@ -222,6 +234,7 @@ private fun TextPart(
     modifier: Modifier,
     vm: OpenNoteViewModel,
     index: Int,
+    scrollState: LazyListState
 ) {
     val textFieldStates by vm.textFieldStates.collectAsState()
     val mediaGetResult by vm.mediaGetResult.collectAsState()
@@ -241,6 +254,17 @@ private fun TextPart(
         }
     }
 
+    val cursorPosition = textFieldStates[index]?.selection?.start ?: 0
+    LaunchedEffect(cursorPosition) {
+        if (isFocused) {
+            scrollState.animateScrollToItem(
+                index = index,
+                scrollOffset = 0
+            )
+            Log.d("EditNoteFragment", "$index $cursorPosition")
+        }
+    }
+
     textFieldStates[index]?.let {
         TextField(
             modifier = modifier
@@ -250,20 +274,6 @@ private fun TextPart(
                 }
                 .fillMaxWidth(),
             value = it,
-            trailingIcon = {
-                if (it.text.isNotEmpty()) {
-                    IconButton(
-                        onClick = {
-                            vm.updateTextFieldState(index, TextFieldValue(""))
-                            vm.updateMdStateText(index, it.text)
-                        }) {
-                        Icon(
-                            imageVector = Icons.Outlined.Close,
-                            contentDescription = null
-                        )
-                    }
-                }
-            },
             onValueChange = { newText ->
                 vm.updateTextFieldState(index, newText)
                 vm.updateMdStateText(index, newText.text)
@@ -288,16 +298,58 @@ fun ImagePart(
     vm: OpenNoteViewModel,
     index: Int
 ) {
+
+    val showDialog by vm.showDeleteImageDialog.collectAsState()
     val bitmap = BitmapFactory.decodeFile(mediaLink)
 
-    bitmap?.let {
-        Image(
-            bitmap = bitmap.asImageBitmap(),
-            contentDescription = null,
-            modifier = modifier
-                .clickable { vm.deleteImageAndMergeText(index) }
-                .fillMaxWidth(),
-            contentScale = ContentScale.Fit,
+    if (showDialog) {
+        ConfirmDialog(
+            text = stringResource(id = R.string.confirm_dialog_delete_image_question),
+            onConfirm = {
+                vm.deleteImageAndMergeText(index)
+                vm.hideDeleteImageDialogState()
+            },
+            onDismiss = {
+                vm.hideDeleteImageDialogState()
+            },
+            onBackHandler = {
+                vm.hideDeleteImageDialogState()
+            }
         )
+    }
+
+    Box(
+        modifier =
+            modifier
+    ) {
+        bitmap?.let {
+            Image(
+                bitmap = bitmap.asImageBitmap(),
+                contentDescription = null,
+                modifier = Modifier
+                    .clickable {
+
+                    }
+                    .fillMaxWidth(),
+                contentScale = ContentScale.Fit,
+            )
+        }
+
+        IconButton(
+            modifier = Modifier
+                .align(Alignment.TopEnd),
+            onClick = {
+                vm.showDeleteImageDialogState()
+            },
+            colors = IconButtonDefaults.iconButtonColors(
+                containerColor = colorResource(id = R.color.main_bg),
+                contentColor = colorResource(id = R.color.grey_neutral),
+            )
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Close,
+                contentDescription = null
+            )
+        }
     }
 }

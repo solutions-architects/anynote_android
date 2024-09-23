@@ -163,7 +163,7 @@ private fun TitlePart(
         maxLines = 1,
         style = TextStyle(
             color = colorResource(id = R.color.main_title_text),
-            fontSize = 26.sp,
+            fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.SansSerif
         ),
