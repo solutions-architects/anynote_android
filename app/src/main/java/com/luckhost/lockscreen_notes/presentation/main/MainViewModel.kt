@@ -52,9 +52,7 @@ class MainViewModel(
         mutableStateMapOf<String, MutableStateFlow<Boolean>>()
 
     init {
-        val localSavedTokens = getLocalAuthTokenUseCase.execute()
-
-        when(localSavedTokens) {
+        when(val localSavedTokens = getLocalAuthTokenUseCase.execute()) {
             is Either.Right -> {
                 accessTokens = localSavedTokens.b
             }

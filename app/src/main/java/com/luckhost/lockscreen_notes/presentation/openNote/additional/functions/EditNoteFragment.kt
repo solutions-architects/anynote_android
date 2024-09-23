@@ -26,7 +26,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Close
@@ -253,7 +252,7 @@ private fun TextPart(
             }
         }
     }
-
+    /* Scroll while typing 
     val cursorPosition = textFieldStates[index]?.selection?.start ?: 0
     LaunchedEffect(cursorPosition) {
         if (isFocused) {
@@ -263,7 +262,7 @@ private fun TextPart(
             )
             Log.d("EditNoteFragment", "$index $cursorPosition")
         }
-    }
+    }*/
 
     textFieldStates[index]?.let {
         TextField(

@@ -2,6 +2,7 @@ package com.luckhost.lockscreen_notes.presentation.openNote.additional.functions
 
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -84,7 +85,8 @@ fun NoteViewFragment(vm: OpenNoteViewModel) {
                                     bitmap = bitmap.asImageBitmap(),
                                     contentDescription = null,
                                     modifier = Modifier
-                                        .fillMaxWidth(),
+                                        .fillMaxWidth()
+                                        .clickable { vm.changeEditModeState() },
                                     contentScale = ContentScale.Fit,
                                 )
                             }
