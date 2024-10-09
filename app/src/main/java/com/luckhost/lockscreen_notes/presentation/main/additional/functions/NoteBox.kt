@@ -47,6 +47,9 @@ import com.luckhost.lockscreen_notes.presentation.main.MainViewModel
 import com.luckhost.lockscreen_notes.presentation.openNote.additional.models.NoteBoxModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
+/**
+ * Note card that shoes on a main screen
+ */
 @Stable
 @Composable
 fun NoteBox(

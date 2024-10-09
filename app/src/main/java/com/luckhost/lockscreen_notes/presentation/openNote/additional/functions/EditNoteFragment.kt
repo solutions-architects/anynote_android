@@ -1,7 +1,6 @@
 package com.luckhost.lockscreen_notes.presentation.openNote.additional.functions
 
 import android.graphics.BitmapFactory
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -22,7 +21,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -148,7 +146,6 @@ fun EditNoteFragment(vm: OpenNoteViewModel) {
                                 .fillMaxWidth(),
                             vm = vm,
                             index = index,
-                            lazyListState
                         )
                         "image" -> {
                             map["mediaLink"]?.let {
@@ -233,7 +230,6 @@ private fun TextPart(
     modifier: Modifier,
     vm: OpenNoteViewModel,
     index: Int,
-    scrollState: LazyListState
 ) {
     val textFieldStates by vm.textFieldStates.collectAsState()
     val mediaGetResult by vm.mediaGetResult.collectAsState()

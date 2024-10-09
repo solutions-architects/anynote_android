@@ -25,8 +25,6 @@ class SQLiteNotesStorage(context: Context): NotesStorage {
     }
 
     override suspend fun getNotes() = flow<Note> {
-
-
         val cursor = db?.query(
             NotesContract.TABLE_NAME,
             null,

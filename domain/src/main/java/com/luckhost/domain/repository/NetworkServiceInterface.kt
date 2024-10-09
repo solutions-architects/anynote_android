@@ -10,6 +10,9 @@ import com.luckhost.domain.models.network.UserAccountParams
 import com.luckhost.domain.models.network.VerifyTokenAnswer
 import com.luckhost.domain.models.network.VerifyTokenRequest
 
+/**
+ * Auth client and api manager
+ */
 interface NetworkServiceInterface {
     suspend fun getAuthToken(loginInformation: LoginInformation):
             Either<NetworkErrorDescription, AuthToken>
