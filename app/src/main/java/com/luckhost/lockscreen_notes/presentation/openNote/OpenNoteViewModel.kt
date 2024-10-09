@@ -38,11 +38,16 @@ class OpenNoteViewModel(
     private val _isEditMode = MutableStateFlow(false)
     val isEditMode: StateFlow<Boolean> = _isEditMode.asStateFlow()
 
+    /* TODO can be removed into _textFieldStates */
     private val _titleTextState = MutableStateFlow("")
     val titleTextState: StateFlow<String> = _titleTextState.asStateFlow()
 
     private val _textFieldStates = MutableStateFlow<Map<Int, TextFieldValue>>(emptyMap())
     val textFieldStates: StateFlow<Map<Int, TextFieldValue>> = _textFieldStates
+
+    // is needed to handle current text field by the text toolbar
+    private val _focusedTextFieldId  = MutableStateFlow<Int>(0)
+    val focusedTextFieldId: StateFlow<Int> = _focusedTextFieldId
 
     private val _mainPartState =
         mutableStateListOf<MutableMap<String, String>>()
@@ -51,9 +56,6 @@ class OpenNoteViewModel(
     private val _mediaGetResult = MutableStateFlow("")
     val mediaGetResult: StateFlow<String> = _mediaGetResult.asStateFlow()
 
-    fun changeEditModeState() {
-        _isEditMode.value = !_isEditMode.value
-    }
 
     fun hideSaveChangesDialogState() { _showSaveChangesDialog.value = false }
     fun showSaveChangesDialogState() { _showSaveChangesDialog.value = true }
@@ -61,14 +63,18 @@ class OpenNoteViewModel(
     fun hideDeleteImageDialogState() { _showDeleteImageDialog.value = false }
     fun showDeleteImageDialogState() { _showDeleteImageDialog.value = true }
 
+    fun changeEditModeState() { _isEditMode.value = !_isEditMode.value }
+
+    fun updateTitleStateText(newTitle: String) { _titleTextState.value = newTitle }
+
     fun updateTextFieldState(index: Int, newText: TextFieldValue) {
         _textFieldStates.value = _textFieldStates.value.toMutableMap().apply {
             this[index] = newText
         }
     }
 
-    fun updateTitleStateText(newTitle: String) {
-        _titleTextState.value = newTitle
+    fun changeFocusedFieldIdState(index: Int) {
+        _focusedTextFieldId.value = index
     }
 
     fun updateMdStateText(index: Int, newText: String) {

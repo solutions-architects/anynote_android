@@ -152,6 +152,9 @@ class OpenNoteActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Changes mode state to edit mode
+     */
     @Composable
     private fun EnterEditModeButton(shouldNotDisplay: Boolean) {
         AnimatedVisibility(
