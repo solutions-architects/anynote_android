@@ -44,7 +44,7 @@ import androidx.constraintlayout.compose.Dimension
 import com.luckhost.lockscreen_notes.presentation.ui.ConfirmDialog
 import com.luckhost.lockscreen_notes.R
 import com.luckhost.lockscreen_notes.presentation.main.MainViewModel
-import com.luckhost.lockscreen_notes.presentation.openNote.additional.models.NoteBoxModel
+import com.luckhost.lockscreen_notes.presentation.main.additional.models.NoteBoxModel
 import dev.jeziellago.compose.markdowntext.MarkdownText
 
 /**

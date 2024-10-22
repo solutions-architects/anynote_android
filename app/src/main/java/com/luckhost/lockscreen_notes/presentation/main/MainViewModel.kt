@@ -20,7 +20,7 @@ import com.luckhost.domain.useCases.objects.GetNotesUseCase
 import com.luckhost.lockscreen_notes.R
 import com.luckhost.lockscreen_notes.di.ResourceProvider
 import com.luckhost.lockscreen_notes.presentation.openNote.OpenNoteActivity
-import com.luckhost.lockscreen_notes.presentation.openNote.additional.models.NoteBoxModel
+import com.luckhost.lockscreen_notes.presentation.main.additional.models.NoteBoxModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

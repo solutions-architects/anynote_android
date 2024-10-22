@@ -14,6 +14,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -32,9 +33,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
@@ -283,11 +284,11 @@ class MainActivity : ComponentActivity() {
     fun NotesList() {
         val noteBoxesList by vm.noteBoxesList.collectAsState()
 
-        LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Fixed(2),
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
             modifier = Modifier.fillMaxWidth()
         ) {
-            items(noteBoxesList) { item ->
+            items(noteBoxesList, key = { it.parentHash }) { item ->  // Указываем уникальный ключ
                 val isVisible = item.visible.collectAsState()
                 Log.d("MainView", isVisible.toString())
                 AnimatedVisibility(
@@ -298,6 +299,11 @@ class MainActivity : ComponentActivity() {
                     exit = slideOutHorizontally(targetOffsetX = { fullWidth -> fullWidth })
                             + shrinkHorizontally()
                             + fadeOut(),
+                    modifier = Modifier.animateItem( // Используем новый animateItem()
+                        placementSpec = tween(durationMillis = 300),  // Анимация перемещения
+                        fadeInSpec = null,  // Можно задать кастомные спецификации для других анимаций
+                        fadeOutSpec = null
+                    )
                 ) {
                     NoteBox(
                         noteBoxModel = item,
@@ -306,8 +312,8 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-
     }
+
 
     override fun onResume() {
         super.onResume()

@@ -15,7 +15,7 @@ class NotesRepositoryImpl(
     override fun saveNote(saveObject: NoteModel) {
         val note = Note(
             serverId = null,
-            content= saveObject.content,
+            content = saveObject.content,
             noteHash = saveObject.hashCode().toString()
         )
         notesStorage.saveNote(note)

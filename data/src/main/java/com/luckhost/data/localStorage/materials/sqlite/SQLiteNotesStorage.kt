@@ -89,7 +89,11 @@ class SQLiteNotesStorage(context: Context): NotesStorage {
                     cursor.getString(
                         cursor.getColumnIndexOrThrow(NotesContract.COLUMN_NAME_HASHCODE))
 
-                note = Note(id, content, hash)
+                note = Note(
+                    serverId = id,
+                    content = content,
+                    noteHash = hash
+                )
             }
         }
         cursor?.close()

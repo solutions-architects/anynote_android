@@ -1,4 +1,4 @@
-package com.luckhost.lockscreen_notes.presentation.openNote.additional.models
+package com.luckhost.lockscreen_notes.presentation.main.additional.models
 
 import kotlinx.coroutines.flow.StateFlow
 

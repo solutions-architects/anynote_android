@@ -26,6 +26,7 @@ val appModule = module {
             getNoteByHashUseCase = get(),
             changeNoteUseCase = get(),
             getCachedImageLinkUseCase = get(),
+            deleteCachedImageUseCase = get(),
             resourceProvider = get(),
         )
     }

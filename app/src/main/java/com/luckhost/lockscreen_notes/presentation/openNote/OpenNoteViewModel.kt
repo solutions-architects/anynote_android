@@ -7,6 +7,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.luckhost.domain.models.NoteModel
+import com.luckhost.domain.useCases.cache.DeleteCachedImageUseCase
 import com.luckhost.domain.useCases.cache.GetCachedImageLinkUseCase
 import com.luckhost.domain.useCases.objects.ChangeNoteUseCase
 import com.luckhost.domain.useCases.objects.GetNoteByHashUseCase
@@ -25,6 +26,7 @@ class OpenNoteViewModel(
     private val getNoteByHashUseCase: GetNoteByHashUseCase,
     private val changeNoteUseCase: ChangeNoteUseCase,
     private val getCachedImageLinkUseCase: GetCachedImageLinkUseCase,
+    private val deleteCachedImageUseCase: DeleteCachedImageUseCase,
     private val resourceProvider: ResourceProvider,
 ) : ViewModel() {
     private lateinit var note: NoteModel
@@ -46,7 +48,7 @@ class OpenNoteViewModel(
     val textFieldStates: StateFlow<Map<Int, TextFieldValue>> = _textFieldStates
 
     // is needed to handle current text field by the text toolbar
-    private val _focusedTextFieldId  = MutableStateFlow<Int>(0)
+    private val _focusedTextFieldId  = MutableStateFlow(0)
     val focusedTextFieldId: StateFlow<Int> = _focusedTextFieldId
 
     private val _mainPartState =
@@ -189,19 +191,22 @@ class OpenNoteViewModel(
             throw NoSuchElementException("No such image by this id!")
         }
 
+        // Checking if image is between the text fields
         if (_mainPartState.size > index + 1 &&
             index > 0 &&
             _mainPartState[index - 1]["name"] == "md" &&
             _mainPartState[index + 1]["name"] == "md"
             ) {
+            // If so, merge text
             val newText =
                 _mainPartState[index - 1]["text"] + _mainPartState[index + 1]["text"]
+
             _mainPartState[index - 1]["text"] = newText
             updateTextFieldState(index -1, TextFieldValue(newText))
 
             _mainPartState.removeAt(index + 1)
         }
-
+        _mainPartState[index]["mediaLink"]?.let { deleteCachedImageUseCase.execute(it) }
         _mainPartState.removeAt(index)
 
         _mainPartState.forEachIndexed { counter, content ->
