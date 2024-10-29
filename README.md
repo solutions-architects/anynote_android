@@ -1,12 +1,12 @@
 # About
 
-- Notes that you can save on your lock screen
+- Notes that you can save in markdown
 - Works on Android
 
 ---
 ## What's inside
 
-- This project was created to study Clean Architecture
+- Kotlin
 - Jetpack Compose
 - MVVM
 - SQLite
