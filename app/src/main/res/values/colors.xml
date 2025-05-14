@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="grey_neutral">#A1A1A1</color>
-    <color name="heavy_metal">#2C2C2C</color>
-    <color name="stroke_color">#5A5A5A</color>
-    <color name="light_grey">#1D1D1D</color>
-    <color name="black_and_brown">#212121</color>
-    <color name="main_bg">#121212</color>
-    <color name="notebox_bg">#1D1D1D</color>
-    <color name="main_title_text">#C7C7C7</color>
+    <!-- Основные цвета (аналоги темной темы, но инвертированные) -->
+    <color name="grey_neutral">#6E6E6E</color>  <!-- нейтральный серый -->
+    <color name="heavy_metal">#D3D3D3</color>  <!-- вместо темно-серого -->
+    <color name="stroke_color">#B0B0B0</color>  <!-- границы элементов -->
+    <color name="light_grey">#F5F5F5</color>   <!-- светлый фон элементов -->
+    <color name="black_and_brown">#424242</color>  <!-- темный текст -->
+    <color name="main_bg">#FAFAFA</color>      <!-- основной фон -->
+    <color name="notebox_bg">#FFFFFF</color>  <!-- фон заметок (белый) -->
+    <color name="main_title_text">#333333</color>  <!-- основной текст -->
+
+    <!-- Акцентные цвета (можно оставить как есть или осветлить) -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
