@@ -13,6 +13,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandHorizontally
@@ -69,6 +70,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.luckhost.domain.useCases.theme.GetThemeStateUseCase
 import com.luckhost.lockscreen_notes.R
 import com.luckhost.lockscreen_notes.presentation.main.additional.functions.DrawerBody
 import com.luckhost.lockscreen_notes.presentation.main.additional.functions.DrawerHeader
@@ -76,11 +78,24 @@ import com.luckhost.lockscreen_notes.presentation.main.additional.functions.Note
 import com.luckhost.lockscreen_notes.presentation.userLogin.LoginActivity
 import com.luckhost.lockscreen_notes.ui.theme.Lockscreen_notesTheme
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
     private val vm by viewModel<MainViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        val isDarkUseCase: GetThemeStateUseCase by inject()
+
+        val isDark = isDarkUseCase.invoke()
+
+        AppCompatDelegate.setDefaultNightMode(
+            if (isDark)
+                AppCompatDelegate.MODE_NIGHT_YES
+            else
+                AppCompatDelegate.MODE_NIGHT_NO
+        )
+
         super.onCreate(savedInstanceState)
         setContent {
             RequestPermissionAtStart()

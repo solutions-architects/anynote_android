@@ -34,6 +34,7 @@ serializationKotlin = "1.7.1"
 glanceAppwidget = "1.1.0"
 junitJupiterVersion = "5.10.1"
 coreKtxVersion = "1.6.1"
+appcompatVersion = "1.7.1"
 
 [libraries]
 androidx-lifecycle-runtime-ktx-v240beta01 = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtxVersion" }
@@ -77,6 +78,7 @@ androidx-glance-appwidget = { group = "androidx.glance", name = "glance-appwidge
 jupiter-junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiterVersion" }
 core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "coreKtxVersion" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompatVersion" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

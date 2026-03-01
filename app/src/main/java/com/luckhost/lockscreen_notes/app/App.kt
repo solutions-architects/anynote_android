@@ -7,6 +7,7 @@ import com.luckhost.lockscreen_notes.di.domainModule.domainCacheModule
 import com.luckhost.lockscreen_notes.di.domainModule.domainModule
 import com.luckhost.lockscreen_notes.di.domainModule.domainNetworkModule
 import com.luckhost.lockscreen_notes.di.domainModule.domainNoteRepoModule
+import com.luckhost.lockscreen_notes.di.domainModule.domainThemeModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 
@@ -20,7 +21,8 @@ class App: Application() {
             androidLogger(Level.ERROR)
             androidContext(this@App)
             modules(listOf(appModule, dataModule, domainModule,
-                domainCacheModule, domainNetworkModule, domainNoteRepoModule
+                domainCacheModule, domainNetworkModule, domainNoteRepoModule,
+                domainThemeModule
                 )
             )
         }
