@@ -3,6 +3,7 @@ package com.luckhost.lockscreen_notes.presentation.main
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.toMutableStateList
@@ -17,6 +18,8 @@ import com.luckhost.domain.useCases.network.localActions.GetLocalAuthTokenUseCas
 import com.luckhost.domain.useCases.network.localActions.SaveLocalAuthTokenUseCase
 import com.luckhost.domain.useCases.objects.DeleteNoteUseCase
 import com.luckhost.domain.useCases.objects.GetNotesUseCase
+import com.luckhost.domain.useCases.theme.GetThemeStateUseCase
+import com.luckhost.domain.useCases.theme.ToggleThemeUseCase
 import com.luckhost.lockscreen_notes.R
 import com.luckhost.lockscreen_notes.di.ResourceProvider
 import com.luckhost.lockscreen_notes.presentation.openNote.OpenNoteActivity
@@ -36,6 +39,10 @@ class MainViewModel(
     private val saveLocalAuthTokenUseCase: SaveLocalAuthTokenUseCase,
     private val deleteCachedImagesUseCase: DeleteCachedImagesUseCase,
     private val getFilteredMdUseCase: GetFilteredMdUseCase,
+
+    private val getThemeStateUseCase: GetThemeStateUseCase,
+    private val toggleThemeUseCase: ToggleThemeUseCase,
+
     private val resourceProvider: ResourceProvider,
 ): ViewModel() {
     private var accessTokens: AuthToken = AuthToken(accessToken = null, refreshToken = null)
@@ -47,6 +54,9 @@ class MainViewModel(
 
     private val _toastNotification = MutableStateFlow("")
     val toastNotification: StateFlow<String> = _toastNotification.asStateFlow()
+
+    private val _isDarkThemeState = MutableStateFlow(getThemeStateUseCase.invoke())
+    val isDarkThemeState: StateFlow<Boolean> = _isDarkThemeState.asStateFlow()
 
     private val _noteBoxesVisibleStateList =
         mutableStateMapOf<String, MutableStateFlow<Boolean>>()
@@ -61,6 +71,11 @@ class MainViewModel(
                     R.string.main_activity_authorization_failed)
             }
         }
+    }
+
+    fun changeTheme() {
+        toggleThemeUseCase.invoke()
+        _isDarkThemeState.value = getThemeStateUseCase.invoke()
     }
 
     fun clearToastNotification() {

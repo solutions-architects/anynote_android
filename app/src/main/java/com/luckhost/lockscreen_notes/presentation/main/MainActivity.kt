@@ -13,6 +13,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -81,21 +82,9 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     private val vm by viewModel<MainViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        val isDarkUseCase: GetThemeStateUseCase by inject()
-
-        val isDark = isDarkUseCase.invoke()
-
-        AppCompatDelegate.setDefaultNightMode(
-            if (isDark)
-                AppCompatDelegate.MODE_NIGHT_YES
-            else
-                AppCompatDelegate.MODE_NIGHT_NO
-        )
-
         super.onCreate(savedInstanceState)
         setContent {
             RequestPermissionAtStart()
@@ -203,6 +192,8 @@ class MainActivity : ComponentActivity() {
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()
 
+        val isDarkTheme by vm.isDarkThemeState.collectAsState()
+
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
@@ -213,7 +204,12 @@ class MainActivity : ComponentActivity() {
                         colorResource(id = R.color.black_and_brown),
                 ) {
                     DrawerHeader()
-                    DrawerBody()
+                    DrawerBody(
+                        isDarkThemeState = isDarkTheme,
+                        onChangeThemeClick = {
+                            vm.changeTheme()
+                        }
+                    )
                 }
             },
         ) {

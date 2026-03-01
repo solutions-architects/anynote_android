@@ -16,6 +16,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -60,13 +61,23 @@ fun DrawerHeader() {
 }
 
 @Composable
-fun DrawerBody() {
+fun DrawerBody(
+    isDarkThemeState: Boolean,
+    onChangeThemeClick: (Boolean) -> Unit,
+) {
 
     Column(
         modifier = Modifier
             .padding(top = 10.dp)
             .fillMaxWidth()
     ) {
+
+        DrawerSwitch(
+            text = stringResource(id = R.string.drawer_change_theme),
+            state = isDarkThemeState,
+            onChange = onChangeThemeClick
+        )
+
         DrawerButton(
             icon = Icons.Default.Settings,
             text = stringResource(id = R.string.drawer_settings_button),
@@ -78,6 +89,42 @@ fun DrawerBody() {
             onClick = {
 
             }
+        )
+    }
+}
+
+@Composable
+fun DrawerSwitch(
+    text: String,
+    state: Boolean,
+    onChange: (Boolean) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .padding(
+                top = 5.dp,
+                bottom = 5.dp
+            )
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            modifier = Modifier
+                .padding(start = 20.dp),
+            text = text,
+            textAlign = TextAlign.Center,
+            style = TextStyle(
+                color = colorResource(id = R.color.main_title_text),
+                fontSize = 18.sp,
+                fontFamily = FontFamily.Default,
+                textAlign = TextAlign.Start
+            ),
+        )
+
+        Switch(
+            checked = state,
+            onCheckedChange = onChange
         )
     }
 }

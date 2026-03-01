@@ -1,4 +1,6 @@
 package com.luckhost.lockscreen_notes.di
+import com.luckhost.domain.useCases.theme.GetThemeStateUseCase
+import com.luckhost.domain.useCases.theme.ToggleThemeUseCase
 import com.luckhost.lockscreen_notes.presentation.openNote.OpenNoteViewModel
 import com.luckhost.lockscreen_notes.presentation.main.MainViewModel
 import com.luckhost.lockscreen_notes.presentation.userLogin.LoginViewModel
@@ -17,7 +19,9 @@ val appModule = module {
             getFilteredMdUseCase = get(),
             deleteCachedImagesUseCase = get(),
             saveLocalAuthTokenUseCase = get(),
-            resourceProvider = get()
+            resourceProvider = get(),
+            getThemeStateUseCase = get<GetThemeStateUseCase>(),
+            toggleThemeUseCase = get<ToggleThemeUseCase>(),
         )
     }
     viewModel<OpenNoteViewModel>{

@@ -15,6 +15,7 @@
 
     <string name="info_dialog_answer_ok">OK</string>
 
+    <string name="drawer_change_theme">Change light theme</string>
     <string name="drawer_settings_button">Settings</string>
     <string name="drawer_about_button">About</string>
     <string name="drawer_about_button_info_dialog_text">

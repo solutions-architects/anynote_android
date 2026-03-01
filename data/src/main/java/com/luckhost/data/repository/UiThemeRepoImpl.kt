@@ -1,5 +1,6 @@
 package com.luckhost.data.repository
 
+import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import com.luckhost.data.localStorage.theme.UiThemeStorage
 import com.luckhost.domain.repository.UiThemeRepoInterface
@@ -19,6 +20,7 @@ class UiThemeRepoImpl(
     }
 
     private fun applySystemTheme(isDark: Boolean) {
+        Log.d("LuckHost", "applySystemTheme ${isDark}")
         AppCompatDelegate.setDefaultNightMode(
             if (isDark)
                 AppCompatDelegate.MODE_NIGHT_YES
