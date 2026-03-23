@@ -21,6 +21,7 @@ import com.luckhost.lockscreen_notes.presentation.userLogin.additional.Destinati
 import com.luckhost.lockscreen_notes.presentation.userLogin.additional.functions.LoadingLayout
 import com.luckhost.lockscreen_notes.presentation.userLogin.additional.functions.LoginLayout
 import com.luckhost.lockscreen_notes.presentation.userLogin.additional.functions.SignUpLayout
+import com.luckhost.lockscreen_notes.ui.theme.Lockscreen_notesTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class LoginActivity : ComponentActivity() {
@@ -28,79 +29,81 @@ class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = colorResource(id = R.color.main_bg)
-            ) {
-                val navController = rememberNavController()
-                val activity = LocalContext.current as Activity
+            Lockscreen_notesTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = colorResource(id = R.color.main_bg)
+                ) {
+                    val navController = rememberNavController()
+                    val activity = LocalContext.current as Activity
 
-                NavHost(navController = navController, startDestination =
-                Destination.Login.route) {
-                    composable(Destination.Login.route) {
-                        LoginLayout(
-                            vm = vm,
-                            onApplyButClick = {
-                                vm.clearErrorText()
-                                vm.getToken()
-                                navController.navigate(
-                                    Destination.Loading.createRoute(Destination.Login.route))
-                            },
-                            onSignUpButClick = {
-                                vm.clearErrorText()
-                                navController.navigate(
-                                    Destination.SignUp.route
-                                )
-                            },
-                            onBackHandler = {
-                                vm.clearErrorText()
-                                activity.finish()
-                            }
-                        )
-                    }
-
-                    composable(Destination.SignUp.route) {
-                        SignUpLayout(
-                            vm = vm,
-                            onApplyButClick = {
-                                vm.clearErrorText()
-                                vm.signUp()
-                                navController.navigate(
-                                    Destination.Loading.createRoute(Destination.SignUp.route))
-                            },
-                            onBackHandlerClick = {
-                                vm.clearErrorText()
-                                navController.navigate(
-                                    Destination.Login.route
-                                )
-                            }
-                        )
-                    }
-
-                    composable(Destination.Loading.route) { backStackEntry ->
-                        val from = backStackEntry.arguments?.getString("from")
-                        LoadingLayout(
-                            vm = vm,
-                            onLoadingEnd = {
-                                navController.clearBackStack(Destination.Loading.route)
-                                if (from != null) {
-                                    navController.navigate(from)
-                                } else {
-                                    navController.navigate(Destination.Login.route)
+                    NavHost(navController = navController, startDestination =
+                        Destination.Login.route) {
+                        composable(Destination.Login.route) {
+                            LoginLayout(
+                                vm = vm,
+                                onApplyButClick = {
+                                    vm.clearErrorText()
+                                    vm.getToken()
+                                    navController.navigate(
+                                        Destination.Loading.createRoute(Destination.Login.route))
+                                },
+                                onSignUpButClick = {
+                                    vm.clearErrorText()
+                                    navController.navigate(
+                                        Destination.SignUp.route
+                                    )
+                                },
+                                onBackHandler = {
+                                    vm.clearErrorText()
+                                    activity.finish()
                                 }
-                            }
-                        )
+                            )
+                        }
+
+                        composable(Destination.SignUp.route) {
+                            SignUpLayout(
+                                vm = vm,
+                                onApplyButClick = {
+                                    vm.clearErrorText()
+                                    vm.signUp()
+                                    navController.navigate(
+                                        Destination.Loading.createRoute(Destination.SignUp.route))
+                                },
+                                onBackHandlerClick = {
+                                    vm.clearErrorText()
+                                    navController.navigate(
+                                        Destination.Login.route
+                                    )
+                                }
+                            )
+                        }
+
+                        composable(Destination.Loading.route) { backStackEntry ->
+                            val from = backStackEntry.arguments?.getString("from")
+                            LoadingLayout(
+                                vm = vm,
+                                onLoadingEnd = {
+                                    navController.clearBackStack(Destination.Loading.route)
+                                    if (from != null) {
+                                        navController.navigate(from)
+                                    } else {
+                                        navController.navigate(Destination.Login.route)
+                                    }
+                                }
+                            )
+                        }
                     }
-                }
 
-                val toastNotification by vm.toastNotification.collectAsState()
+                    val toastNotification by vm.toastNotification.collectAsState()
 
-                val context = LocalContext.current
-                if (toastNotification.isNotEmpty()) {
-                    LaunchedEffect(vm.toastNotification) {
-                        Toast.makeText(context, toastNotification,
-                            Toast.LENGTH_SHORT).show()
-                        vm.clearToastNotification()
+                    val context = LocalContext.current
+                    if (toastNotification.isNotEmpty()) {
+                        LaunchedEffect(vm.toastNotification) {
+                            Toast.makeText(context, toastNotification,
+                                Toast.LENGTH_SHORT).show()
+                            vm.clearToastNotification()
+                        }
                     }
                 }
             }

@@ -9,12 +9,10 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandHorizontally
@@ -71,7 +69,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.luckhost.domain.useCases.theme.GetThemeStateUseCase
 import com.luckhost.lockscreen_notes.R
 import com.luckhost.lockscreen_notes.presentation.main.additional.functions.DrawerBody
 import com.luckhost.lockscreen_notes.presentation.main.additional.functions.DrawerHeader
@@ -79,7 +76,6 @@ import com.luckhost.lockscreen_notes.presentation.main.additional.functions.Note
 import com.luckhost.lockscreen_notes.presentation.userLogin.LoginActivity
 import com.luckhost.lockscreen_notes.ui.theme.Lockscreen_notesTheme
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
@@ -201,7 +197,7 @@ class MainActivity : AppCompatActivity() {
                     modifier = Modifier
                         .width(250.dp),
                     drawerContainerColor =
-                        colorResource(id = R.color.black_and_brown),
+                        colorResource(id = R.color.main_bg),
                 ) {
                     DrawerHeader()
                     DrawerBody(

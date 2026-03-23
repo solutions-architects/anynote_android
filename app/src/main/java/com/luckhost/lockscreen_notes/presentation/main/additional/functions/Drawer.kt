@@ -1,5 +1,6 @@
 package com.luckhost.lockscreen_notes.presentation.main.additional.functions
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,6 +43,7 @@ fun DrawerHeader() {
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
+            .background(colorResource(id = R.color.main_bg))
     ) {
         Text(
             text = stringResource(id = R.string.app_name),
@@ -69,6 +71,7 @@ fun DrawerBody(
     Column(
         modifier = Modifier
             .padding(top = 10.dp)
+            .background(colorResource(id = R.color.main_bg))
             .fillMaxWidth()
     ) {
 
@@ -105,6 +108,7 @@ fun DrawerSwitch(
                 top = 5.dp,
                 bottom = 5.dp
             )
+            .background(colorResource(id = R.color.main_bg))
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
@@ -141,11 +145,12 @@ fun DrawerButton(
                 top = 5.dp,
                 bottom = 5.dp
             )
+            .background(colorResource(id = R.color.main_bg))
             .fillMaxWidth(),
 
         shape = RoundedCornerShape(5.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = colorResource(id = R.color.black_and_brown),
+            containerColor = colorResource(id = R.color.main_bg),
             contentColor = colorResource(id = R.color.grey_neutral),
         ),
         onClick = { onClick() }

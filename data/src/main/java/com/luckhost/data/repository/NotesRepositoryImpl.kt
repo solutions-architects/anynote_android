@@ -5,11 +5,8 @@ import com.luckhost.data.localStorage.models.Note
 import com.luckhost.data.localStorage.materials.NotesStorage
 import com.luckhost.data.network.NetworkModule
 import com.luckhost.data.network.dto.AccessTokens
-import com.luckhost.data.network.dto.SuccessMessage
-import com.luckhost.data.network.models.NetworkError
 import com.luckhost.data.network.models.Either
 import com.luckhost.domain.models.Either as DomainEither
-import com.luckhost.domain.models.ErrorDescription
 import com.luckhost.domain.models.NoteModel
 import com.luckhost.domain.models.network.AuthToken
 import com.luckhost.domain.repository.AuthTokensRepoInterface
@@ -25,274 +22,196 @@ class NotesRepositoryImpl(
     private val notesStorage: NotesStorage,
     private val networkModule: NetworkModule,
     private val authTokensRepoImp: AuthTokensRepoInterface,
-): NotesRepositoryInterface {
+) : NotesRepositoryInterface {
 
-    private suspend fun getAuthToken(
-        onSuccess: suspend (AuthToken) -> Unit,
-        onError: suspend () -> Unit = {},
-    ) {
-        try {
-            val tokens = authTokensRepoImp.getTokens()
+    // -------------------- AUTH --------------------
 
-            when(tokens) {
-                is DomainEither.Left<ErrorDescription> -> {
+    private suspend fun getAuthToken(): AuthToken? {
+        return try {
+            when (val tokens = authTokensRepoImp.getTokens()) {
+                is DomainEither.Left -> {
                     Log.e("NotesRepositoryImpl", tokens.a.toString())
-
-                    onError()
+                    null
                 }
-                is DomainEither.Right<AuthToken> -> {
-                    onSuccess(tokens.b)
-                }
+                is DomainEither.Right -> tokens.b
             }
         } catch (e: Exception) {
             Log.e("NotesRepositoryImpl", e.toString())
-
-            onError()
-
+            null
         }
     }
+
+    // -------------------- CREATE --------------------
 
     override fun saveNote(saveObject: NoteModel) {
-        
-        try {
-            val tokens = authTokensRepoImp.getTokens()
-            
-            when(tokens) {
-                is DomainEither.Left<ErrorDescription> -> {
-                    Log.e("NotesRepositoryImpl", tokens.a.toString())
-                }
-                is DomainEither.Right<AuthToken> -> {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        val response = networkModule.createNewNote(
-                            accessToken =
-                                AccessTokens(
-                                    accessToken = tokens.b.accessToken,
-                                    refreshToken = tokens.b.refreshToken
-                                ),
-                            note = Note(
-                                serverId = null,
-                                content = saveObject.content,
-                                noteHash = saveObject.hashCode ?:
-                                    throw NullPointerException("NotesRepositoryImpl user id is null"),
-                                user =
-                                    tokens.b.userId
-                                        ?: throw NullPointerException("NotesRepositoryImpl user id is null"),
-                                contentHash = saveObject.content.hashCode().toString()
-                            ),
-                            user = tokens.b.userId
-                                ?: throw NullPointerException("NotesRepositoryImpl user id is null"),
-                            noteHash = null
-                        )
+        CoroutineScope(Dispatchers.IO).launch {
 
-                        when(response) {
-                            is Either.Left<NetworkError> -> {
-                                Log.e("NotesRepositoryImpl response", response.a.toString())
+            val localNote = Note(
+                serverId = saveObject.serverId,
+                content = saveObject.content,
+                noteHash = saveObject.hashCode
+                    ?: throw NullPointerException("hashCode is null"),
+                contentHash = saveObject.content.hashCode().toString()
+            )
 
-                            }
-                            is Either.Right<Note> -> {
-                                val note = Note(
-                                    serverId = response.b.serverId,
-                                    content = saveObject.content,
-                                    noteHash = response.b.noteHash,
-                                    contentHash = response.b.contentHash,
-                                    user = response.b.user
-                                )
-                                notesStorage.saveNote(note)
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("NotesRepositoryImpl", e.toString())
+            // ✅ 1. Всегда сохраняем локально
+            notesStorage.saveNote(localNote)
 
+            // ✅ 2. Пытаемся синкнуть
+            syncCreateNote(localNote)
         }
     }
 
-    private suspend fun getNetworkNotes(): List<NoteModel>? {
-        var result: List<NoteModel>? = null
+    private suspend fun syncCreateNote(note: Note) {
+        val token = getAuthToken() ?: return
 
-        getAuthToken(
-            onSuccess = { token ->
-                val notes = networkModule.getAllNotes(
-                    AccessTokens(
-                        accessToken = token.accessToken,
-                        refreshToken = token.refreshToken
-                    )
-                )
+        val userId = token.userId ?: return
 
-                result = when(notes) {
-                    is Either.Right<List<Note>> -> {
-                        notes.b.map { networkNote ->
-                            NoteModel(
-                                serverId = networkNote.serverId,
-                                content = networkNote.content.toMutableList(),
-                                hashCode = networkNote.noteHash,
-                            )
-                        }
-                    }
-                    else -> null
-                }
-            },
-            onError = {
-                result = null
-            }
+        val response = networkModule.createNewNote(
+            accessToken = AccessTokens(token.accessToken, token.refreshToken),
+            note = note.copy(user = userId),
+            user = userId
         )
 
-        return result
+        when (response) {
+            is Either.Right -> {
+                val serverNote = response.b
+
+                // обновляем локальную запись (serverId и hash)
+                notesStorage.changeNote(
+                    note.noteHash,
+                    serverNote
+                )
+            }
+            is Either.Left -> {
+                Log.e("NotesRepositoryImpl", "syncCreateNote failed: ${response.a}")
+            }
+        }
     }
+
+    // -------------------- READ --------------------
 
     override suspend fun getNotes(): List<NoteModel> {
         return withContext(Dispatchers.IO) {
-            // Пробуем получить заметки из сети
-            val networkNotes = try {
-                getNetworkNotes()
-            } catch (e: Exception) {
-                null
-            }
 
-            // Если получили с сети - возвращаем их
-            networkNotes?.let { return@withContext it }
-
-            // Иначе возвращаем из локального хранилища
-            notesStorage.getNotes()
+            // ✅ 1. Сразу локальные данные
+            val localNotes = notesStorage.getNotes()
                 .map { note ->
                     NoteModel(
+                        serverId = note.serverId,
                         content = note.content.toMutableList(),
-                        hashCode = note.noteHash,
+                        hashCode = note.noteHash
                     )
                 }.toList()
+
+            // ✅ 2. Фоновая синхронизация
+            launchSyncNotes()
+
+            localNotes
+        }
+    }
+
+    private fun launchSyncNotes() {
+        CoroutineScope(Dispatchers.IO).launch {
+
+            val token = getAuthToken() ?: return@launch
+
+            val result = networkModule.getAllNotes(
+                AccessTokens(token.accessToken, token.refreshToken)
+            )
+
+            when (result) {
+                is Either.Right -> {
+                    result.b.forEach { networkNote ->
+                        notesStorage.saveNote(networkNote)
+                    }
+                }
+                is Either.Left -> {
+                    Log.e("NotesRepositoryImpl", "syncNotes failed: ${result.a}")
+                }
+            }
         }
     }
 
     override suspend fun getNoteByHash(noteHash: String): NoteModel {
-        //val noteFromDb = notesStorage.getNoteByHash(noteHash)
-
         return getNotes().find {
             it.hashCode == noteHash
         } ?: throw NullPointerException("getNoteByHash fail")
-
-//        return NoteModel(
-//            content = noteFromDb.content.toMutableList(),
-//            hashCode = noteFromDb.noteHash,
-//        )
     }
+
+    // -------------------- DELETE --------------------
 
     override suspend fun deleteNote(noteHash: String) {
+        withContext(Dispatchers.IO) {
 
-
-        try {
-            val token = getAuthToken()
-            token?.let {
-
-                val note = getNoteByHash(noteHash)
-
-                val delete = networkModule.deleteNoteById(
-                    AccessTokens(
-                        accessToken = it.accessToken,
-                        refreshToken = it.refreshToken
-                    ),
-                    note = Note(
-                        serverId = note.serverId,
-                        content = note.content,
-                        noteHash = note.hashCode ?:
-                        throw NullPointerException("NotesRepositoryImpl user id is null"),
-                        user =
-                            token.userId
-                                ?: throw NullPointerException("NotesRepositoryImpl user id is null"),
-                        contentHash = note.content.hashCode().toString()
-                    ),
-                )
-
-                when(delete) {
-                    is Either.Left<NetworkError> -> {
-                        Log.e("NotesRepositoryImpl", delete.a.toString())
-                    }
-                    is Either.Right<SuccessMessage> -> {
-                        Log.e("NotesRepositoryImpl", delete.b.toString())
-
-                        notesStorage.deleteNote(noteHash)
-                    }
-                }
+            val note = try {
+                getNoteByHash(noteHash)
+            } catch (e: Exception) {
+                null
             }
-        } catch (e: Exception) {
-            Log.e("NotesRepositoryImpl", "Network error: $e")
-            null
-        }
 
-    }
-    // Улучшенная версия с прямым возвратом результата
-    private suspend fun getAuthToken(): AuthToken? {
-        return try {
-            val tokens = authTokensRepoImp.getTokens()
+            // ✅ 1. Удаляем локально
+            notesStorage.deleteNote(noteHash)
 
-            when(tokens) {
-                is DomainEither.Left<ErrorDescription> -> {
-                    Log.e("NotesRepositoryImpl", tokens.a.toString())
-                    null
-                }
-                is DomainEither.Right<AuthToken> -> {
-                    tokens.b
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("NotesRepositoryImpl", e.toString())
-            null
+            // ✅ 2. Пытаемся синкнуть
+            note?.let { syncDelete(it) }
         }
     }
 
-    // Тогда основной метод упрощается:
-    private suspend fun getNetworkChangeResult(note: Note): Either<NetworkError, SuccessMessage>? {
-        return try {
-            val token = getAuthToken()
-            token?.let {
+    private suspend fun syncDelete(note: NoteModel) {
+        val token = getAuthToken() ?: return
+        val userId = token.userId ?: return
 
-                token.userId?.let {
-                    note.user = it
-                } ?: run {
-                    Log.e("NotesRepositoryImpl", "userId is null!!")
-                }
+        val result = networkModule.deleteNoteById(
+            AccessTokens(token.accessToken, token.refreshToken),
+            Note(
+                serverId = note.serverId,
+                content = note.content,
+                noteHash = note.hashCode ?: return,
+                user = userId,
+                contentHash = note.content.hashCode().toString()
+            )
+        )
 
-                networkModule.changeNoteById(
-                    AccessTokens(
-                        accessToken = it.accessToken,
-                        refreshToken = it.refreshToken
-                    ),
-                    note
-                )
-            }
-        } catch (e: Exception) {
-            Log.e("NotesRepositoryImpl", "Network error: $e")
-            null
+        if (result is Either.Left) {
+            Log.e("NotesRepositoryImpl", "delete sync failed: ${result.a}")
         }
     }
+
+    // -------------------- UPDATE --------------------
 
     override suspend fun changeNote(noteHash: String, saveObject: NoteModel) {
         withContext(Dispatchers.IO) {
-            // Создаем Note
+
             val note = Note(
                 serverId = saveObject.serverId,
                 content = saveObject.content,
-                noteHash = noteHash,
+                noteHash = noteHash
             )
 
-            try {
-                val networkResult = getNetworkChangeResult(note)
+            // ✅ 1. Обновляем локально
+            notesStorage.changeNote(noteHash, note)
 
-                when(networkResult) {
-                    is Either.Left<NetworkError> -> {
-                        Log.e("NotesRepositoryImpl", "Sync failed: ${networkResult.a}")
-                    }
-                    is Either.Right<SuccessMessage> -> {
-                        Log.d("NotesRepositoryImpl", "Sync successful: ${networkResult.b}")
-                        notesStorage.changeNote(noteHash, note)
-                    }
-                    null -> {
-                        Log.e("NotesRepositoryImpl", "Sync failed: auth error")
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("NotesRepositoryImpl", "Sync error: $e")
+            // ✅ 2. Синк
+            syncChange(note)
+        }
+    }
+
+    private suspend fun syncChange(note: Note) {
+        val token = getAuthToken() ?: return
+        val userId = token.userId ?: return
+
+        val result = networkModule.changeNoteById(
+            AccessTokens(token.accessToken, token.refreshToken),
+            note.copy(user = userId)
+        )
+
+        when (result) {
+            is Either.Right -> {
+                Log.d("NotesRepositoryImpl", "change sync success")
+            }
+            is Either.Left -> {
+                Log.e("NotesRepositoryImpl", "change sync failed: ${result.a}")
             }
         }
     }
