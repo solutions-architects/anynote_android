@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -40,7 +41,7 @@ import com.luckhost.lockscreen_notes.presentation.openNote.additional.functions.
 import com.luckhost.lockscreen_notes.ui.theme.Lockscreen_notesTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class OpenNoteActivity : ComponentActivity() {
+class OpenNoteActivity : AppCompatActivity() {
     private val vm by viewModel<OpenNoteViewModel>()
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
