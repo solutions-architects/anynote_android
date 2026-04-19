@@ -1,9 +1,9 @@
 package com.luckhost.lockscreen_notes.di
 import com.luckhost.domain.useCases.theme.GetThemeStateUseCase
 import com.luckhost.domain.useCases.theme.ToggleThemeUseCase
-import com.luckhost.lockscreen_notes.presentation.openNote.OpenNoteViewModel
-import com.luckhost.lockscreen_notes.presentation.main.MainViewModel
-import com.luckhost.lockscreen_notes.presentation.userLogin.LoginViewModel
+import com.luckhost.lockscreen_notes.presentation.screens.openNote.OpenNoteViewModel
+import com.luckhost.lockscreen_notes.presentation.screens.main.MainViewModel
+import com.luckhost.lockscreen_notes.presentation.screens.userLogin.LoginViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
