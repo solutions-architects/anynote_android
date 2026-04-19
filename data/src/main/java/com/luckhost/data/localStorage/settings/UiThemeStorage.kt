@@ -1,4 +1,4 @@
-package com.luckhost.data.localStorage.theme
+package com.luckhost.data.localStorage.settings
 
 import android.content.Context
 import android.content.SharedPreferences

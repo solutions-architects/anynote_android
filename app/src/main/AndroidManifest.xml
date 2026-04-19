@@ -35,6 +35,11 @@
             android:label="@string/title_activity_login"
             android:theme="@style/Theme.Lockscreen_notes" />
         <activity
+            android:name=".presentation.screens.settings.SettingsActivity"
+            android:exported="false"
+            android:label="@string/title_activity_settings"
+            android:theme="@style/Theme.Lockscreen_notes" />
+        <activity
             android:name=".presentation.screens.openNote.OpenNoteActivity"
             android:exported="false"
             android:label="@string/title_activity_create_note"

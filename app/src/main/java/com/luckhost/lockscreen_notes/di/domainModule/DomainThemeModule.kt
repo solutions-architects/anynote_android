@@ -1,8 +1,7 @@
 package com.luckhost.lockscreen_notes.di.domainModule
 
 import android.content.Context
-import android.content.SharedPreferences
-import com.luckhost.data.localStorage.theme.UiThemeStorage
+import com.luckhost.data.localStorage.settings.UiThemeStorage
 import com.luckhost.data.repository.UiThemeRepoImpl
 import com.luckhost.domain.repository.UiThemeRepoInterface
 import com.luckhost.domain.useCases.theme.GetThemeStateUseCase

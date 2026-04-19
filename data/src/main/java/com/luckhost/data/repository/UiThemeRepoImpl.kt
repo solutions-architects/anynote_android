@@ -2,7 +2,7 @@ package com.luckhost.data.repository
 
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
-import com.luckhost.data.localStorage.theme.UiThemeStorage
+import com.luckhost.data.localStorage.settings.UiThemeStorage
 import com.luckhost.domain.repository.UiThemeRepoInterface
 
 class UiThemeRepoImpl(

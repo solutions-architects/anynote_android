@@ -1,8 +1,11 @@
 package com.luckhost.lockscreen_notes.di
+import com.luckhost.domain.useCases.settings.GetColumnsCountUseCase
+import com.luckhost.domain.useCases.settings.SetColumnsCountUseCase
 import com.luckhost.domain.useCases.theme.GetThemeStateUseCase
 import com.luckhost.domain.useCases.theme.ToggleThemeUseCase
 import com.luckhost.lockscreen_notes.presentation.screens.openNote.OpenNoteViewModel
 import com.luckhost.lockscreen_notes.presentation.screens.main.MainViewModel
+import com.luckhost.lockscreen_notes.presentation.screens.settings.SettingsViewModel
 import com.luckhost.lockscreen_notes.presentation.screens.userLogin.LoginViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -20,10 +23,19 @@ val appModule = module {
             deleteCachedImagesUseCase = get(),
             saveLocalAuthTokenUseCase = get(),
             resourceProvider = get(),
-            getThemeStateUseCase = get<GetThemeStateUseCase>(),
-            toggleThemeUseCase = get<ToggleThemeUseCase>(),
+            getColumnsCountUseCase = get(),
         )
     }
+
+    viewModel<SettingsViewModel> {
+        SettingsViewModel(
+            getThemeStateUseCase = get<GetThemeStateUseCase>(),
+            toggleThemeUseCase = get<ToggleThemeUseCase>(),
+            getColumnsCountUseCase = get<GetColumnsCountUseCase>(),
+            setColumnsCountUseCase = get<SetColumnsCountUseCase>()
+        )
+    }
+
     viewModel<OpenNoteViewModel>{
         OpenNoteViewModel(
             saveNoteUseCase = get(),

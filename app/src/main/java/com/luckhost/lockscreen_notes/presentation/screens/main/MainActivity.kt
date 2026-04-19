@@ -73,15 +73,24 @@ import com.luckhost.lockscreen_notes.R
 import com.luckhost.lockscreen_notes.presentation.screens.main.additional.functions.DrawerBody
 import com.luckhost.lockscreen_notes.presentation.screens.main.additional.functions.DrawerHeader
 import com.luckhost.lockscreen_notes.presentation.screens.main.additional.functions.NoteBox
+import com.luckhost.lockscreen_notes.presentation.screens.settings.SettingsActivity
 import com.luckhost.lockscreen_notes.presentation.screens.userLogin.LoginActivity
 import com.luckhost.lockscreen_notes.ui.theme.Lockscreen_notesTheme
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.jvm.java
 
 class MainActivity : AppCompatActivity() {
     private val vm by viewModel<MainViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        vm.refreshNotesList()
+        vm.refreshColumns()
         setContent {
             RequestPermissionAtStart()
             Lockscreen_notesTheme {
@@ -94,7 +103,6 @@ class MainActivity : AppCompatActivity() {
     fun RequestPermissionAtStart() {
         val context = LocalContext.current
         var showDialog by remember { mutableStateOf(false) }
-        var hasPermission by remember { mutableStateOf(false) }
 
         val activity = (context as? Activity)
 
@@ -110,12 +118,7 @@ class MainActivity : AppCompatActivity() {
         val permissionLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
-            if (isGranted) {
-                hasPermission = true
-                showDialog = false
-            } else {
-                showDialog = true
-            }
+            showDialog = !isGranted
         }
 
         LaunchedEffect(Unit) {
@@ -188,8 +191,6 @@ class MainActivity : AppCompatActivity() {
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()
 
-        val isDarkTheme by vm.isDarkThemeState.collectAsState()
-
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
@@ -201,10 +202,12 @@ class MainActivity : AppCompatActivity() {
                 ) {
                     DrawerHeader()
                     DrawerBody(
-                        isDarkThemeState = isDarkTheme,
-                        onChangeThemeClick = {
-                            vm.changeTheme()
-                        }
+                        openSettingsClick = {
+                            val intent = Intent(
+                                context, SettingsActivity::class.java
+                            )
+                            context.startActivity(intent)
+                        },
                     )
                 }
             },
@@ -291,8 +294,10 @@ class MainActivity : AppCompatActivity() {
     fun NotesList() {
         val noteBoxesList by vm.noteBoxesList.collectAsState()
 
+        val columns by vm.columnsCount.collectAsState()
+
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
+            columns = GridCells.Fixed(columns),
             modifier = Modifier.fillMaxWidth()
         ) {
             items(noteBoxesList, key = { it.parentHash }) { item ->  // Указываем уникальный ключ
@@ -319,12 +324,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-
-    override fun onResume() {
-        super.onResume()
-        vm.refreshNotesList()
     }
 }
 
