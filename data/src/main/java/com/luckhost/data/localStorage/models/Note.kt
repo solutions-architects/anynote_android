@@ -27,6 +27,8 @@ data class Note(
 
     var user: Int = 0,
 
+    var syncState: SyncState = SyncState.SYNCED,
+
     var contentHash: String? = null
 ) {
     init {

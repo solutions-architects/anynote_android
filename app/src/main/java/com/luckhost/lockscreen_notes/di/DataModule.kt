@@ -7,6 +7,8 @@ import com.luckhost.data.localStorage.keys.tokens.SharedPrefTokensStorage
 import com.luckhost.data.localStorage.keys.tokens.TokensStorage
 import com.luckhost.data.localStorage.materials.NotesStorage
 import com.luckhost.data.localStorage.materials.sqlite.SQLiteNotesStorage
+import com.luckhost.data.localStorage.sync.InMemorySyncQueue
+import com.luckhost.data.localStorage.sync.SyncQueue
 import com.luckhost.data.network.NetworkModule
 import com.luckhost.data.network.retrofit.RetrofitModule
 import com.luckhost.data.repository.AuthTokensRepoImpl
@@ -28,7 +30,12 @@ val dataModule = module {
             notesStorage = get(),
             networkModule = get<NetworkModule>(),
             authTokensRepoImp = get<AuthTokensRepoInterface>(),
+            syncQueue = get<SyncQueue>(),
         )
+    }
+
+    single<SyncQueue> {
+        InMemorySyncQueue()
     }
 
     single<NetworkModule> {

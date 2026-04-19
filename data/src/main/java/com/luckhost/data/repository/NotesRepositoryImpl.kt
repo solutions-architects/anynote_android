@@ -1,8 +1,11 @@
 package com.luckhost.data.repository
 
-import android.util.Log
 import com.luckhost.data.localStorage.models.Note
 import com.luckhost.data.localStorage.materials.NotesStorage
+import com.luckhost.data.localStorage.models.OperationType
+import com.luckhost.data.localStorage.models.PendingOperation
+import com.luckhost.data.localStorage.models.SyncState
+import com.luckhost.data.localStorage.sync.SyncQueue
 import com.luckhost.data.network.NetworkModule
 import com.luckhost.data.network.dto.AccessTokens
 import com.luckhost.data.network.models.Either
@@ -22,6 +25,7 @@ class NotesRepositoryImpl(
     private val notesStorage: NotesStorage,
     private val networkModule: NetworkModule,
     private val authTokensRepoImp: AuthTokensRepoInterface,
+    private val syncQueue: SyncQueue,
 ) : NotesRepositoryInterface {
 
     // -------------------- AUTH --------------------
@@ -29,14 +33,10 @@ class NotesRepositoryImpl(
     private suspend fun getAuthToken(): AuthToken? {
         return try {
             when (val tokens = authTokensRepoImp.getTokens()) {
-                is DomainEither.Left -> {
-                    Log.e("NotesRepositoryImpl", tokens.a.toString())
-                    null
-                }
+                is DomainEither.Left -> null
                 is DomainEither.Right -> tokens.b
             }
         } catch (e: Exception) {
-            Log.e("NotesRepositoryImpl", e.toString())
             null
         }
     }
@@ -46,46 +46,20 @@ class NotesRepositoryImpl(
     override fun saveNote(saveObject: NoteModel) {
         CoroutineScope(Dispatchers.IO).launch {
 
-            val localNote = Note(
+            val note = Note(
                 serverId = saveObject.serverId,
                 content = saveObject.content,
                 noteHash = saveObject.hashCode
                     ?: throw NullPointerException("hashCode is null"),
-                contentHash = saveObject.content.hashCode().toString()
+                contentHash = saveObject.content.hashCode().toString(),
+                syncState = SyncState.PENDING_CREATE
             )
 
-            // ✅ 1. Всегда сохраняем локально
-            notesStorage.saveNote(localNote)
+            notesStorage.saveNote(note)
 
-            // ✅ 2. Пытаемся синкнуть
-            syncCreateNote(localNote)
-        }
-    }
+            syncQueue.add(PendingOperation(note.noteHash, OperationType.CREATE))
 
-    private suspend fun syncCreateNote(note: Note) {
-        val token = getAuthToken() ?: return
-
-        val userId = token.userId ?: return
-
-        val response = networkModule.createNewNote(
-            accessToken = AccessTokens(token.accessToken, token.refreshToken),
-            note = note.copy(user = userId),
-            user = userId
-        )
-
-        when (response) {
-            is Either.Right -> {
-                val serverNote = response.b
-
-                // обновляем локальную запись (serverId и hash)
-                notesStorage.changeNote(
-                    note.noteHash,
-                    serverNote
-                )
-            }
-            is Either.Left -> {
-                Log.e("NotesRepositoryImpl", "syncCreateNote failed: ${response.a}")
-            }
+            processQueue()
         }
     }
 
@@ -94,42 +68,18 @@ class NotesRepositoryImpl(
     override suspend fun getNotes(): List<NoteModel> {
         return withContext(Dispatchers.IO) {
 
-            // ✅ 1. Сразу локальные данные
-            val localNotes = notesStorage.getNotes()
-                .map { note ->
+            val local = notesStorage.getNotes()
+                .map {
                     NoteModel(
-                        serverId = note.serverId,
-                        content = note.content.toMutableList(),
-                        hashCode = note.noteHash
+                        serverId = it.serverId,
+                        content = it.content.toMutableList(),
+                        hashCode = it.noteHash
                     )
                 }.toList()
 
-            // ✅ 2. Фоновая синхронизация
-            launchSyncNotes()
+            processQueue()
 
-            localNotes
-        }
-    }
-
-    private fun launchSyncNotes() {
-        CoroutineScope(Dispatchers.IO).launch {
-
-            val token = getAuthToken() ?: return@launch
-
-            val result = networkModule.getAllNotes(
-                AccessTokens(token.accessToken, token.refreshToken)
-            )
-
-            when (result) {
-                is Either.Right -> {
-                    result.b.forEach { networkNote ->
-                        notesStorage.saveNote(networkNote)
-                    }
-                }
-                is Either.Left -> {
-                    Log.e("NotesRepositoryImpl", "syncNotes failed: ${result.a}")
-                }
-            }
+            local
         }
     }
 
@@ -145,36 +95,19 @@ class NotesRepositoryImpl(
         withContext(Dispatchers.IO) {
 
             val note = try {
-                getNoteByHash(noteHash)
+                notesStorage.getNoteByHash(noteHash)
             } catch (e: Exception) {
                 null
             }
 
-            // ✅ 1. Удаляем локально
-            notesStorage.deleteNote(noteHash)
+            note?.let {
+                it.syncState = SyncState.PENDING_DELETE
+                notesStorage.changeNote(noteHash, it)
 
-            // ✅ 2. Пытаемся синкнуть
-            note?.let { syncDelete(it) }
-        }
-    }
+                syncQueue.add(PendingOperation(noteHash, OperationType.DELETE))
+            }
 
-    private suspend fun syncDelete(note: NoteModel) {
-        val token = getAuthToken() ?: return
-        val userId = token.userId ?: return
-
-        val result = networkModule.deleteNoteById(
-            AccessTokens(token.accessToken, token.refreshToken),
-            Note(
-                serverId = note.serverId,
-                content = note.content,
-                noteHash = note.hashCode ?: return,
-                user = userId,
-                contentHash = note.content.hashCode().toString()
-            )
-        )
-
-        if (result is Either.Left) {
-            Log.e("NotesRepositoryImpl", "delete sync failed: ${result.a}")
+            processQueue()
         }
     }
 
@@ -186,33 +119,82 @@ class NotesRepositoryImpl(
             val note = Note(
                 serverId = saveObject.serverId,
                 content = saveObject.content,
-                noteHash = noteHash
+                noteHash = noteHash,
+                syncState = SyncState.PENDING_UPDATE
             )
 
-            // ✅ 1. Обновляем локально
             notesStorage.changeNote(noteHash, note)
 
-            // ✅ 2. Синк
-            syncChange(note)
+            syncQueue.add(PendingOperation(noteHash, OperationType.UPDATE))
+
+            processQueue()
         }
     }
 
-    private suspend fun syncChange(note: Note) {
-        val token = getAuthToken() ?: return
-        val userId = token.userId ?: return
+    // -------------------- SYNC ENGINE --------------------
 
-        val result = networkModule.changeNoteById(
-            AccessTokens(token.accessToken, token.refreshToken),
-            note.copy(user = userId)
-        )
+    private fun processQueue() {
+        CoroutineScope(Dispatchers.IO).launch {
 
-        when (result) {
-            is Either.Right -> {
-                Log.d("NotesRepositoryImpl", "change sync success")
-            }
-            is Either.Left -> {
-                Log.e("NotesRepositoryImpl", "change sync failed: ${result.a}")
+            val token = getAuthToken() ?: return@launch
+            val userId = token.userId ?: return@launch
+
+            val operations = syncQueue.getAll()
+
+            operations.forEach { operation ->
+
+                val note = try {
+                    notesStorage.getNoteByHash(operation.noteHash)
+                } catch (e: Exception) {
+                    syncQueue.remove(operation.noteHash)
+                    return@forEach
+                }
+
+                when (operation.type) {
+
+                    OperationType.CREATE -> {
+                        val result = networkModule.createNewNote(
+                            AccessTokens(token.accessToken, token.refreshToken),
+                            note.copy(user = userId),
+                            userId
+                        )
+
+                        if (result is Either.Right) {
+                            notesStorage.changeNote(
+                                note.noteHash,
+                                result.b.copy(syncState = SyncState.SYNCED)
+                            )
+                            syncQueue.remove(note.noteHash)
+                        }
+                    }
+
+                    OperationType.UPDATE -> {
+                        val result = networkModule.changeNoteById(
+                            AccessTokens(token.accessToken, token.refreshToken),
+                            note.copy(user = userId)
+                        )
+
+                        if (result is Either.Right) {
+                            note.syncState = SyncState.SYNCED
+                            notesStorage.changeNote(note.noteHash, note)
+                            syncQueue.remove(note.noteHash)
+                        }
+                    }
+
+                    OperationType.DELETE -> {
+                        val result = networkModule.deleteNoteById(
+                            AccessTokens(token.accessToken, token.refreshToken),
+                            note.copy(user = userId)
+                        )
+
+                        if (result is Either.Right) {
+                            notesStorage.deleteNote(note.noteHash)
+                            syncQueue.remove(note.noteHash)
+                        }
+                    }
+                }
             }
         }
     }
 }
+
