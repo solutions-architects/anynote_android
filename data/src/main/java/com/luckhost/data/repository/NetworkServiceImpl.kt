@@ -5,6 +5,7 @@ import com.luckhost.data.network.NetworkModule
 import com.luckhost.data.network.dto.AccessTokens
 import com.luckhost.data.network.dto.AccountParams
 import com.luckhost.data.network.dto.LoginRequest
+import com.luckhost.data.network.dto.RegisterRequest
 import com.luckhost.data.network.models.Either
 import com.luckhost.data.network.models.NetworkError
 import com.luckhost.data.network.toDomainAuthTokenEither
@@ -17,6 +18,7 @@ import com.luckhost.domain.models.NoteModel
 import com.luckhost.domain.models.network.AuthToken
 import com.luckhost.domain.models.network.LoginInformation
 import com.luckhost.domain.models.network.NetworkErrorDescription
+import com.luckhost.domain.models.network.RegisterInformation
 import com.luckhost.domain.models.network.SuccessDescription
 import com.luckhost.domain.models.network.UserAccountParams
 import com.luckhost.domain.models.network.VerifyTokenAnswer as DomainVerifyTokenAnswer
@@ -30,23 +32,29 @@ class NetworkServiceImpl(
             DomainEither<NetworkErrorDescription, AuthToken> {
         val response = networkModule.getAuthToken(
             loginInformation = LoginRequest(
+                email = loginInformation.email,
                 password = loginInformation.password,
-                username = loginInformation.username,
         ))
 
         return response.toDomainAuthTokenEither()
     }
 
-    override suspend fun register(loginInformation: LoginInformation):
+    override suspend fun register(info: RegisterInformation):
             DomainEither<NetworkErrorDescription, SuccessDescription> {
         val response = networkModule.register(
-            loginInformation = LoginRequest(
-                password = loginInformation.password,
-                username = loginInformation.username,
+            request = RegisterRequest(
+                username = info.username,
+                email = info.email,
+                password = info.password,
             )
         )
 
         return response.toDomainOnlyErrorEither()
+    }
+
+    override suspend fun verifyEmail(token: String):
+            DomainEither<NetworkErrorDescription, SuccessDescription> {
+        return networkModule.verifyEmail(token).toDomainOnlyErrorEither()
     }
 
     override suspend fun refreshAccessToken(refreshToken: AuthToken):

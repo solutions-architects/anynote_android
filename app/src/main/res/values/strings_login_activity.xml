@@ -4,6 +4,7 @@
     <string name="login_activity_sign_up_text">Sign up</string>
 
     <string name="login_activity_nickname_text_field">Nickname</string>
+    <string name="login_activity_email_text_field">Email</string>
     <string name="login_activity_password_text_field">Password</string>
     <string name="login_activity_repeat_password_text_field">Repeat password</string>
 
@@ -18,6 +19,8 @@
     <string name="login_activity_entered_login_is_empty">You entered an empty nickname!
         We really want to know your nickname so that we can
         contact you with good news later!</string>
+    <string name="login_activity_entered_email_is_empty">You entered an empty email!
+        We need it to verify your account.</string>
     <string name="login_activity_failed_connect_message">Failed to connect to the server!
         Please check your internet connection or try later :/</string>
     <string name="login_activity_no_such_account_message">The server said that there
@@ -28,6 +31,15 @@
 
     <string name="login_activity_registration_successful">Registration is successful!</string>
     <string name="login_activity_login_successful">Login is successful!</string>
+
+    <string name="login_activity_email_verification_title">Check your email!</string>
+    <string name="login_activity_email_verification_subtitle">We sent a verification link to your
+        email address. Please click it to activate your account, then sign in.</string>
+
+    <string name="login_activity_email_verified">Email verified! You can now sign in.</string>
+    <string name="login_activity_email_verify_expired">Verification link has expired.
+        Please register again.</string>
+    <string name="login_activity_email_verify_invalid">Invalid verification link.</string>
 
 
 

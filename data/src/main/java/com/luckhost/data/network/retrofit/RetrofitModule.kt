@@ -6,9 +6,12 @@ import com.luckhost.data.network.dto.AccessTokens
 import com.luckhost.data.network.dto.AccountAnswerBody
 import com.luckhost.data.network.dto.AccountParams
 import com.luckhost.data.network.dto.CreateNoteRequest
+import com.luckhost.data.network.dto.EmailVerifyResponse
 import com.luckhost.data.network.dto.LoginAnswerBody
 import com.luckhost.data.network.dto.LoginRequest
 import com.luckhost.data.network.dto.RefreshToken
+import com.luckhost.data.network.dto.RegisterAnswerBody
+import com.luckhost.data.network.dto.RegisterRequest
 import com.luckhost.data.network.dto.VerifyTokenRequest
 import com.luckhost.data.network.models.Either
 import com.luckhost.data.network.models.NetworkError
@@ -28,11 +31,18 @@ class RetrofitModule: NetworkModule  {
     }
 
     override suspend fun register(
-        loginInformation: LoginRequest): Either<NetworkError, AccountAnswerBody> {
+        request: RegisterRequest): Either<NetworkError, RegisterAnswerBody> {
 
         return makeRequest(
-            responseCall = { netApi.register(loginInformation) },
+            responseCall = { netApi.register(request) },
             errorStringToGet = "detail",
+        ).last()
+    }
+
+    override suspend fun verifyEmail(token: String): Either<NetworkError, EmailVerifyResponse> {
+        return makeRequest(
+            responseCall = { netApi.verifyEmail(token) },
+            errorStringToGet = "error",
         ).last()
     }
 

@@ -7,8 +7,10 @@ import androidx.lifecycle.viewModelScope
 import com.luckhost.domain.models.Either
 import com.luckhost.domain.models.network.AuthToken
 import com.luckhost.domain.models.network.LoginInformation
+import com.luckhost.domain.models.network.RegisterInformation
 import com.luckhost.domain.useCases.network.GetAuthTokenUseCase
 import com.luckhost.domain.useCases.network.SignUpUseCase
+import com.luckhost.domain.useCases.network.VerifyEmailUseCase
 import com.luckhost.lockscreen_notes.di.ResourceProvider
 import com.luckhost.lockscreen_notes.R
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +22,7 @@ import java.util.Locale
 class LoginViewModel(
     private val getAuthTokenUseCase: GetAuthTokenUseCase,
     private val signUpUseCase: SignUpUseCase,
+    private val verifyEmailUseCase: VerifyEmailUseCase,
     private val resourceProvider: ResourceProvider,
 ): ViewModel() {
     private var authToken = AuthToken(null, null)
@@ -33,12 +36,20 @@ class LoginViewModel(
     private val _errorTextState = MutableStateFlow("")
     val errorTextState: StateFlow<String> = _errorTextState.asStateFlow()
 
+    // In login screen: acts as email. In signup screen: acts as username.
     private val _loginTextState = MutableStateFlow("")
+    private val _emailTextState = MutableStateFlow("")
     private val _passwordTextState = MutableStateFlow("")
     private val _passwordRepeatTextState = MutableStateFlow("")
     val loginTextState: StateFlow<String> = _loginTextState.asStateFlow()
+    val emailTextState: StateFlow<String> = _emailTextState.asStateFlow()
     val passwordTextState: StateFlow<String> = _passwordTextState.asStateFlow()
     val passwordRepeatTextState: StateFlow<String> = _passwordRepeatTextState.asStateFlow()
+
+    private val _signUpSuccessState = MutableStateFlow(false)
+    val signUpSuccessState: StateFlow<Boolean> = _signUpSuccessState.asStateFlow()
+
+    private var pendingVerifyToken: String? = null
 
     fun clearErrorText() {
         _errorTextState.value = ""
@@ -52,6 +63,10 @@ class LoginViewModel(
         _loginTextState.value = newText
     }
 
+    fun updateEmailText(newText: String) {
+        _emailTextState.value = newText
+    }
+
     fun updatePasswordText(newText: String) {
         _passwordTextState.value = newText
     }
@@ -60,9 +75,13 @@ class LoginViewModel(
         _passwordRepeatTextState.value = newText
     }
 
+    fun setPendingVerifyToken(token: String) {
+        pendingVerifyToken = token
+    }
 
     fun signUp() {
         clearErrorText()
+        _signUpSuccessState.value = false
         if (_passwordTextState.value != _passwordRepeatTextState.value) {
             _errorTextState.value = resourceProvider.getString(
                 R.string.login_activity_passwords_does_not_match
@@ -75,23 +94,28 @@ class LoginViewModel(
             _errorTextState.value = resourceProvider.getString(
                 R.string.login_activity_entered_login_is_empty
             )
+        } else if (_emailTextState.value == "") {
+            _errorTextState.value = resourceProvider.getString(
+                R.string.login_activity_entered_email_is_empty
+            )
         } else {
             _isLoadingState.value = true
             viewModelScope.launch {
                 val response = signUpUseCase.execute(
-                    loginParams = LoginInformation(
+                    params = RegisterInformation(
                         username = _loginTextState.value,
-                        password = _passwordTextState.value
+                        email = _emailTextState.value,
+                        password = _passwordTextState.value,
                     )
                 )
 
                 when(response) {
                     is Either.Right -> {
-                        _toastNotification.value = resourceProvider.getString(
-                            R.string.login_activity_registration_successful)
+                        _signUpSuccessState.value = true
                         _isLoadingState.value = false
                     }
                     is Either.Left -> {
+                        _signUpSuccessState.value = false
                         _isLoadingState.value = false
                         val errorMessage = response.a.toString()
                         showErrorMessage(errorMessage)
@@ -114,11 +138,10 @@ class LoginViewModel(
             _isLoadingState.value = true
             _errorTextState.value = ""
 
-
             viewModelScope.launch {
                 val response = getAuthTokenUseCase.execute(
                     loginParams = LoginInformation(
-                        username = loginTextState.value,
+                        email = loginTextState.value,
                         password = passwordTextState.value
                     )
                 )
@@ -126,7 +149,7 @@ class LoginViewModel(
                     is Either.Right -> {
                         authToken = response.b
                         _toastNotification.value = resourceProvider.getString(
-                            R.string.login_activity_registration_successful)
+                            R.string.login_activity_login_successful)
                         _isLoadingState.value = false
                     }
                     is Either.Left -> {
@@ -134,6 +157,27 @@ class LoginViewModel(
                         val errorMessage = response.a.toString()
                         showErrorMessage(errorMessage)
                     }
+                }
+            }
+        }
+    }
+
+    fun startEmailVerification() {
+        val token = pendingVerifyToken ?: return
+        _isLoadingState.value = true
+        viewModelScope.launch {
+            val response = verifyEmailUseCase.execute(token)
+            pendingVerifyToken = null
+            when(response) {
+                is Either.Right -> {
+                    _toastNotification.value = resourceProvider.getString(
+                        R.string.login_activity_email_verified)
+                    _isLoadingState.value = false
+                }
+                is Either.Left -> {
+                    _isLoadingState.value = false
+                    val errorMessage = response.a.toString()
+                    showEmailVerifyError(errorMessage)
                 }
             }
         }
@@ -155,5 +199,22 @@ class LoginViewModel(
                 R.string.login_activity_unexpected_error_message)
         }
         Log.e("LoginVM", "error: $errorMessage")
+    }
+
+    private fun showEmailVerifyError(errorMessage: String) {
+        if (errorMessage.lowercase(Locale.ROOT).contains("activation expired")) {
+            _errorTextState.value = resourceProvider.getString(
+                R.string.login_activity_email_verify_expired)
+        } else if (errorMessage.lowercase(Locale.ROOT).contains("invalid token")) {
+            _errorTextState.value = resourceProvider.getString(
+                R.string.login_activity_email_verify_invalid)
+        } else if (errorMessage.lowercase(Locale.ROOT).contains("failed to connect to")) {
+            _errorTextState.value = resourceProvider.getString(
+                R.string.login_activity_failed_connect_message)
+        } else {
+            _errorTextState.value = resourceProvider.getString(
+                R.string.login_activity_unexpected_error_message)
+        }
+        Log.e("LoginVM", "email verify error: $errorMessage")
     }
 }

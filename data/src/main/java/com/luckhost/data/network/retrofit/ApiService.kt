@@ -4,9 +4,12 @@ import com.luckhost.data.network.dto.AccessToken
 import com.luckhost.data.network.dto.AccountAnswerBody
 import com.luckhost.data.network.dto.AccountParams
 import com.luckhost.data.network.dto.CreateNoteRequest
+import com.luckhost.data.network.dto.EmailVerifyResponse
 import com.luckhost.data.network.dto.LoginAnswerBody
 import com.luckhost.data.network.dto.LoginRequest
 import com.luckhost.data.network.dto.RefreshToken
+import com.luckhost.data.network.dto.RegisterAnswerBody
+import com.luckhost.data.network.dto.RegisterRequest
 import com.luckhost.data.network.dto.VerifyTokenRequest
 import com.luckhost.data.localStorage.models.Note
 import okhttp3.Request
@@ -18,10 +21,14 @@ import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
     @POST("auth/reg/")
-    suspend fun register(@Body request: LoginRequest): Response<AccountAnswerBody>
+    suspend fun register(@Body request: RegisterRequest): Response<RegisterAnswerBody>
+
+    @GET("email-verify/")
+    suspend fun verifyEmail(@Query("token") token: String): Response<EmailVerifyResponse>
 
 
     @GET("note/")

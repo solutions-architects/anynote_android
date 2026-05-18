@@ -50,6 +50,7 @@ val appModule = module {
         LoginViewModel(
             getAuthTokenUseCase = get(),
             signUpUseCase = get(),
+            verifyEmailUseCase = get(),
             resourceProvider = get()
         )
     }

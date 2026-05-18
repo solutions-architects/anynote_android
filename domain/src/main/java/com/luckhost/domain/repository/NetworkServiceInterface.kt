@@ -5,6 +5,7 @@ import com.luckhost.domain.models.NoteModel
 import com.luckhost.domain.models.network.AuthToken
 import com.luckhost.domain.models.network.LoginInformation
 import com.luckhost.domain.models.network.NetworkErrorDescription
+import com.luckhost.domain.models.network.RegisterInformation
 import com.luckhost.domain.models.network.SuccessDescription
 import com.luckhost.domain.models.network.UserAccountParams
 import com.luckhost.domain.models.network.VerifyTokenAnswer
@@ -16,7 +17,9 @@ import com.luckhost.domain.models.network.VerifyTokenRequest
 interface NetworkServiceInterface {
     suspend fun getAuthToken(loginInformation: LoginInformation):
             Either<NetworkErrorDescription, AuthToken>
-    suspend fun register(loginInformation: LoginInformation):
+    suspend fun register(info: RegisterInformation):
+            Either<NetworkErrorDescription, SuccessDescription>
+    suspend fun verifyEmail(token: String):
             Either<NetworkErrorDescription, SuccessDescription>
     suspend fun refreshAccessToken(refreshToken: AuthToken):
             Either<NetworkErrorDescription, AuthToken>

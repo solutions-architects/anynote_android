@@ -4,8 +4,11 @@ import com.luckhost.data.network.dto.AccessToken
 import com.luckhost.data.network.dto.AccessTokens
 import com.luckhost.data.network.dto.AccountAnswerBody
 import com.luckhost.data.network.dto.AccountParams
+import com.luckhost.data.network.dto.EmailVerifyResponse
 import com.luckhost.data.network.dto.LoginAnswerBody
 import com.luckhost.data.network.dto.LoginRequest
+import com.luckhost.data.network.dto.RegisterAnswerBody
+import com.luckhost.data.network.dto.RegisterRequest
 import com.luckhost.data.network.models.NetworkError
 import com.luckhost.data.network.models.Either
 import com.luckhost.data.localStorage.models.Note
@@ -14,8 +17,10 @@ import com.luckhost.data.network.dto.SuccessMessage
 interface NetworkModule {
     suspend fun getAuthToken(loginInformation: LoginRequest):
             Either<NetworkError, LoginAnswerBody>
-    suspend fun register(loginInformation: LoginRequest):
-            Either<NetworkError, AccountAnswerBody>
+    suspend fun register(request: RegisterRequest):
+            Either<NetworkError, RegisterAnswerBody>
+    suspend fun verifyEmail(token: String):
+            Either<NetworkError, EmailVerifyResponse>
 
     suspend fun refreshAccessToken(refreshToken: AccessTokens):
             Either<NetworkError, AccessToken>

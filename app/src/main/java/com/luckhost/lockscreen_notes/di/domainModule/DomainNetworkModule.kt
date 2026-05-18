@@ -9,6 +9,7 @@ import com.luckhost.domain.useCases.network.GetAuthTokenUseCase
 import com.luckhost.domain.useCases.network.GetUserAccountParamsUseCase
 import com.luckhost.domain.useCases.network.RefreshAccTokenUseCase
 import com.luckhost.domain.useCases.network.SignUpUseCase
+import com.luckhost.domain.useCases.network.VerifyEmailUseCase
 import com.luckhost.domain.useCases.network.VerifyTokenUseCase
 import com.luckhost.domain.useCases.network.localActions.GetLocalAuthTokenUseCase
 import com.luckhost.domain.useCases.network.localActions.SaveLocalAuthTokenUseCase
@@ -68,6 +69,11 @@ val domainNetworkModule = module {
     }
     factory<VerifyTokenUseCase> {
         VerifyTokenUseCase(
+            netApi = get(),
+        )
+    }
+    factory<VerifyEmailUseCase> {
+        VerifyEmailUseCase(
             netApi = get(),
         )
     }

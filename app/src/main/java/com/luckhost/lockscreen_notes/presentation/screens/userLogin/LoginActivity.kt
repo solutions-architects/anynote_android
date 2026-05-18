@@ -18,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.luckhost.lockscreen_notes.R
 import com.luckhost.lockscreen_notes.presentation.screens.userLogin.additional.Destination
+import com.luckhost.lockscreen_notes.presentation.screens.userLogin.additional.functions.EmailVerificationLayout
 import com.luckhost.lockscreen_notes.presentation.screens.userLogin.additional.functions.LoadingLayout
 import com.luckhost.lockscreen_notes.presentation.screens.userLogin.additional.functions.LoginLayout
 import com.luckhost.lockscreen_notes.presentation.screens.userLogin.additional.functions.SignUpLayout
@@ -79,19 +80,65 @@ class LoginActivity : AppCompatActivity() {
                             )
                         }
 
+                        composable(Destination.EmailVerification.route) {
+                            EmailVerificationLayout(vm = vm)
+                        }
+
+                        composable(Destination.EmailVerifying.route) {
+                            LoadingLayout(
+                                vm = vm,
+                                onLoadingEnd = {
+                                    val errorText = vm.errorTextState.value
+                                    if (errorText.isEmpty()) {
+                                        navController.navigate(Destination.Login.route) {
+                                            popUpTo(0) { inclusive = true }
+                                        }
+                                    } else {
+                                        navController.navigate(Destination.EmailVerification.route) {
+                                            popUpTo(Destination.EmailVerifying.route) {
+                                                inclusive = true
+                                            }
+                                        }
+                                    }
+                                }
+                            )
+                        }
+
                         composable(Destination.Loading.route) { backStackEntry ->
                             val from = backStackEntry.arguments?.getString("from")
                             LoadingLayout(
                                 vm = vm,
                                 onLoadingEnd = {
-                                    navController.clearBackStack(Destination.Loading.route)
-                                    if (from != null) {
-                                        navController.navigate(from)
+                                    if (from == Destination.SignUp.route
+                                        && vm.signUpSuccessState.value) {
+                                        navController.navigate(
+                                            Destination.EmailVerification.route) {
+                                            popUpTo(0) { inclusive = true }
+                                        }
                                     } else {
-                                        navController.navigate(Destination.Login.route)
+                                        navController.clearBackStack(Destination.Loading.route)
+                                        if (from != null) {
+                                            navController.navigate(from)
+                                        } else {
+                                            navController.navigate(Destination.Login.route)
+                                        }
                                     }
                                 }
                             )
+                        }
+                    }
+
+                    // Handle email verification deep link
+                    LaunchedEffect(Unit) {
+                        val uri = intent.data
+                        if (uri != null) {
+                            val token = uri.getQueryParameter("token")
+                            if (token != null) {
+                                vm.clearErrorText()
+                                vm.setPendingVerifyToken(token)
+                                vm.startEmailVerification()
+                                navController.navigate(Destination.EmailVerifying.route)
+                            }
                         }
                     }
 

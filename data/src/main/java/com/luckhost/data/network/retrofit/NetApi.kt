@@ -4,7 +4,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object NetApi {
-    private const val BASE_URL_ADDRESS = "http://devfordinner.ru/api/"
+    private const val BASE_URL_ADDRESS = "http://94.183.233.193/api/"
 
     private val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL_ADDRESS)

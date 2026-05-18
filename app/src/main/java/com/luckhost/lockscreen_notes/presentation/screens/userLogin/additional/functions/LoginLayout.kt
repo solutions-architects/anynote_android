@@ -101,7 +101,7 @@ fun LoginLayout(
                         end.linkTo(parent.end)
                         bottom.linkTo(passInpRef.top, margin = 24.dp)
                     },
-                labelText = stringResource(id = R.string.login_activity_nickname_text_field),
+                labelText = stringResource(id = R.string.login_activity_email_text_field),
                 value = loginTextState,
                 onValueChange = { text -> vm.updateLoginText(text) }
             )

@@ -40,6 +40,7 @@ fun SignUpLayout(
     onBackHandlerClick: () -> Unit
 ) {
     val loginTextState by vm.loginTextState.collectAsState()
+    val emailTextState by vm.emailTextState.collectAsState()
     val passwordTextState by vm.passwordTextState.collectAsState()
     val passwordRepeatTextState by vm.passwordRepeatTextState.collectAsState()
     val errorText by vm.errorTextState.collectAsState()
@@ -54,7 +55,7 @@ fun SignUpLayout(
     ) {
         ConstraintLayout {
             val (errTextRef, headerRef, nicknameInpRef,
-                passInpRef, buttonsRowRef, repeatPusRef) = createRefs()
+                emailInpRef, passInpRef, buttonsRowRef, repeatPusRef) = createRefs()
 
             Text(
                 modifier = Modifier
@@ -100,11 +101,24 @@ fun SignUpLayout(
                     .constrainAs(nicknameInpRef) {
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
-                        bottom.linkTo(passInpRef.top, margin = 24.dp)
+                        bottom.linkTo(emailInpRef.top, margin = 24.dp)
                     },
                 labelText = stringResource(id = R.string.login_activity_nickname_text_field),
                 value = loginTextState,
                 onValueChange = { text -> vm.updateLoginText(text) }
+            )
+
+            LoginInputField(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .constrainAs(emailInpRef) {
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        bottom.linkTo(passInpRef.top, margin = 24.dp)
+                    },
+                labelText = stringResource(id = R.string.login_activity_email_text_field),
+                value = emailTextState,
+                onValueChange = { text -> vm.updateEmailText(text) }
             )
 
             LoginInputField(
@@ -148,7 +162,7 @@ fun SignUpLayout(
                     modifier = Modifier
                         .padding(end = 4.dp)
                         .wrapContentSize(),
-                    onClick = { /*TODO*/ }) {
+                    onClick = { onBackHandlerClick() }) {
                     Text(text = stringResource(id = R.string.login_activity_sign_in_button),
                         color = colorResource(id = R.color.main_title_text),
                         style = TextStyle(
