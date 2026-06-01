@@ -163,6 +163,7 @@ class LoginViewModel(
                 when(response) {
                     is Either.Right -> {
                         authToken = response.b
+                        _isLoggedIn.value = true
                         _toastNotification.value = resourceProvider.getString(
                             R.string.login_activity_login_successful)
                         _isLoadingState.value = false

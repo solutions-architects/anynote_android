@@ -91,9 +91,7 @@ class OpenNoteViewModel(
         note.hashCode?.let {
             _mainPartState.clear()
             getNote(it)
-        } ?: {
-            throw NullPointerException("Note hash was null!")
-        }
+        } ?: throw NullPointerException("Note hash was null!")
     }
 
     fun createEmptyNote() {

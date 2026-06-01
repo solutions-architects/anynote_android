@@ -64,10 +64,7 @@ class MainViewModel(
             is Either.Right -> {
                 accessTokens = localSavedTokens.b
             }
-            is Either.Left -> {
-                _toastNotification.value = resourceProvider.getString(
-                    R.string.main_activity_authorization_failed)
-            }
+            is Either.Left -> { }
         }
     }
 
