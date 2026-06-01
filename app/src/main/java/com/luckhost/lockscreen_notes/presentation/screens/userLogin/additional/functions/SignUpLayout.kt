@@ -132,7 +132,8 @@ fun SignUpLayout(
                     },
                 labelText = stringResource(id = R.string.login_activity_password_text_field),
                 value = passwordTextState,
-                onValueChange = { text -> vm.updatePasswordText(text) }
+                onValueChange = { text -> vm.updatePasswordText(text) },
+                isPassword = true
             )
 
             LoginInputField(
@@ -146,7 +147,8 @@ fun SignUpLayout(
                 labelText =
                 stringResource(id = R.string.login_activity_repeat_password_text_field),
                 value = passwordRepeatTextState,
-                onValueChange = { text -> vm.updatePasswordRepeatText(text) }
+                onValueChange = { text -> vm.updatePasswordRepeatText(text) },
+                isPassword = true
             )
 
             Row(modifier = Modifier

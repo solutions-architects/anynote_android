@@ -11,6 +11,7 @@ import com.luckhost.domain.useCases.network.RefreshAccTokenUseCase
 import com.luckhost.domain.useCases.network.SignUpUseCase
 import com.luckhost.domain.useCases.network.VerifyEmailUseCase
 import com.luckhost.domain.useCases.network.VerifyTokenUseCase
+import com.luckhost.domain.useCases.network.localActions.ClearLocalAuthTokenUseCase
 import com.luckhost.domain.useCases.network.localActions.GetLocalAuthTokenUseCase
 import com.luckhost.domain.useCases.network.localActions.SaveLocalAuthTokenUseCase
 import org.koin.dsl.module
@@ -40,6 +41,11 @@ val domainNetworkModule = module {
         GetAuthTokenUseCase(
             netApi = get(),
             tokenStorage = get<AuthTokensRepoInterface>()
+        )
+    }
+    factory<ClearLocalAuthTokenUseCase> {
+        ClearLocalAuthTokenUseCase(
+            repository = get(),
         )
     }
     factory<GetLocalAuthTokenUseCase> {

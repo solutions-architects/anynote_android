@@ -24,6 +24,10 @@ class SharedPrefTokensStorage(context: Context): TokensStorage {
             .putString(SHARED_PREFS_NAME, jsonString).apply()
     }
 
+    override fun clearTokens() {
+        sharedPreferences.edit().remove(SHARED_PREFS_NAME).apply()
+    }
+
     override fun getTokensOrThrow(): AuthToken {
         val gson = Gson()
         val jsonString = sharedPreferences.getString(

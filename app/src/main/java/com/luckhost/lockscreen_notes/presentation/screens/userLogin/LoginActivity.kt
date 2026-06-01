@@ -58,6 +58,9 @@ class LoginActivity : AppCompatActivity() {
                                 onBackHandler = {
                                     vm.clearErrorText()
                                     activity.finish()
+                                },
+                                onLogoutClick = {
+                                    vm.logout()
                                 }
                             )
                         }

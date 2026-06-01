@@ -11,6 +11,8 @@ import com.luckhost.domain.models.network.RegisterInformation
 import com.luckhost.domain.useCases.network.GetAuthTokenUseCase
 import com.luckhost.domain.useCases.network.SignUpUseCase
 import com.luckhost.domain.useCases.network.VerifyEmailUseCase
+import com.luckhost.domain.useCases.network.localActions.ClearLocalAuthTokenUseCase
+import com.luckhost.domain.useCases.network.localActions.GetLocalAuthTokenUseCase
 import com.luckhost.lockscreen_notes.di.ResourceProvider
 import com.luckhost.lockscreen_notes.R
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,9 +25,17 @@ class LoginViewModel(
     private val getAuthTokenUseCase: GetAuthTokenUseCase,
     private val signUpUseCase: SignUpUseCase,
     private val verifyEmailUseCase: VerifyEmailUseCase,
+    private val clearLocalAuthTokenUseCase: ClearLocalAuthTokenUseCase,
+    private val getLocalAuthTokenUseCase: GetLocalAuthTokenUseCase,
     private val resourceProvider: ResourceProvider,
 ): ViewModel() {
     private var authToken = AuthToken(null, null)
+
+    private val _isLoggedIn = MutableStateFlow(checkIsLoggedIn())
+    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
+
+    private fun checkIsLoggedIn(): Boolean =
+        getLocalAuthTokenUseCase.execute() is Either.Right
 
     private val _toastNotification = MutableStateFlow("")
     val toastNotification: StateFlow<String> = _toastNotification.asStateFlow()
@@ -50,6 +60,11 @@ class LoginViewModel(
     val signUpSuccessState: StateFlow<Boolean> = _signUpSuccessState.asStateFlow()
 
     private var pendingVerifyToken: String? = null
+
+    fun logout() {
+        clearLocalAuthTokenUseCase.execute()
+        _isLoggedIn.value = false
+    }
 
     fun clearErrorText() {
         _errorTextState.value = ""

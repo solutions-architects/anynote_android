@@ -8,4 +8,5 @@ import com.luckhost.domain.models.network.AuthToken
 interface TokensStorage {
     fun saveTokens(tokens: AuthToken)
     fun getTokensOrThrow(): AuthToken
+    fun clearTokens()
 }

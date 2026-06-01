@@ -4,15 +4,22 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -38,16 +45,94 @@ fun LoginLayout(
     vm: LoginViewModel,
     onApplyButClick: () -> Unit,
     onSignUpButClick: () -> Unit,
-    onBackHandler: () -> Unit
+    onBackHandler: () -> Unit,
+    onLogoutClick: () -> Unit,
 ) {
     val loginTextState by vm.loginTextState.collectAsState()
     val passwordTextState by vm.passwordTextState.collectAsState()
     val errorText by vm.errorTextState.collectAsState()
+    val isLoggedIn by vm.isLoggedIn.collectAsState()
 
     BackHandler {
         onBackHandler()
     }
 
+    if (isLoggedIn) {
+        AccountLayout(onLogoutClick = onLogoutClick)
+    } else {
+        LoginFormLayout(
+            loginTextState = loginTextState,
+            passwordTextState = passwordTextState,
+            errorText = errorText,
+            onLoginChange = { vm.updateLoginText(it) },
+            onPasswordChange = { vm.updatePasswordText(it) },
+            onApplyButClick = onApplyButClick,
+            onSignUpButClick = onSignUpButClick,
+        )
+    }
+}
+
+@Composable
+private fun AccountLayout(onLogoutClick: () -> Unit) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Icon(
+                imageVector = Icons.Default.AccountCircle,
+                contentDescription = null,
+                modifier = Modifier.size(120.dp),
+                tint = colorResource(id = R.color.grey_neutral)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(id = R.string.login_activity_account_title),
+                style = TextStyle(
+                    color = colorResource(id = R.color.main_title_text),
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.SansSerif,
+                    textAlign = TextAlign.Center
+                )
+            )
+            Spacer(modifier = Modifier.height(32.dp))
+            Button(
+                shape = RoundedCornerShape(8.dp),
+                border = BorderStroke(2.dp, Color.Red.copy(alpha = 0.6f)),
+                colors = ButtonColors(
+                    containerColor = Color.Transparent,
+                    contentColor = Color.Red,
+                    disabledContainerColor = Color.Transparent,
+                    disabledContentColor = Color.Red,
+                ),
+                onClick = onLogoutClick
+            ) {
+                Text(
+                    text = stringResource(id = R.string.login_activity_logout_button),
+                    style = TextStyle(
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun LoginFormLayout(
+    loginTextState: String,
+    passwordTextState: String,
+    errorText: String,
+    onLoginChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onApplyButClick: () -> Unit,
+    onSignUpButClick: () -> Unit,
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -55,6 +140,7 @@ fun LoginLayout(
         ConstraintLayout {
             val (errTextRef, headerRef, nicknameInpRef,
                 passInpRef, buttonsRowRef) = createRefs()
+
             Text(
                 modifier = Modifier
                     .wrapContentSize()
@@ -103,7 +189,7 @@ fun LoginLayout(
                     },
                 labelText = stringResource(id = R.string.login_activity_email_text_field),
                 value = loginTextState,
-                onValueChange = { text -> vm.updateLoginText(text) }
+                onValueChange = onLoginChange,
             )
 
             LoginInputField(
@@ -117,24 +203,28 @@ fun LoginLayout(
                     },
                 labelText = stringResource(id = R.string.login_activity_password_text_field),
                 value = passwordTextState,
-                onValueChange = { text -> vm.updatePasswordText(text) }
+                onValueChange = onPasswordChange,
+                isPassword = true,
             )
 
-            Row(modifier = Modifier
-                .constrainAs(buttonsRowRef) {
-                    top.linkTo(passInpRef.bottom, margin = 24.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-                .wrapContentSize(),
+            Row(
+                modifier = Modifier
+                    .constrainAs(buttonsRowRef) {
+                        top.linkTo(passInpRef.bottom, margin = 24.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                    .wrapContentSize(),
                 horizontalArrangement = Arrangement.Center,
             ) {
                 TextButton(
                     modifier = Modifier
                         .padding(end = 4.dp)
                         .wrapContentSize(),
-                    onClick = { onSignUpButClick() }) {
-                    Text(text = stringResource(id = R.string.login_activity_sign_in_button),
+                    onClick = onSignUpButClick,
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.login_activity_sign_in_button),
                         color = colorResource(id = R.color.main_title_text),
                         style = TextStyle(
                             fontSize = 26.sp,
@@ -154,10 +244,10 @@ fun LoginLayout(
                         disabledContainerColor = colorResource(id = R.color.grey_neutral),
                         disabledContentColor = colorResource(id = R.color.light_grey),
                     ),
-                    onClick = {
-                        onApplyButClick()
-                    }) {
-                    Text(text = stringResource(id = R.string.login_activity_next_button),
+                    onClick = onApplyButClick,
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.login_activity_next_button),
                         style = TextStyle(fontSize = 26.sp),
                         color = colorResource(id = R.color.heavy_metal),
                         fontWeight = FontWeight.Bold

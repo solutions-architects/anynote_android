@@ -1,6 +1,7 @@
 package com.luckhost.lockscreen_notes.presentation.screens.userLogin.additional.functions
 
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -8,6 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.luckhost.lockscreen_notes.R
@@ -18,6 +22,7 @@ fun LoginInputField(
     labelText: String,
     value: String,
     onValueChange: (String) -> Unit,
+    isPassword: Boolean = false,
 ) {
     OutlinedTextField(
         modifier = modifier,
@@ -34,6 +39,8 @@ fun LoginInputField(
             fontSize = 16.sp
         ),
         shape = RoundedCornerShape(10.dp),
+        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+        keyboardOptions = if (isPassword) KeyboardOptions(keyboardType = KeyboardType.Password) else KeyboardOptions.Default,
         colors = OutlinedTextFieldDefaults.colors(
             cursorColor = colorResource(id = R.color.grey_neutral),
             focusedBorderColor = colorResource(id = R.color.grey_neutral),

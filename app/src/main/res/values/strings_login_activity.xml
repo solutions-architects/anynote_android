@@ -41,6 +41,7 @@
         Please register again.</string>
     <string name="login_activity_email_verify_invalid">Invalid verification link.</string>
 
-
+    <string name="login_activity_logout_button">Sign out</string>
+    <string name="login_activity_account_title">Account</string>
 
 </resources>

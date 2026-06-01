@@ -13,6 +13,10 @@ class AuthTokensRepoImpl(
         storage.saveTokens(tokens)
     }
 
+    override fun clearTokens() {
+        storage.clearTokens()
+    }
+
     override fun getTokens(): Either<ErrorDescription, AuthToken> {
         return try {
             val result = storage.getTokensOrThrow()

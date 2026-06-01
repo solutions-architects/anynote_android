@@ -10,4 +10,5 @@ import com.luckhost.domain.models.network.AuthToken
 interface AuthTokensRepoInterface {
     fun saveTokens(tokens: AuthToken)
     fun getTokens(): Either<ErrorDescription, AuthToken>
+    fun clearTokens()
 }

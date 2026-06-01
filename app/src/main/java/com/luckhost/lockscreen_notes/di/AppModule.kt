@@ -6,6 +6,8 @@ import com.luckhost.domain.useCases.theme.ToggleThemeUseCase
 import com.luckhost.lockscreen_notes.presentation.screens.openNote.OpenNoteViewModel
 import com.luckhost.lockscreen_notes.presentation.screens.main.MainViewModel
 import com.luckhost.lockscreen_notes.presentation.screens.settings.SettingsViewModel
+import com.luckhost.domain.useCases.network.localActions.ClearLocalAuthTokenUseCase
+import com.luckhost.domain.useCases.network.localActions.GetLocalAuthTokenUseCase
 import com.luckhost.lockscreen_notes.presentation.screens.userLogin.LoginViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -51,6 +53,8 @@ val appModule = module {
             getAuthTokenUseCase = get(),
             signUpUseCase = get(),
             verifyEmailUseCase = get(),
+            clearLocalAuthTokenUseCase = get<ClearLocalAuthTokenUseCase>(),
+            getLocalAuthTokenUseCase = get<GetLocalAuthTokenUseCase>(),
             resourceProvider = get()
         )
     }
