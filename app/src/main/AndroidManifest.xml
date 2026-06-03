@@ -64,6 +64,28 @@
             android:theme="@style/Theme.Lockscreen_notes"
             android:windowSoftInputMode="adjustResize"/>
         <activity
+            android:name=".presentation.screens.userLogin.GitHubCallbackActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.Lockscreen_notes">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="lockscreennotes"
+                    android:host="github-success" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="lockscreennotes"
+                    android:host="github-error" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".presentation.screens.main.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Lockscreen_notes">

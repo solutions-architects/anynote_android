@@ -1,5 +1,6 @@
 package com.luckhost.lockscreen_notes.presentation.screens.userLogin.additional.functions
 
+import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -28,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -47,18 +50,26 @@ fun LoginLayout(
     onSignUpButClick: () -> Unit,
     onBackHandler: () -> Unit,
     onLogoutClick: () -> Unit,
+    onConnectGithubClick: (Context) -> Unit,
+    onDisconnectGithubClick: () -> Unit,
 ) {
     val loginTextState by vm.loginTextState.collectAsState()
     val passwordTextState by vm.passwordTextState.collectAsState()
     val errorText by vm.errorTextState.collectAsState()
     val isLoggedIn by vm.isLoggedIn.collectAsState()
+    val githubUsername by vm.githubUsername.collectAsState()
 
     BackHandler {
         onBackHandler()
     }
 
     if (isLoggedIn) {
-        AccountLayout(onLogoutClick = onLogoutClick)
+        AccountLayout(
+            githubUsername = githubUsername,
+            onLogoutClick = onLogoutClick,
+            onConnectGithubClick = onConnectGithubClick,
+            onDisconnectGithubClick = onDisconnectGithubClick,
+        )
     } else {
         LoginFormLayout(
             loginTextState = loginTextState,
@@ -73,7 +84,13 @@ fun LoginLayout(
 }
 
 @Composable
-private fun AccountLayout(onLogoutClick: () -> Unit) {
+private fun AccountLayout(
+    githubUsername: String?,
+    onLogoutClick: () -> Unit,
+    onConnectGithubClick: (Context) -> Unit,
+    onDisconnectGithubClick: () -> Unit,
+) {
+    val context = LocalContext.current
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -100,6 +117,59 @@ private fun AccountLayout(onLogoutClick: () -> Unit) {
                 )
             )
             Spacer(modifier = Modifier.height(32.dp))
+
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+
+            if (githubUsername != null) {
+                Text(
+                    text = "GitHub: @$githubUsername",
+                    style = TextStyle(
+                        color = colorResource(id = R.color.main_title_text),
+                        fontSize = 16.sp,
+                        fontFamily = FontFamily.Monospace,
+                    )
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(2.dp, colorResource(id = R.color.grey_neutral)),
+                    colors = ButtonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = colorResource(id = R.color.grey_neutral),
+                        disabledContainerColor = Color.Transparent,
+                        disabledContentColor = colorResource(id = R.color.grey_neutral),
+                    ),
+                    onClick = onDisconnectGithubClick
+                ) {
+                    Text(
+                        text = "Отключить GitHub",
+                        style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    )
+                }
+            } else {
+                Button(
+                    shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(2.dp, colorResource(id = R.color.grey_neutral)),
+                    colors = ButtonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = colorResource(id = R.color.grey_neutral),
+                        disabledContainerColor = Color.Transparent,
+                        disabledContentColor = colorResource(id = R.color.grey_neutral),
+                    ),
+                    onClick = { onConnectGithubClick(context) }
+                ) {
+                    Text(
+                        text = "Подключить GitHub",
+                        style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+
             Button(
                 shape = RoundedCornerShape(8.dp),
                 border = BorderStroke(2.dp, Color.Red.copy(alpha = 0.6f)),

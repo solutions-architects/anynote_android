@@ -27,6 +27,12 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class LoginActivity : AppCompatActivity() {
     private val vm by viewModel<LoginViewModel>()
+
+    override fun onResume() {
+        super.onResume()
+        vm.refreshGithubState()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -61,6 +67,12 @@ class LoginActivity : AppCompatActivity() {
                                 },
                                 onLogoutClick = {
                                     vm.logout()
+                                },
+                                onConnectGithubClick = { context ->
+                                    vm.connectGithub(context)
+                                },
+                                onDisconnectGithubClick = {
+                                    vm.disconnectGithub()
                                 }
                             )
                         }

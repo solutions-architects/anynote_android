@@ -1,6 +1,9 @@
 package com.luckhost.lockscreen_notes.presentation.screens.userLogin
 
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,6 +11,9 @@ import com.luckhost.domain.models.Either
 import com.luckhost.domain.models.network.AuthToken
 import com.luckhost.domain.models.network.LoginInformation
 import com.luckhost.domain.models.network.RegisterInformation
+import com.luckhost.domain.useCases.github.ClearGithubConnectionUseCase
+import com.luckhost.domain.useCases.github.GetGithubUsernameUseCase
+import com.luckhost.domain.useCases.github.SaveGithubUsernameUseCase
 import com.luckhost.domain.useCases.network.GetAuthTokenUseCase
 import com.luckhost.domain.useCases.network.SignUpUseCase
 import com.luckhost.domain.useCases.network.VerifyEmailUseCase
@@ -21,18 +27,26 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.Locale
 
+private const val GITHUB_LOGIN_URL = "http://94.183.233.193/api/login/"
+
 class LoginViewModel(
     private val getAuthTokenUseCase: GetAuthTokenUseCase,
     private val signUpUseCase: SignUpUseCase,
     private val verifyEmailUseCase: VerifyEmailUseCase,
     private val clearLocalAuthTokenUseCase: ClearLocalAuthTokenUseCase,
     private val getLocalAuthTokenUseCase: GetLocalAuthTokenUseCase,
+    private val getGithubUsernameUseCase: GetGithubUsernameUseCase,
+    private val saveGithubUsernameUseCase: SaveGithubUsernameUseCase,
+    private val clearGithubConnectionUseCase: ClearGithubConnectionUseCase,
     private val resourceProvider: ResourceProvider,
 ): ViewModel() {
     private var authToken = AuthToken(null, null)
 
     private val _isLoggedIn = MutableStateFlow(checkIsLoggedIn())
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
+
+    private val _githubUsername = MutableStateFlow(getGithubUsernameUseCase.execute())
+    val githubUsername: StateFlow<String?> = _githubUsername.asStateFlow()
 
     private fun checkIsLoggedIn(): Boolean =
         getLocalAuthTokenUseCase.execute() is Either.Right
@@ -64,6 +78,21 @@ class LoginViewModel(
     fun logout() {
         clearLocalAuthTokenUseCase.execute()
         _isLoggedIn.value = false
+    }
+
+    fun connectGithub(context: Context) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(GITHUB_LOGIN_URL))
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
+    }
+
+    fun refreshGithubState() {
+        _githubUsername.value = getGithubUsernameUseCase.execute()
+    }
+
+    fun disconnectGithub() {
+        clearGithubConnectionUseCase.execute()
+        _githubUsername.value = null
     }
 
     fun clearErrorText() {

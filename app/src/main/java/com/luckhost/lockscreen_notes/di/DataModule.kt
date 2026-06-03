@@ -2,6 +2,8 @@ package com.luckhost.lockscreen_notes.di
 
 import com.luckhost.data.localStorage.cache.images.ImageCacheStorageImpl
 import com.luckhost.data.localStorage.cache.images.ImageCacheStorageInterface
+import com.luckhost.data.localStorage.keys.github.SharedPrefGithubStorage
+import com.luckhost.data.repository.GithubStorageRepoImpl
 import com.luckhost.data.repository.NotesRepositoryImpl
 import com.luckhost.data.localStorage.keys.tokens.SharedPrefTokensStorage
 import com.luckhost.data.localStorage.keys.tokens.TokensStorage
@@ -15,6 +17,7 @@ import com.luckhost.data.repository.AuthTokensRepoImpl
 import com.luckhost.data.repository.MediaCacheRepoImpl
 import com.luckhost.data.repository.NetworkServiceImpl
 import com.luckhost.domain.repository.AuthTokensRepoInterface
+import com.luckhost.domain.repository.GithubStorageInterface
 import com.luckhost.domain.repository.MediaCacheRepoInterface
 import com.luckhost.domain.repository.NetworkServiceInterface
 import com.luckhost.domain.repository.NotesRepositoryInterface
@@ -62,5 +65,9 @@ val dataModule = module {
 
     single<ImageCacheStorageInterface> {
         ImageCacheStorageImpl(context = get())
+    }
+
+    single<GithubStorageInterface> {
+        GithubStorageRepoImpl(storage = SharedPrefGithubStorage(context = get()))
     }
 }

@@ -1,6 +1,10 @@
 package com.luckhost.lockscreen_notes.di.domainModule
 
 import com.luckhost.domain.repository.AuthTokensRepoInterface
+import com.luckhost.domain.repository.GithubStorageInterface
+import com.luckhost.domain.useCases.github.ClearGithubConnectionUseCase
+import com.luckhost.domain.useCases.github.GetGithubUsernameUseCase
+import com.luckhost.domain.useCases.github.SaveGithubUsernameUseCase
 import com.luckhost.domain.useCases.network.ChangeNoteOnServerUseCase
 import com.luckhost.domain.useCases.network.ChangeUserAccountParamsUseCase
 import com.luckhost.domain.useCases.network.CreateNoteOnServerUseCase
@@ -82,5 +86,14 @@ val domainNetworkModule = module {
         VerifyEmailUseCase(
             netApi = get(),
         )
+    }
+    factory<GetGithubUsernameUseCase> {
+        GetGithubUsernameUseCase(repo = get<GithubStorageInterface>())
+    }
+    factory<SaveGithubUsernameUseCase> {
+        SaveGithubUsernameUseCase(repo = get<GithubStorageInterface>())
+    }
+    factory<ClearGithubConnectionUseCase> {
+        ClearGithubConnectionUseCase(repo = get<GithubStorageInterface>())
     }
 }

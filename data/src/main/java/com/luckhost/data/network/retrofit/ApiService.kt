@@ -53,17 +53,23 @@ interface ApiService {
 
 
 
-    @POST("auth/refresh/")
+    @POST("token/refresh/")
     suspend fun refreshAccessToken(@Body request: RefreshToken): Response<AccessToken>
 
-    @POST("auth/verify")
+    @POST("token/verify/")
     suspend fun verifyToken(@Body request: VerifyTokenRequest): Response<Request>
 
-    @GET("account")
+    @GET("profile/")
     suspend fun getAccountParams(
         @Header("Authorization") token: String): Response<AccountAnswerBody>
 
-    @PATCH("account")
+    @PATCH("profile/")
     suspend fun changeAccountParams(@Header("Authorization") token: String,
                                     @Body request: AccountParams): Response<Request>
+
+    @GET("github/init/")
+    suspend fun githubInit(@Header("Authorization") token: String): Response<Void>
+
+    @GET("github/get_user/")
+    suspend fun getGithubUser(@Header("Authorization") token: String): Response<Void>
 }
