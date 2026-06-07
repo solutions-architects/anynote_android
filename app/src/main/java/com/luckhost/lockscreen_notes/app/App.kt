@@ -2,6 +2,8 @@ package com.luckhost.lockscreen_notes.app
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
+import com.luckhost.data.localStorage.settings.LanguageStorage
 import com.luckhost.data.localStorage.settings.UiThemeStorage
 import com.luckhost.lockscreen_notes.di.appModule
 import com.luckhost.lockscreen_notes.di.dataModule
@@ -40,6 +42,12 @@ class App: Application() {
                 AppCompatDelegate.MODE_NIGHT_YES
             else
                 AppCompatDelegate.MODE_NIGHT_NO
+        )
+
+        val languageStorage by inject<LanguageStorage>()
+        val savedLanguage = languageStorage.getLanguage()
+        AppCompatDelegate.setApplicationLocales(
+            LocaleListCompat.forLanguageTags(savedLanguage)
         )
     }
 }

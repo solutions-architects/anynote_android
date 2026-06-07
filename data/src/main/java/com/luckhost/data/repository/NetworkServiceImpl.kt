@@ -127,7 +127,6 @@ class NetworkServiceImpl(
                     firstName = userParams.firstName,
                     lastName = userParams.lastName,
                     email = userParams.email,
-                    isStuff = userParams.isStuff
                 )
             )
 

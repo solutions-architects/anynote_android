@@ -53,6 +53,11 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".presentation.screens.profile.ProfileActivity"
+            android:exported="false"
+            android:label="Profile"
+            android:theme="@style/Theme.Lockscreen_notes" />
+        <activity
             android:name=".presentation.screens.settings.SettingsActivity"
             android:exported="false"
             android:label="@string/title_activity_settings"

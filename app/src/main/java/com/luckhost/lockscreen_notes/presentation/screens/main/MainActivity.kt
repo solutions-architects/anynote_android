@@ -73,8 +73,9 @@ import com.luckhost.lockscreen_notes.R
 import com.luckhost.lockscreen_notes.presentation.screens.main.additional.functions.DrawerBody
 import com.luckhost.lockscreen_notes.presentation.screens.main.additional.functions.DrawerHeader
 import com.luckhost.lockscreen_notes.presentation.screens.main.additional.functions.NoteBox
+import com.luckhost.lockscreen_notes.presentation.screens.profile.ProfileActivity
 import com.luckhost.lockscreen_notes.presentation.screens.settings.SettingsActivity
-import com.luckhost.lockscreen_notes.presentation.screens.userLogin.LoginActivity
+
 import com.luckhost.lockscreen_notes.ui.theme.Lockscreen_notesTheme
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -246,7 +247,7 @@ class MainActivity : AppCompatActivity() {
                                     top = 8.dp
                                 ),
                             onClick = {
-                                val intent = Intent(context, LoginActivity::class.java)
+                                val intent = Intent(context, ProfileActivity::class.java)
                                 context.startActivity(intent)
                             }) {
                             Icon(

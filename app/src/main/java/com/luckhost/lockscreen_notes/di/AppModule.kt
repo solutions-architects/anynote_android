@@ -1,6 +1,8 @@
 package com.luckhost.lockscreen_notes.di
 import com.luckhost.domain.useCases.settings.GetColumnsCountUseCase
+import com.luckhost.domain.useCases.settings.GetLanguageUseCase
 import com.luckhost.domain.useCases.settings.SetColumnsCountUseCase
+import com.luckhost.domain.useCases.settings.SetLanguageUseCase
 import com.luckhost.domain.useCases.theme.GetThemeStateUseCase
 import com.luckhost.domain.useCases.theme.ToggleThemeUseCase
 import com.luckhost.lockscreen_notes.presentation.screens.openNote.OpenNoteViewModel
@@ -12,6 +14,9 @@ import com.luckhost.domain.useCases.github.SaveGithubUsernameUseCase
 import com.luckhost.domain.useCases.network.localActions.ClearLocalAuthTokenUseCase
 import com.luckhost.domain.useCases.network.localActions.GetLocalAuthTokenUseCase
 import com.luckhost.lockscreen_notes.presentation.screens.userLogin.LoginViewModel
+import com.luckhost.lockscreen_notes.presentation.screens.profile.ProfileViewModel
+import com.luckhost.domain.useCases.network.ChangeUserAccountParamsUseCase
+import com.luckhost.domain.useCases.network.GetUserAccountParamsUseCase
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -37,7 +42,9 @@ val appModule = module {
             getThemeStateUseCase = get<GetThemeStateUseCase>(),
             toggleThemeUseCase = get<ToggleThemeUseCase>(),
             getColumnsCountUseCase = get<GetColumnsCountUseCase>(),
-            setColumnsCountUseCase = get<SetColumnsCountUseCase>()
+            setColumnsCountUseCase = get<SetColumnsCountUseCase>(),
+            getLanguageUseCase = get<GetLanguageUseCase>(),
+            setLanguageUseCase = get<SetLanguageUseCase>(),
         )
     }
 
@@ -62,6 +69,15 @@ val appModule = module {
             saveGithubUsernameUseCase = get<SaveGithubUsernameUseCase>(),
             clearGithubConnectionUseCase = get<ClearGithubConnectionUseCase>(),
             resourceProvider = get()
+        )
+    }
+
+    viewModel<ProfileViewModel> {
+        ProfileViewModel(
+            getUserAccountParamsUseCase = get<GetUserAccountParamsUseCase>(),
+            changeUserAccountParamsUseCase = get<ChangeUserAccountParamsUseCase>(),
+            getLocalAuthTokenUseCase = get<GetLocalAuthTokenUseCase>(),
+            clearLocalAuthTokenUseCase = get<ClearLocalAuthTokenUseCase>(),
         )
     }
 }
