@@ -27,7 +27,7 @@ fun InfoDialog(
                 markdown = mdText
             )
         },
-        containerColor = colorResource(id = R.color.black_and_brown),
+        containerColor = colorResource(id = R.color.light_grey),
         titleContentColor = colorResource(id = R.color.main_title_text),
         textContentColor = colorResource(id = R.color.main_title_text),
         confirmButton = {

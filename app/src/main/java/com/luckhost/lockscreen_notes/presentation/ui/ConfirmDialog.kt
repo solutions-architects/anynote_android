@@ -23,7 +23,7 @@ fun ConfirmDialog(
         onDismissRequest = { onBackHandler() },
         title = { Text(text = stringResource(id = R.string.confirm_dialog_question)) },
         text = { Text(text) },
-        containerColor = colorResource(id = R.color.black_and_brown),
+        containerColor = colorResource(id = R.color.light_grey),
         titleContentColor = colorResource(id = R.color.main_title_text),
         textContentColor = colorResource(id = R.color.main_title_text),
         confirmButton = {
@@ -45,7 +45,7 @@ fun ConfirmDialog(
             Button(
                 onClick = { onDismiss() },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = colorResource(id = R.color.black_and_brown),
+                    containerColor = colorResource(id = R.color.light_grey),
                     contentColor = colorResource(id = R.color.grey_neutral),
                 ),
                 border = BorderStroke(

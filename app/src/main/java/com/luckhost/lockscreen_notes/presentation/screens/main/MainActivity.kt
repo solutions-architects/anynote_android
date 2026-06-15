@@ -133,7 +133,7 @@ class MainActivity : AppCompatActivity() {
                     R.string.main_activity_permission_denied_title)) },
                 text = { Text(stringResource(id =
                     R.string.main_activity_image_read_permission_needed)) },
-                containerColor = colorResource(id = R.color.black_and_brown),
+                containerColor = colorResource(id = R.color.light_grey),
                 titleContentColor = colorResource(id = R.color.main_title_text),
                 textContentColor = colorResource(id = R.color.main_title_text),
                 dismissButton = {
@@ -143,7 +143,7 @@ class MainActivity : AppCompatActivity() {
                             activity?.finish()
                         },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = colorResource(id = R.color.black_and_brown),
+                            containerColor = colorResource(id = R.color.light_grey),
                             contentColor = colorResource(id = R.color.grey_neutral),
                         ),
                         border = BorderStroke(

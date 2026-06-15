@@ -1,8 +1,6 @@
 package com.luckhost.lockscreen_notes.di
 import com.luckhost.domain.useCases.settings.GetColumnsCountUseCase
-import com.luckhost.domain.useCases.settings.GetLanguageUseCase
 import com.luckhost.domain.useCases.settings.SetColumnsCountUseCase
-import com.luckhost.domain.useCases.settings.SetLanguageUseCase
 import com.luckhost.domain.useCases.theme.GetThemeStateUseCase
 import com.luckhost.domain.useCases.theme.ToggleThemeUseCase
 import com.luckhost.lockscreen_notes.presentation.screens.openNote.OpenNoteViewModel
@@ -43,8 +41,6 @@ val appModule = module {
             toggleThemeUseCase = get<ToggleThemeUseCase>(),
             getColumnsCountUseCase = get<GetColumnsCountUseCase>(),
             setColumnsCountUseCase = get<SetColumnsCountUseCase>(),
-            getLanguageUseCase = get<GetLanguageUseCase>(),
-            setLanguageUseCase = get<SetLanguageUseCase>(),
         )
     }
 
